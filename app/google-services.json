@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "310712169134",
+    "project_id": "foodkeeper-97d38",
+    "storage_bucket": "foodkeeper-97d38.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:310712169134:android:39986c3425a469d077f33f",
+        "android_client_info": {
+          "package_name": "com.example.foodkeeper"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC6yDwOS4hZUzuJFOuHWv6q_EYJWhrvrMo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
