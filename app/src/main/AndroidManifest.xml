@@ -2,29 +2,82 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
+
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@mipmap/app_logo"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:roundIcon="@mipmap/app_logo"
         android:supportsRtl="true"
         android:theme="@style/Theme.FoodKeeper">
         <activity
-            android:name=".DeleteActivity"
+            android:name=".Fridge.AddFridgeActivity"
             android:exported="false" />
         <activity
-            android:name=".ViewAnItemActivity"
+            android:name=".Fridge.ViewFridgeDetails"
             android:exported="false" />
         <activity
-            android:name=".ItemsViewActivity"
+            android:name=".Fridge.ManageFridgeActivity"
             android:exported="false" />
         <activity
-            android:name=".AddItemActivity"
+            android:name=".Fridge.EditFridgeActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ExpiringActivity"
+            android:exported="false" />
+        <activity
+            android:name=".MenuActivity"
+            android:exported="false" />
+        <activity
+            android:name=".MainActivity"
+            android:exported="false" />
+        <activity
+            android:name=".FoodItem.ViewAnItemActivity"
+            android:exported="false" />
+        <activity
+            android:name=".FoodItem.EditItemActivity"
             android:exported="false" />
         <activity
             android:name=".RegisterActivity"
+            android:exported="false" />
+        <activity
+            android:name=".FoodItem.ItemsViewActivity"
+            android:exported="false" />
+        <activity
+            android:name=".FoodItem.AddItemActivity"
+            android:exported="false" />
+        <activity
+            android:name=".Meal.UpdateMealActivity"
+            android:exported="false" />
+        <activity
+            android:name=".Meal.ViewMealActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ViewMeals.mealsViewActivity"
+            android:exported="false" />
+        <activity
+            android:name=".MealPlan.MealPlanActivity"
+            android:theme="@style/PopupTheme"
+            android:windowSoftInputMode="adjustPan" />
+        <activity android:name=".MealPlan.WeeklyViewActivity" />
+        <activity
+            android:name=".MealPlan.MonthlyViewActivity"
+            android:theme="@style/PopupTheme"
+            android:windowSoftInputMode="adjustPan" />
+        <activity android:name=".Meal.FullView" />
+        <activity android:name=".Meal.CreateMealActivity" />
+        <activity
+            android:name=".LoginActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

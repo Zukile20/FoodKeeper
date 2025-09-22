@@ -1,176 +1,232 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="16dp"
-    android:fillViewport="true">
+    android:background="@color/mainBlue">
+
+    <LinearLayout
+        android:id="@+id/linearLayout"
+        android:layout_width="353dp"
+        android:layout_height="38dp"
+        android:layout_gravity="center"
+        android:layout_marginTop="16dp"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <Button
+            android:id="@+id/backEditBtn"
+            android:layout_width="37dp"
+            android:layout_height="37dp"
+            android:contentDescription="back button"
+            android:background="@drawable/back_arrow"
+            android:drawableTint="@color/white"/>
+
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="144dp"
+            android:layout_height="32dp"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="Edit Food Item"
+            android:textColor="#ffffffff"
+            android:textSize="21sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/imageView4"
+        android:layout_width="265dp"
+        android:layout_height="244dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.168"
+        app:srcCompat="@drawable/white_circle" />
+
+    <ImageView
+        android:id="@+id/imageView6"
+        android:layout_width="match_parent"
+        android:layout_height="652dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:srcCompat="@drawable/white_background" />
+
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/editItemImage"
+        android:layout_width="207dp"
+        android:layout_height="198dp"
+        android:layout_gravity="center"
+        android:layout_marginTop="16dp"
+        android:scaleType="centerCrop"
+        android:backgroundTint="@color/black"
+        app:layout_constraintBottom_toBottomOf="@+id/imageView4"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/imageView4"
+        app:layout_constraintVertical_bias="0.371"
+        app:shapeAppearanceOverlay="@style/CircleImageView"
+        app:srcCompat="@drawable/image_placeholder"/>
+
+    <ScrollView
+        android:id="@+id/scroller"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fillViewport="true"
+        app:layout_constraintTop_toBottomOf="@id/imageView4"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/nameEditText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Name"
+                    android:inputType="textCapWords"/>
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/categoryEditText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Category"
+                    android:inputType="textCapWords"
+                    android:focusable="false"
+                    android:clickable="true"/>
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/txtDateLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:endIconMode="custom"
+                app:endIconDrawable="@drawable/ic_calendar"
+                app:endIconTint="@color/black"
+                app:endIconContentDescription="Open calendar">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/expiryDateEditText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Expiry Date"
+                    android:focusable="false"
+                    android:inputType="none"/>
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <LinearLayout
+                xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:background="@drawable/quantity_bg">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="Quantity: "
+                    android:textSize="17dp"
+                    android:layout_marginTop="15dp"/>
+
+                <Button
+                    android:id="@+id/btn_minus"
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:text="-"
+                    android:textSize="40dp"
+                    android:textColor="@color/black"
+                    android:stateListAnimator="@null"
+                    android:elevation="0dp"
+                    android:textAlignment="center"
+                    android:backgroundTint="@color/white"/>
+
+                <TextView
+                    android:id="@+id/tv_quantity"
+                    android:layout_width="60dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:text="0"
+                    android:textSize="18sp"
+                    android:gravity="center"
+                    android:padding="8dp"/>
+
+                <Button
+                    android:id="@+id/btn_plus"
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:text="+"
+                    android:textSize="40dp"
+                    android:stateListAnimator="@null"
+                    android:elevation="0dp"
+                    android:textColor="@color/mainBlue"
+                    android:textAlignment="center"
+                    android:backgroundTint="@color/white"/>
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:paddingTop="15dp">
-
-        <androidx.appcompat.widget.Toolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="@color/mainBlue"
-            android:elevation="4dp"
-            app:navigationIcon="@drawable/ic_arrow_back"
-            app:title="Add food item"
-            app:titleTextColor="@android:color/white"/>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="24dp"
-            android:gravity="center_horizontal"
-            android:orientation="vertical">
-
-            <ImageView
-                android:id="@+id/profileImageView"
-                android:layout_width="120dp"
-                android:layout_height="120dp"
-                android:background="@drawable/white_circle"
-                android:contentDescription="Profile image"
-                android:scaleType="centerCrop"
-                android:src="@drawable/placeholder"/>
-
-            <Button
-                android:id="@+id/uploadImageButton"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-
-                android:layout_marginTop="8dp"
-                android:text="Upload Photo"
-                android:textColor="@color/mainBlue" />
-        </LinearLayout>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textStyle="bold"
-            android:text="Name: "
-            android:textSize="17dp"
-            android:paddingBottom="10dp"/>
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/nameEditText"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Name"/>
-        </com.google.android.material.textfield.TextInputLayout>
-
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textStyle="bold"
-            android:text="Category: "
-            android:textSize="17dp"
-            android:paddingBottom="10dp"/>
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/categoryEditText"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Category"/>
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textStyle="bold"
-            android:text="Expiry Date: "
-            android:textSize="17dp"
-            android:paddingBottom="10dp"/>
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/expiryEditText"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Best Before"
-                android:inputType="date"/>
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textStyle="bold"
-            android:text="Quantity: "
-            android:textSize="17dp"
-            android:paddingBottom="10dp"/>
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/quantityLayout"
-            android:orientation="horizontal"
-            android:gravity="center"
-            android:layout_gravity="center"
-            android:padding="16dp">
-
-            <Button
-                android:id="@+id/minusButton"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="-"
-                android:textAllCaps="false"
-                android:textColor="@color/black"
-                android:textSize="50sp"
-                android:backgroundTint="#FEF7FF"/>
-
-            <TextView
-                android:id="@+id/textQuantity"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:gravity="center"
-                android:text="15"
-                android:textSize="18sp" />
-
-            <Button
-                android:id="@+id/plusButton"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="+"
-                android:textAllCaps="false"
-                android:textColor="@color/mainBlue"
-                android:textSize="30sp"
-                android:backgroundTint="#FEF7FF"/>
-        </LinearLayout>
+        android:layout_height="0dp"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:gravity="center"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/scroller" >
 
         <Button
-            android:id="@+id/addItemButton"
-            android:layout_width="match_parent"
+            android:id="@+id/cancelButton"
+            android:layout_width="150dp"
             android:layout_height="wrap_content"
-            android:text="Add Item"
+            android:layout_marginTop="24dp"
+            android:gravity="center_horizontal"
+            android:text="Cancel"
+            android:textAllCaps="false"
+            android:background="@drawable/rounded_button"
+            android:textColor="@color/white"
+            app:backgroundTint="@color/grey"
+            android:textAlignment="center"
+            android:layout_marginEnd="50dp"/>
+
+        <Button
+            android:id="@+id/saveButton"
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:background="@drawable/rounded_button"
+            android:gravity="center_horizontal"
+            android:text="Save"
+            android:textAlignment="center"
             android:textAllCaps="false"
             android:textColor="@color/white"
-            android:textSize="16sp"
-            android:layout_marginBottom="10dp"
-            android:backgroundTint="@color/mainBlue"/>
-
+            app:backgroundTint="@color/mainBlue" />
     </LinearLayout>
-</ScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

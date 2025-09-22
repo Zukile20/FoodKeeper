@@ -5,4 +5,18 @@
     <color name="mainBlue">#40B4FC</color>
     <color name="grey">#9E9E9E</color>
     <color name="light_grey">#E0E0E0</color>
+    <color name="red">#FF5252</color>
+    <color name="green">#4CAF50</color>
+    <color name="orange">#FB8C00</color>
+    <color name="dark_blue">#0D47A1</color>
+    <color name="medium_blue">#64B5F6</color>
+    <color name="light_blue_background">#E3F2FD</color>
+    <color name="blue">#56aeff</color>
+    <color name="light_pink">#fbf6f3</color>
+    <color name="yellow">#ffde59</color>
+
+
+    <style name="BLUE_LABEL" parent="Widget.AppCompat.Button">
+        <item name="backgroundTint">#38b6ff</item>
+    </style>
 </resources>
