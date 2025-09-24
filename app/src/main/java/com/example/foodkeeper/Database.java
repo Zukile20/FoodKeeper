@@ -1,5 +1,7 @@
 package com.example.foodkeeper;
 
+import static androidx.room.RoomMasterTable.TABLE_NAME;
+
 import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.content.Context;
@@ -564,7 +566,6 @@ public class Database extends SQLiteOpenHelper {
 //        }
 //        return 0;
 //    }
-
     private void createTables(SQLiteDatabase db) {
         fridgeUserItemTables(db);
         createMealPlanMealTables(db);
@@ -707,59 +708,6 @@ public class Database extends SQLiteOpenHelper {
 
         cursor.close();
         return foodItems;
-    }
-
-    // RECIPE METHODS
-    public static final String TABLE_RECIPES = "recipes";
-    public static final String COLUMN_ID = "id";
-    public static final String COLUMN_TITLE = "Recipe_Name";
-    public static final String COLUMN_IMAGE = "Recipe_image";
-    public static final String COLUMN_LIKES = "Recipe_likes";
-    public static final String COLUMN_TIME = "Cooking_time";
-    public static final String COLUMN_SERVINGS = "Recipe_servings";
-    public static final String COLUMN_FAVORITE = "Favorite";
-
-    public static final String TABLE_INGREDIENTS = "Ingredients";
-    public static final String COLUMN_INGREDIENT_ID = "Ingredient_id";
-    public static final String COLUMN_INGREDIENT_NAME = "Ingredient_Name";
-
-    public static final String TABLE_RECIPE_INGREDIENTS = "Recipe_Ingredients";
-
-    public static final String TABLE_INSTRUCTIONS = "Instructions";
-    public static final String COLUMN_INSTRUCTION_ID = "Instruction_id";
-    public static final String COLUMN_STEP_NUMBER = "Step_number";
-    public static final String COLUMN_STEPS = "Step";
-    public static final String COLUMN_RECIPE_ID = "Recipe_id";
-
-    private void createRecipeTables(SQLiteDatabase db) {
-        db.execSQL("PRAGMA foreign_keys=ON");
-
-        db.execSQL("CREATE TABLE " + TABLE_RECIPES + " (" +
-                COLUMN_ID + " INTEGER PRIMARY KEY, " +
-                COLUMN_TITLE + " TEXT, " +
-                COLUMN_IMAGE + " TEXT, " +
-                COLUMN_LIKES + " INTEGER, " +
-                COLUMN_TIME + " INTEGER, " +
-                COLUMN_SERVINGS + " INTEGER, " +
-                COLUMN_FAVORITE + " INTEGER DEFAULT 0)");
-
-        db.execSQL("CREATE TABLE " + TABLE_INGREDIENTS + " (" +
-                COLUMN_INGREDIENT_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                COLUMN_INGREDIENT_NAME + " TEXT NOT NULL UNIQUE)");
-
-        db.execSQL("CREATE TABLE " + TABLE_RECIPE_INGREDIENTS + " (" +
-                COLUMN_RECIPE_ID + " INTEGER, " +
-                COLUMN_INGREDIENT_ID + " INTEGER, " +
-                "PRIMARY KEY (" + COLUMN_RECIPE_ID + ", " + COLUMN_INGREDIENT_ID + "), " +
-                "FOREIGN KEY (" + COLUMN_RECIPE_ID + ") REFERENCES " + TABLE_RECIPES + "(" + COLUMN_ID + ") ON DELETE CASCADE, " +
-                "FOREIGN KEY (" + COLUMN_INGREDIENT_ID + ") REFERENCES " + TABLE_INGREDIENTS + "(" + COLUMN_INGREDIENT_ID + ") ON DELETE CASCADE)");
-
-        db.execSQL("CREATE TABLE " + TABLE_INSTRUCTIONS + " (" +
-                COLUMN_INSTRUCTION_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                COLUMN_RECIPE_ID + " INTEGER, " +
-                COLUMN_STEP_NUMBER + " INTEGER, " +
-                COLUMN_STEPS + " TEXT, " +
-                "FOREIGN KEY (" + COLUMN_RECIPE_ID + ") REFERENCES " + TABLE_RECIPES + "(" + COLUMN_ID + ") ON DELETE CASCADE)");
     }
 
     // MEAL PLAN METHODS
@@ -928,21 +876,6 @@ public class Database extends SQLiteOpenHelper {
         db.delete("Meal", "mealID =?", new String[]{String.valueOf(meal.getMealID())});
     }
 
-    // SHOPPING LIST METHODS
-    private static final String SHOPPING_TABLE_NAME = "my_shoppingList";
-    private static final String SHOPPING_COLUMN_ID = "ShoppingList_ItemID";
-    private static final String SHOPPING_COLUMN_NAME = "ShoppingList_ItemName";
-    private static final String SHOPPING_COLUMN_QTY = "ShoppingList_ItemQTY";
-    private static final String SHOPPING_COLUMN_BOUGHT = "ShoppingList_ItemBought";
-
-    private void createShoppingListTable(SQLiteDatabase db) {
-        String query = "CREATE TABLE " + SHOPPING_TABLE_NAME +
-                " (" + SHOPPING_COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                SHOPPING_COLUMN_NAME + " TEXT, " +
-                SHOPPING_COLUMN_QTY + " INTEGER ," +
-                SHOPPING_COLUMN_BOUGHT + " INTEGER);";
-        db.execSQL(query);
-    }
 
     private void createMealPlanMealTables(SQLiteDatabase db) {
         String createMealTable = "CREATE TABLE Meal (" +
@@ -975,4 +908,134 @@ public class Database extends SQLiteOpenHelper {
                 ")";
         db.execSQL(createMealPlanTable);
     }
+
+    // RECIPE METHODS
+    public static final String TABLE_RECIPES = "recipes";
+    public static final String COLUMN_ID = "id";
+    public static final String COLUMN_TITLE = "Recipe_Name";
+    public static final String COLUMN_IMAGE = "Recipe_image";
+    public static final String COLUMN_LIKES = "Recipe_likes";
+    public static final String COLUMN_TIME = "Cooking_time";
+    public static final String COLUMN_SERVINGS = "Recipe_servings";
+    public static final String COLUMN_FAVORITE = "Favorite";
+
+    public static final String TABLE_INGREDIENTS = "Ingredients";
+    public static final String COLUMN_INGREDIENT_ID = "Ingredient_id";
+    public static final String COLUMN_INGREDIENT_NAME = "Ingredient_Name";
+
+    public static final String TABLE_RECIPE_INGREDIENTS = "Recipe_Ingredients";
+
+    public static final String TABLE_INSTRUCTIONS = "Instructions";
+    public static final String COLUMN_INSTRUCTION_ID = "Instruction_id";
+    public static final String COLUMN_STEP_NUMBER = "Step_number";
+    public static final String COLUMN_STEPS = "Step";
+    public static final String COLUMN_RECIPE_ID = "Recipe_id";
+
+    private void createRecipeTables(SQLiteDatabase db) {
+        db.execSQL("PRAGMA foreign_keys=ON");
+
+        db.execSQL("CREATE TABLE " + TABLE_RECIPES + " (" +
+                COLUMN_ID + " INTEGER PRIMARY KEY, " +
+                COLUMN_TITLE + " TEXT, " +
+                COLUMN_IMAGE + " TEXT, " +
+                COLUMN_LIKES + " INTEGER, " +
+                COLUMN_TIME + " INTEGER, " +
+                COLUMN_SERVINGS + " INTEGER, " +
+                COLUMN_FAVORITE + " INTEGER DEFAULT 0)");
+
+        db.execSQL("CREATE TABLE " + TABLE_INGREDIENTS + " (" +
+                COLUMN_INGREDIENT_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                COLUMN_INGREDIENT_NAME + " TEXT NOT NULL UNIQUE)");
+
+        db.execSQL("CREATE TABLE " + TABLE_RECIPE_INGREDIENTS + " (" +
+                COLUMN_RECIPE_ID + " INTEGER, " +
+                COLUMN_INGREDIENT_ID + " INTEGER, " +
+                "PRIMARY KEY (" + COLUMN_RECIPE_ID + ", " + COLUMN_INGREDIENT_ID + "), " +
+                "FOREIGN KEY (" + COLUMN_RECIPE_ID + ") REFERENCES " + TABLE_RECIPES + "(" + COLUMN_ID + ") ON DELETE CASCADE, " +
+                "FOREIGN KEY (" + COLUMN_INGREDIENT_ID + ") REFERENCES " + TABLE_INGREDIENTS + "(" + COLUMN_INGREDIENT_ID + ") ON DELETE CASCADE)");
+
+        db.execSQL("CREATE TABLE " + TABLE_INSTRUCTIONS + " (" +
+                COLUMN_INSTRUCTION_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                COLUMN_RECIPE_ID + " INTEGER, " +
+                COLUMN_STEP_NUMBER + " INTEGER, " +
+                COLUMN_STEPS + " TEXT, " +
+                "FOREIGN KEY (" + COLUMN_RECIPE_ID + ") REFERENCES " + TABLE_RECIPES + "(" + COLUMN_ID + ") ON DELETE CASCADE)");
+    }
+
+
+
+
+
+
+    // SHOPPING LIST METHODS
+    private static final String SHOPPING_TABLE_NAME = "my_shoppingList";
+    private static final String SHOPPING_COLUMN_ID = "ShoppingList_ItemID";
+    private static final String SHOPPING_COLUMN_NAME = "ShoppingList_ItemName";
+    private static final String SHOPPING_COLUMN_QTY = "ShoppingList_ItemQTY";
+    private static final String SHOPPING_COLUMN_BOUGHT = "ShoppingList_ItemBought";
+    private void createShoppingListTable(SQLiteDatabase db) {
+        String query = "CREATE TABLE " + SHOPPING_TABLE_NAME +
+                " (" + SHOPPING_COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                SHOPPING_COLUMN_NAME + " TEXT, " +
+                SHOPPING_COLUMN_QTY + " INTEGER ," +
+                SHOPPING_COLUMN_BOUGHT + " INTEGER);";
+        db.execSQL(query);
+    }
+    public long AddItem(String ItemName, int ItemQty){
+
+        SQLiteDatabase db= this.getWritableDatabase();
+        ContentValues cv= new ContentValues();
+
+        cv.put(SHOPPING_COLUMN_NAME,ItemName);
+        cv.put(SHOPPING_COLUMN_QTY,ItemQty);
+        cv.put(SHOPPING_COLUMN_BOUGHT,0);
+
+        long results= db.insert(SHOPPING_TABLE_NAME,null,cv);
+
+        if(results==-1)
+        {
+            Toast.makeText(context, "Failed", Toast.LENGTH_SHORT).show();
+        }
+        else {
+            Toast.makeText(context, "Added Successfully", Toast.LENGTH_SHORT).show();
+        }
+        return results;
+    }
+    public Cursor readAllData(){
+
+        String query = "SELECT * FROM " + SHOPPING_TABLE_NAME;
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cursor = null;
+        if (db != null) {
+            cursor = db.rawQuery(query, null);
+        }
+        return cursor;
+    }
+    public void deleteItemById(int id) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        int result = db.delete(SHOPPING_TABLE_NAME, SHOPPING_COLUMN_ID + "=?", new String[]{String.valueOf(id)});
+
+        if (result == -1) {
+            Toast.makeText(context, "Failed to delete item", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(context, "Item deleted", Toast.LENGTH_SHORT).show();
+        }
+    }
+    public void UpdateItemShoppingList(int id){
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues cv = new ContentValues();
+        cv.put(SHOPPING_COLUMN_BOUGHT,1);
+        db.update(SHOPPING_TABLE_NAME, cv  ,SHOPPING_COLUMN_ID+"=?" ,new String[]{String.valueOf(id)});
+    }
+    public void UpdateItemBackShoppingList(int id) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues cv = new ContentValues();
+        cv.put(SHOPPING_COLUMN_BOUGHT, 0); // Unmark as bought
+        db.update(SHOPPING_COLUMN_BOUGHT, cv, SHOPPING_COLUMN_ID + "=?", new String[]{String.valueOf(id)});
+    }
+
+
+
 }

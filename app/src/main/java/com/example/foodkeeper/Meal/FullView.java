@@ -14,9 +14,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.foodkeeper.Database;
 import com.example.foodkeeper.FoodItem.FoodItem;
-import com.example.foodkeeper.FoodkeeperUtils.Database;
 import com.example.foodkeeper.R;
+import com.example.foodkeeper.SessionManager;
 
 import java.util.ArrayList;
 
@@ -28,25 +29,27 @@ public class FullView extends AppCompatActivity implements FoodSelectionAdapter.
     private RecyclerView recyclerView;
     private Button backBtn;
     private EditText searchText;
+    private SessionManager session;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_full_view);
+
         getIntentData();
         initializeViews();
         setupRecyclerView();
         setupListeners();
     }
-
     private void getIntentData() {
         Database db = Database.getInstance(this);
+        session= new SessionManager(this);
         Intent intent = getIntent();
         if (intent != null) {
             // Get the FoodItem objects directly from prev.ious activity
             if (intent.hasExtra("foodItems")) {
                 ArrayList<String> selectedItems = intent.getStringArrayListExtra("foodItems");
-               FOOD_ITEMS = (ArrayList<FoodItem>)db.getAllFoodItems();
+               FOOD_ITEMS = (ArrayList<FoodItem>)db.getFoodItemsInConnectedFridge(session.getUserEmail());
                markSelectedItems(selectedItems);
 
             }

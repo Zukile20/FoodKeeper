@@ -35,7 +35,7 @@ import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
-import com.example.foodkeeper.FoodkeeperUtils.Database;
+import com.example.foodkeeper.Database;
 import com.example.foodkeeper.FoodkeeperUtils.DeleteConfirmationDialog;
 import com.example.foodkeeper.Meal.Meal;
 import com.example.foodkeeper.Meal.UpdateMealActivity;

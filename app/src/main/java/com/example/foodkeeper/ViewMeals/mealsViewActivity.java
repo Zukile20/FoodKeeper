@@ -18,7 +18,6 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.foodkeeper.FoodkeeperUtils.Database;
 import com.example.foodkeeper.FoodkeeperUtils.SwipeRevealCallback;
 import com.example.foodkeeper.Meal.CreateMealActivity;
 import com.example.foodkeeper.Meal.Meal;

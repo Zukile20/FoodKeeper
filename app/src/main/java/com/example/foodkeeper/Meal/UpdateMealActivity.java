@@ -21,9 +21,10 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.example.foodkeeper.Database;
 import com.example.foodkeeper.FoodItem.FoodItem;
-import com.example.foodkeeper.FoodkeeperUtils.Database;
 import com.example.foodkeeper.R;
+import com.example.foodkeeper.SessionManager;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -54,6 +55,7 @@ public class UpdateMealActivity extends AppCompatActivity implements FoodSelecti
     private TextView counterTextViewer;
     private Button saveBtn,loadImage,backBtn,fullViewBtn;
     private Database db ;
+    private SessionManager session;
     FoodSelectionAdapter adapter ;
     private boolean imageSelectedForCurrentMeal = false;
     private Uri selectedImageUri ;
@@ -120,7 +122,9 @@ public class UpdateMealActivity extends AppCompatActivity implements FoodSelecti
     }
     private void loadData()
     {
-        FOOD_ITEMS.addAll(db.getAllFoodItems());
+        session= new SessionManager(this);
+
+        FOOD_ITEMS.addAll(db.getFoodItemsInConnectedFridge(session.getUserEmail()));
     }
     private void initializeFields()
     {

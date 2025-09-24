@@ -77,6 +77,9 @@
         <activity android:name=".Meal.FullView" />
         <activity android:name=".Meal.CreateMealActivity" />
         <activity
+            android:name=".ShoppingList.MainShoppingListActivity"
+            android:exported="false" />
+        <activity
             android:name=".LoginActivity"
             android:exported="true">
             <intent-filter>
