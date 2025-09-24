@@ -101,13 +101,10 @@ public class RegisterActivity extends AppCompatActivity {
             return;
         }
 
-        Integer phone = null;
         Integer fridgeSize = null;
-        try {
-            phone = Integer.parseInt(phoneStr);
-            fridgeSize = Integer.parseInt(fridgeSizeStr);
-        } catch (NumberFormatException e) {
-            Toast.makeText(getApplicationContext(), "Please enter valid numbers for phone and fridge size", Toast.LENGTH_SHORT).show();
+        String phone = phoneStr;
+        if (!phone.matches("\\d+")) {
+            Toast.makeText(getApplicationContext(), "Please enter a valid phone number", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -127,7 +124,7 @@ public class RegisterActivity extends AppCompatActivity {
             finish();
         }
 
-        db.register(name, surname, email, phone, password, imageBlob);
+        db.register(name, surname, email, Integer.valueOf(phone), password, imageBlob);
 
         Fridge fridge = new Fridge(fridgeBrand, fridgeModel, fridgeDescription, fridgeSize, true, null);
         long fridgeId = db.addFridge(fridge,email);

@@ -17,7 +17,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.168"
-        app:srcCompat="@drawable/white_circle" />
+        app:srcCompat="@drawable/circle_background_white" />
 
     <ImageView
         android:id="@+id/imageView6"
@@ -77,7 +77,7 @@
             android:id="@+id/backBtn"
             android:layout_width="37dp"
             android:layout_height="37dp"
-            android:background="@drawable/back_arrow"
+            android:background="@drawable/back_white_arrow"
             android:contentDescription="back button" />
 
         <TextView

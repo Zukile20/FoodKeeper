@@ -21,7 +21,7 @@
             android:id="@+id/backEditFridgeBtn"
             android:layout_width="37dp"
             android:layout_height="37dp"
-            android:background="@drawable/back_arrow"
+            android:background="@drawable/back_white_arrow"
             android:contentDescription="back button"
             android:drawableTint="@color/white" />
 
@@ -46,7 +46,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/linearLayout"
         app:layout_constraintVertical_bias="0.0"
-        app:srcCompat="@drawable/white_circle" />
+        app:srcCompat="@drawable/circle_background_blue" />
 
     <ImageView
         android:id="@+id/imageView6"

@@ -5,6 +5,8 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -85,6 +87,20 @@ public class AddFridgeActivity extends AppCompatActivity {
                 addFridge();
             }
         });
+        numberEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                try {
+                    fridgeSize = Integer.parseInt(s.toString());
+                } catch (NumberFormatException e) {
+                    fridgeSize = 0;
+                }
+            }
+            @Override
+            public void afterTextChanged(Editable s){}
+                });
     }
     private void openImagePicker() {
         Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
@@ -112,7 +128,7 @@ public class AddFridgeActivity extends AppCompatActivity {
         String description = descriptionEditText.getText().toString().trim();
         String sizeStr = numberEditText.getText().toString().trim();
 
-        if (brand.isEmpty() || model.isEmpty() || Integer.parseInt(sizeStr) <=0) {
+        if (brand.isEmpty() || model.isEmpty() || fridgeSize <= 0) {
             Toast.makeText(this, "Please fill in all details", Toast.LENGTH_SHORT).show();
             return;
         }

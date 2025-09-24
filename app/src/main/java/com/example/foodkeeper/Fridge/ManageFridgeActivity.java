@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.se.omapi.Session;
 import android.view.View;
+import android.widget.ImageButton;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -11,6 +12,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.foodkeeper.Database;
+import com.example.foodkeeper.MenuActivity;
 import com.example.foodkeeper.R;
 import com.example.foodkeeper.SessionManager;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -22,6 +24,7 @@ public class ManageFridgeActivity extends AppCompatActivity {
     private FloatingActionButton fabAddItem;
     private ArrayList<Fridge> fridgeList;
     private FridgeAdapter adapter;
+    private ImageButton backBtn;
     private Database db;
     private SessionManager session;
     @Override
@@ -59,6 +62,9 @@ public class ManageFridgeActivity extends AppCompatActivity {
                 startActivityForResult(intent, 2);
             }
         });
+        backBtn = findViewById(R.id.backFridgeBtn);
+        backBtn.setOnClickListener(v -> {
+            startActivity(new Intent(this, MenuActivity.class));});
     }
 
     private void refreshList() {
@@ -103,6 +109,7 @@ public class ManageFridgeActivity extends AppCompatActivity {
                         }
                     }
                 }
+                refreshList();
             }
             else if (data.hasExtra("UPDATED_FRIDGE_ID")) {
                 int updatedFridgeId = data.getIntExtra("UPDATED_FRIDGE_ID", -1);

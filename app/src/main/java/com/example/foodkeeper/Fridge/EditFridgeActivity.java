@@ -7,10 +7,13 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
+
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -19,6 +22,7 @@ import com.example.foodkeeper.R;
 import com.example.foodkeeper.SessionManager;
 import com.google.android.material.imageview.ShapeableImageView;
 import com.google.android.material.textfield.TextInputEditText;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
@@ -34,7 +38,7 @@ public class EditFridgeActivity extends AppCompatActivity {
     private Bitmap selectedImage;
     private static final int PICK_IMAGE_REQUEST = 1;
     private int fridgeId;
-    SessionManager session ;
+    SessionManager session;
 
 
     @Override
@@ -84,9 +88,28 @@ public class EditFridgeActivity extends AppCompatActivity {
         }
 
         loadFridgeDetails(fridgeId);
+        numberEditFridgeText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                try {
+                    fridgeSize = Integer.parseInt(s.toString());
+                } catch (NumberFormatException e) {
+                    fridgeSize = 0;
+                }
+            }
+        });
     }
+
     private void loadFridgeDetails(int fridgeId) {
-        currentFridge = db.getFridgeById(fridgeId,session.getUserEmail());
+        currentFridge = db.getFridgeById(fridgeId, session.getUserEmail());
 
         if (currentFridge == null) {
             Toast.makeText(this, "Failed to load fridge details", Toast.LENGTH_SHORT).show();
@@ -112,10 +135,12 @@ public class EditFridgeActivity extends AppCompatActivity {
             fridgeEditImage.setImageResource(R.drawable.image_placeholder);
         }
     }
+
     private void openImagePicker() {
         Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         startActivityForResult(intent, PICK_IMAGE_REQUEST);
     }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -131,55 +156,52 @@ public class EditFridgeActivity extends AppCompatActivity {
             }
         }
     }
+
     private void saveFridgeDetails() {
         String brand = brandEditFridgeText.getText().toString().trim();
         String model = modelEditFridgeText.getText().toString().trim();
         String description = descriptionEditFridgeText.getText().toString().trim();
         String sizeStr = numberEditFridgeText.getText().toString().trim();
 
-        if (brand.isEmpty() || model.isEmpty() || Integer.parseInt(sizeStr) <=0) {
+        if (brand.isEmpty() || model.isEmpty() || Integer.parseInt(sizeStr) <= 0) {
             Toast.makeText(this, "Please fill in all details", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        try {
-            int size = Integer.parseInt(sizeStr);
+        currentFridge.setBrand(brand);
+        currentFridge.setModel(model);
+        currentFridge.setDescription(description);
+        currentFridge.setSize(fridgeSize);
 
-            currentFridge.setBrand(brand);
-            currentFridge.setModel(model);
-            currentFridge.setDescription(description);
-            currentFridge.setSize(size);
-
-            byte[] imageData = null;
-            if (selectedImage != null) {
-                ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                selectedImage.compress(Bitmap.CompressFormat.JPEG, 70, stream);
-                imageData = stream.toByteArray();
-                currentFridge.setImage(imageData);
-            }
-
-            boolean updated = db.updateFridge(currentFridge,session.getUserEmail());
-
-            if (updated) {
-                Toast.makeText(this, "Fridge updated successfully", Toast.LENGTH_SHORT).show();
-                Intent resultIntent = new Intent();
-                resultIntent.putExtra("UPDATED_FRIDGE_ID", fridgeId);
-                setResult(RESULT_OK, resultIntent);
-                finish();
-            } else {
-                Toast.makeText(this, "Failed to update fridge", Toast.LENGTH_SHORT).show();
-            }
-
-        } catch (NumberFormatException e) {
-            Toast.makeText(this, "Please enter a valid size", Toast.LENGTH_SHORT).show();
+        byte[] imageData = null;
+        if (selectedImage != null) {
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            selectedImage.compress(Bitmap.CompressFormat.JPEG, 70, stream);
+            imageData = stream.toByteArray();
+            currentFridge.setImage(imageData);
         }
+
+        boolean updated = db.updateFridge(currentFridge, session.getUserEmail());
+
+        if (updated) {
+            Toast.makeText(this, "Fridge updated successfully", Toast.LENGTH_SHORT).show();
+            Intent resultIntent = new Intent();
+            resultIntent.putExtra("UPDATED_FRIDGE_ID", fridgeId);
+            setResult(RESULT_OK, resultIntent);
+            finish();
+        } else {
+            Toast.makeText(this, "Failed to update fridge", Toast.LENGTH_SHORT).show();
+        }
+
     }
+
     @SuppressLint("GestureBackNavigation")
     @Override
-    public void onBackPressed(){
+    public void onBackPressed() {
         super.onBackPressed();
         overridePendingTransition(0, 0);
     }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();

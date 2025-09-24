@@ -31,7 +31,7 @@
             android:layout_height="32dp"
             android:layout_weight="1"
             android:gravity="center"
-            android:text="Edit Food Item"
+            android:text="My profile"
             android:textColor="#ffffffff"
             android:textSize="21sp"
             android:textStyle="bold" />

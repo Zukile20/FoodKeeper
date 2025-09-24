@@ -17,6 +17,8 @@ import com.example.foodkeeper.DeleteDialog;
 import com.example.foodkeeper.R;
 import com.example.foodkeeper.SessionManager;
 
+import java.util.ArrayList;
+
 public class ViewFridgeDetails extends AppCompatActivity implements DeleteDialog.OnDeleteConfirmListener {
 
     private ImageView fridgeDetailImage;
@@ -125,11 +127,25 @@ public class ViewFridgeDetails extends AppCompatActivity implements DeleteDialog
 
     @Override
     public void onDeleteConfirmed() {
+        boolean wasConnected = currentFridge.isLoggedIn();
+
         boolean deleted = db.deleteFridge(currentFridge.getId(),session.getUserEmail());
         if (deleted) {
             Toast.makeText(this, "Fridge deleted", Toast.LENGTH_SHORT).show();
+
             Intent resultIntent = new Intent();
             resultIntent.putExtra("DELETED_FRIDGE_ID", currentFridge.getId());
+
+            if (wasConnected) {
+                ArrayList<Fridge> allFridges = new ArrayList<>(db.getUserFridges(session.getUserEmail()));
+                if (!allFridges.isEmpty()) {
+                    Fridge nextFridge = allFridges.get(0);
+                    db.logIntoFridge(nextFridge.getId(),session.getUserEmail());
+
+                    resultIntent.putExtra("CONNECTED_FRIDGE_ID", nextFridge.getId());
+                }
+            }
+
             setResult(RESULT_OK, resultIntent);
             finish();
         } else {
