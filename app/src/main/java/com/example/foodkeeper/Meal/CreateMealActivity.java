@@ -155,12 +155,12 @@ public class CreateMealActivity extends AppCompatActivity implements FoodSelecti
             imageSelectedForCurrentMeal = false;
             selectedImageUri = null;
 
-            long mealID = db.createMeal(name, imageUri);
-            Meal meal = new Meal(mealID, name, R.drawable.place_holder);
+//            long mealID = db.createMeal(name, imageUri);
+//            Meal meal = new Meal(mealID, name, R.drawable.place_holder);
 
-            meal.setFoodItemIDs(foodItemAdapter.getSelectedItemIds());
-            db.updateMeal(meal);//creates a new meal
-            return String.valueOf(mealID);
+//            meal.setFoodItemIDs(foodItemAdapter.getSelectedItemIds());
+//            db.updateMeal(meal);//creates a new meal
+            return null;
         }
         catch (IOException e) {
             throw new RuntimeException(e);

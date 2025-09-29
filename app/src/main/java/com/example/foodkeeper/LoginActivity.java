@@ -3,6 +3,8 @@ package com.example.foodkeeper;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -35,13 +37,17 @@ public class LoginActivity extends AppCompatActivity {
 
         db = new Database(this);
         SessionManager sess = new SessionManager(this);
-        if(sess.isLoggedIn())
-        {
-            startActivity(new Intent(this, ItemsViewActivity.class));
-            finish();
-            return;
-        }
+        if (sess.isLoggedIn()) {
 
+
+            if (isEmailExists(sess.getUserEmail())) {
+                startActivity(new Intent(this, ItemsViewActivity.class));
+                finish();
+                return;
+            } else {
+                sess.logoutUser();
+            }
+        }
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -89,5 +95,12 @@ public class LoginActivity extends AppCompatActivity {
     protected void onDestroy() {
         db.close();
         super.onDestroy();
+    }
+    private boolean isEmailExists(String email) {
+        SQLiteDatabase db = this.db.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT * FROM users WHERE email = ?", new String[]{email});
+        boolean exists = cursor.getCount() > 0;
+        cursor.close();
+        return exists;
     }
 }

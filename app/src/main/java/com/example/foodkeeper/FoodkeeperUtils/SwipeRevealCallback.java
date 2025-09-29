@@ -35,19 +35,15 @@ public class SwipeRevealCallback extends ItemTouchHelper.SimpleCallback {
         this.adapter = adapter;
         this.context = adapter.getContext();
 
-        // Initialize icons
         editIcon = ContextCompat.getDrawable(context, R.drawable.ic_edit);
         deleteIcon = ContextCompat.getDrawable(context, R.drawable.trash);
 
-        // Dimensions
         buttonWidth = dpToPx(80);
         iconSize = dpToPx(24);
 
-        // Colors
         editColor = ContextCompat.getColor(context, R.color.blue);
-        deleteColor = ContextCompat.getColor(context, R.color.grey);
+        deleteColor = ContextCompat.getColor(context, R.color.red);
 
-        // Paint for buttons
         buttonPaint = new Paint();
         buttonPaint.setAntiAlias(true);
     }
@@ -70,11 +66,9 @@ public class SwipeRevealCallback extends ItemTouchHelper.SimpleCallback {
 
     @Override
     public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
-        // Mark this position as swiped and keep buttons revealed
         currentSwipedPosition = viewHolder.getAdapterPosition();
         buttonsRevealed = true;
 
-        // Keep the item in swiped position by setting translation (positive for right swipe)
         View itemView = viewHolder.itemView;
         float maxSwipeDistance = buttonWidth * 2;
         itemView.setTranslationX(maxSwipeDistance);
@@ -89,13 +83,11 @@ public class SwipeRevealCallback extends ItemTouchHelper.SimpleCallback {
             View itemView = viewHolder.itemView;
             int itemHeight = itemView.getHeight();
 
-            // Limit swipe distance to show both buttons
             float maxSwipeDistance = buttonWidth * 2;
             if (Math.abs(dX) > maxSwipeDistance) {
                 dX = dX > 0 ? maxSwipeDistance : -maxSwipeDistance;
             }
 
-            // Draw buttons when swiping right
             if (dX > 0) {
                 drawButtons(c, itemView, dX, itemHeight);
             }
@@ -111,16 +103,13 @@ public class SwipeRevealCallback extends ItemTouchHelper.SimpleCallback {
         float deleteRight = itemView.getLeft() + buttonWidth;
         c.drawRect(deleteLeft, itemView.getTop(), deleteRight, itemView.getBottom(), buttonPaint);
 
-        // Draw delete icon
         drawIcon(c, deleteIcon, deleteLeft, itemView.getTop(), buttonWidth, itemHeight);
 
-        // Draw Edit button (right of delete button when swiped right)
         buttonPaint.setColor(editColor);
         float editLeft = itemView.getLeft() + buttonWidth;
         float editRight = itemView.getLeft() + buttonWidth * 2;
         c.drawRect(editLeft, itemView.getTop(), editRight, itemView.getBottom(), buttonPaint);
 
-        // Draw edit icon
         drawIcon(c, editIcon, editLeft, itemView.getTop(), buttonWidth, itemHeight);
     }
 
@@ -128,13 +117,11 @@ public class SwipeRevealCallback extends ItemTouchHelper.SimpleCallback {
                           float buttonWidth, float itemHeight) {
         if (icon == null) return;
 
-        // Calculate icon position to center it in the button
         int iconLeft = (int) (left + (buttonWidth - iconSize) / 2);
         int iconTop = (int) (top + (itemHeight - iconSize) / 2);
         int iconRight = iconLeft + iconSize;
         int iconBottom = iconTop + iconSize;
 
-        // Set icon bounds and draw
         icon.setBounds(iconLeft, iconTop, iconRight, iconBottom);
         icon.setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_IN);
         icon.draw(c);
@@ -145,7 +132,6 @@ public class SwipeRevealCallback extends ItemTouchHelper.SimpleCallback {
                           @NonNull RecyclerView.ViewHolder viewHolder) {
         super.clearView(recyclerView, viewHolder);
 
-        // DON'T reset translation if buttons should stay revealed
         if (!buttonsRevealed || viewHolder.getAdapterPosition() != currentSwipedPosition) {
             viewHolder.itemView.setTranslationX(0);
         }
@@ -153,17 +139,17 @@ public class SwipeRevealCallback extends ItemTouchHelper.SimpleCallback {
 
     @Override
     public float getSwipeThreshold(@NonNull RecyclerView.ViewHolder viewHolder) {
-        return 0.3f; // Lower threshold for easier reveal
+        return 0.3f;
     }
 
     @Override
     public float getSwipeEscapeVelocity(float defaultValue) {
-        return defaultValue * 0.1f; // Much slower escape velocity
+        return defaultValue * 0.1f;
     }
 
     @Override
     public float getSwipeVelocityThreshold(float defaultValue) {
-        return defaultValue * 5f; // Higher velocity threshold
+        return defaultValue * 5f;
     }
 
     // Handle button clicks
@@ -174,22 +160,18 @@ public class SwipeRevealCallback extends ItemTouchHelper.SimpleCallback {
         if (viewHolder != null) {
             View itemView = viewHolder.itemView;
 
-            // Check if click is within the item bounds
             if (x >= itemView.getLeft() && x <= itemView.getRight() &&
                     y >= itemView.getTop() && y <= itemView.getBottom()) {
 
-                // Calculate button positions (buttons are revealed on the left side)
                 float buttonAreaRight = itemView.getLeft() + (buttonWidth * 2);
 
                 if (x <= buttonAreaRight) {
-                    // Delete button (left button)
                     if (x >= itemView.getLeft() && x <= itemView.getLeft() + buttonWidth) {
                         adapter.deleteItem(currentSwipedPosition);
                         resetSwipeState(viewHolder);
                         return true;
                     }
 
-                    // Edit button (right of delete button)
                     if (x >= itemView.getLeft() + buttonWidth && x <= buttonAreaRight) {
                         adapter.editItem(currentSwipedPosition);
                         resetSwipeState(viewHolder);
@@ -201,7 +183,6 @@ public class SwipeRevealCallback extends ItemTouchHelper.SimpleCallback {
         return false;
     }
 
-    // Reset swipe state and close the revealed buttons
     public void resetSwipeState(RecyclerView.ViewHolder viewHolder) {
         if (viewHolder != null) {
             viewHolder.itemView.animate()
@@ -215,7 +196,6 @@ public class SwipeRevealCallback extends ItemTouchHelper.SimpleCallback {
         }
     }
 
-    // Close any open swipe
     public void closeOpenSwipe(RecyclerView recyclerView) {
         if (buttonsRevealed && currentSwipedPosition != -1) {
             RecyclerView.ViewHolder viewHolder = recyclerView.findViewHolderForAdapterPosition(currentSwipedPosition);
@@ -223,7 +203,6 @@ public class SwipeRevealCallback extends ItemTouchHelper.SimpleCallback {
         }
     }
 
-    // Check if any item is currently swiped open
 
     private int dpToPx(int dp) {
         return (int) (dp * context.getResources().getDisplayMetrics().density);

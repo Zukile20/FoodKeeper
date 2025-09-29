@@ -73,7 +73,7 @@
                     android:layout_height="match_parent"
                     android:contentDescription="Meal image"
                     android:scaleType="centerCrop"
-                    android:src="@drawable/apple" />
+                    android:src="@drawable/image_placeholder" />
 
             </androidx.cardview.widget.CardView>
 

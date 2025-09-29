@@ -4,229 +4,405 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/mainBlue">
+    android:background="@color/blue">
 
+    <!-- Header Section -->
     <LinearLayout
-        android:id="@+id/linearLayout"
-        android:layout_width="353dp"
-        android:layout_height="38dp"
-        android:layout_gravity="center"
-        android:layout_marginTop="16dp"
-        android:orientation="horizontal"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <Button
-            android:id="@+id/backEditBtn"
-            android:layout_width="37dp"
-            android:layout_height="37dp"
-            android:contentDescription="back button"
-            android:background="@drawable/back_white_arrow"
-            android:drawableTint="@color/white"/>
-
-        <TextView
-            android:id="@+id/textView"
-            android:layout_width="144dp"
-            android:layout_height="32dp"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:text="My profile"
-            android:textColor="#ffffffff"
-            android:textSize="21sp"
-            android:textStyle="bold" />
-    </LinearLayout>
-
-    <ImageView
-        android:id="@+id/imageView4"
-        android:layout_width="265dp"
-        android:layout_height="244dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.168"
-        app:srcCompat="@drawable/circle_background_white" />
-
-    <ImageView
-        android:id="@+id/imageView6"
-        android:layout_width="match_parent"
-        android:layout_height="652dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:srcCompat="@drawable/white_background" />
-
-    <com.google.android.material.imageview.ShapeableImageView
-        android:id="@+id/editItemImage"
-        android:layout_width="207dp"
-        android:layout_height="198dp"
-        android:layout_gravity="center"
-        android:layout_marginTop="16dp"
-        android:scaleType="centerCrop"
-        android:backgroundTint="@color/black"
-        app:layout_constraintBottom_toBottomOf="@+id/imageView4"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/imageView4"
-        app:layout_constraintVertical_bias="0.371"
-        app:shapeAppearanceOverlay="@style/CircleImageView"
-        app:srcCompat="@drawable/image_placeholder"/>
-
-    <ScrollView
-        android:id="@+id/scroller"
+        android:id="@+id/headerLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:fillViewport="true"
-        app:layout_constraintTop_toBottomOf="@id/imageView4"
+        android:orientation="horizontal"
+        android:padding="16dp"
+        android:gravity="center_vertical"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
-        <LinearLayout
+        <Button
+            android:id="@+id/backBtn"
+            android:layout_width="47dp"
+            android:layout_height="47dp"
+            android:background="@drawable/back_white_arrow"
+            android:contentDescription="Back button" />
+
+        <TextView
+            android:id="@+id/titleHeader"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="My Profile"
+            android:textColor="#FFFFFF"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:gravity="center" />
+
+        <View
+            android:layout_width="40dp"
+            android:layout_height="40dp" />
+
+    </LinearLayout>
+
+    <!-- Profile Image Section -->
+
+    <ImageView
+        android:id="@+id/imageView8"
+        android:layout_width="match_parent"
+        android:layout_height="724dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/imageSection"
+        app:layout_constraintVertical_bias="1.0"
+        app:srcCompat="@drawable/white_background" />
+
+    <RelativeLayout
+        android:id="@+id/imageSection"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:layout_marginTop="20dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/headerLayout">
+
+
+        <ImageView
+            android:id="@+id/circleBackground"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            android:src="@drawable/circle_background_white" />
+
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/profileImageView"
+            android:layout_width="160dp"
+            android:layout_height="160dp"
+            android:layout_centerInParent="true"
+            android:scaleType="centerCrop"
+            android:src="@drawable/image_placeholder"
+            app:shapeAppearanceOverlay="@style/CircleImageView" />
+
+        <!-- Camera button -->
+        <Button
+            android:id="@+id/loadPicture"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_alignEnd="@+id/profileImageView"
+            android:layout_alignBottom="@+id/profileImageView"
+            android:layout_marginEnd="-8dp"
+            android:layout_marginBottom="-8dp"
+            android:background="@drawable/camera"
+            android:visibility="gone"
+            tools:visibility="visible" />
+
+    </RelativeLayout>
+
+
+
+    <!-- White content area -->
+
+
+    <LinearLayout
+        android:id="@+id/profileFieldsLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/white_background"
+        android:orientation="vertical"
+        android:padding="24dp"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <!-- Name Field -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:text="Name"
+                android:textColor="#666666"
+                android:textSize="14sp" />
+
+            <EditText
+                android:id="@+id/etName"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:background="@drawable/white_textbox"
+                android:enabled="false"
+                android:textColor="@color/black"
+                android:hint="Enter your name"
+                android:inputType="textPersonName"
+                android:padding="12dp"
+                android:textSize="16sp" />
+
+        </LinearLayout>
+
+        <!-- Surname Field -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:text="Surname"
+                android:textColor="#666666"
+                android:textSize="14sp" />
+
+            <EditText
+                android:id="@+id/etSurname"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:background="@drawable/white_textbox"
+                android:enabled="false"
+                android:textColor="@color/black"
+
+
+                android:hint="Enter your surname"
+                android:inputType="textPersonName"
+                android:padding="12dp"
+                android:textSize="16sp" />
+
+        </LinearLayout>
+
+        <!-- Email Field -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:text="Email"
+                android:textColor="#666666"
+                android:textSize="14sp" />
+
+            <EditText
+                android:id="@+id/etEmail"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:background="@drawable/white_textbox"
+                android:enabled="false"
+                android:focusable="false"
+                android:hint="Enter your email"
+                android:textColor="@color/black"
+                android:inputType="textEmailAddress"
+                android:padding="12dp"
+                android:textSize="16sp" />
+
+        </LinearLayout>
+
+        <!-- Phone Field -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:text="Phone"
+                android:textColor="#666666"
+                android:textSize="14sp" />
+
+            <EditText
+                android:id="@+id/etPhone"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:background="@drawable/white_textbox"
+                android:enabled="false"
+                android:hint="Enter your phone number"
+                android:inputType="phone"
+                android:textColor="@color/black"
+                android:padding="12dp"
+                android:textSize="16sp" />
+
+        </LinearLayout>
+
+        <!-- Password Section -->
+        <LinearLayout
+            android:id="@+id/passwordSection"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="24dp"
+            android:background="@color/light_blue_background"
             android:orientation="vertical"
             android:padding="16dp">
 
-            <com.google.android.material.textfield.TextInputLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/nameEditText"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="Name"
-                    android:inputType="textCapWords"/>
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/categoryEditText"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="Category"
-                    android:inputType="textCapWords"
-                    android:focusable="false"
-                    android:clickable="true"/>
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/txtDateLayout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:endIconMode="custom"
-                app:endIconDrawable="@drawable/ic_calendar"
-                app:endIconTint="@color/black"
-                app:endIconContentDescription="Open calendar">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/expiryDateEditText"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="Expiry Date"
-                    android:focusable="false"
-                    android:inputType="none"/>
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <LinearLayout
-                xmlns:android="http://schemas.android.com/apk/res/android"
+            <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:background="@drawable/quantity_bg">
+                android:layout_marginBottom="16dp"
+                android:text="Password &amp; Security"
+                android:textColor="#333333"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <!-- Current Password Field -->
+            <LinearLayout
+                android:id="@+id/currentPasswordLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                android:orientation="vertical"
+                android:visibility="gone">
 
                 <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:text="Current Password"
+                    android:textColor="#666666"
+                    android:textSize="14sp" />
+
+                <EditText
+                    android:id="@+id/etCurrentPassword"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:text="Quantity: "
-                    android:textSize="17dp"
-                    android:layout_marginTop="15dp"/>
+                    android:layout_height="48dp"
+                    android:background="@drawable/white_textbox"
+                    android:hint="Enter current password"
+                    android:inputType="textPassword"
+                    android:padding="12dp"
+                    android:textSize="16sp" />
 
-                <Button
-                    android:id="@+id/btn_minus"
-                    android:layout_width="100dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="20dp"
-                    android:text="-"
-                    android:textSize="40dp"
-                    android:textColor="@color/black"
-                    android:stateListAnimator="@null"
-                    android:elevation="0dp"
-                    android:textAlignment="center"
-                    android:backgroundTint="@color/white"/>
+            </LinearLayout>
+
+            <!-- New Password Field -->
+            <LinearLayout
+                android:id="@+id/newPasswordLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                android:orientation="vertical"
+                android:visibility="gone">
 
                 <TextView
-                    android:id="@+id/tv_quantity"
-                    android:layout_width="60dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="20dp"
-                    android:text="0"
-                    android:textSize="18sp"
-                    android:gravity="center"
-                    android:padding="8dp"/>
+                    android:layout_marginBottom="8dp"
+                    android:text="New Password"
+                    android:textColor="#666666"
+                    android:textSize="14sp" />
 
-                <Button
-                    android:id="@+id/btn_plus"
-                    android:layout_width="100dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="20dp"
-                    android:text="+"
-                    android:textSize="40dp"
-                    android:stateListAnimator="@null"
-                    android:elevation="0dp"
-                    android:textColor="@color/mainBlue"
-                    android:textAlignment="center"
-                    android:backgroundTint="@color/white"/>
+                <EditText
+                    android:id="@+id/etNewPassword"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:background="@drawable/white_textbox"
+                    android:hint="Enter new password"
+                    android:inputType="textPassword"
+                    android:padding="12dp"
+                    android:textSize="16sp" />
+
             </LinearLayout>
+
+            <!-- Confirm Password Field -->
+            <LinearLayout
+                android:id="@+id/confirmPasswordLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:text="Confirm New Password"
+                    android:textColor="#666666"
+                    android:textSize="14sp" />
+
+                <EditText
+                    android:id="@+id/etConfirmPassword"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:background="@drawable/white_textbox"
+                    android:hint="Confirm new password"
+                    android:inputType="textPassword"
+                    android:padding="12dp"
+                    android:textSize="16sp" />
+
+            </LinearLayout>
+
+            <!-- Change Password Button -->
+            <Button
+                android:id="@+id/btnChangePassword"
+                android:layout_width="match_parent"
+                android:layout_height="44dp"
+                android:background="@drawable/grey_button"
+                android:text="Change Password"
+                android:textColor="#1976D2"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
         </LinearLayout>
-    </ScrollView>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:orientation="horizontal"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:gravity="center"
-        android:layout_marginTop="10dp"
-        android:layout_marginBottom="10dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/scroller" >
-
-        <Button
-            android:id="@+id/cancelButton"
-            android:layout_width="150dp"
+        <!-- Action Buttons -->
+        <LinearLayout
+            android:id="@+id/buttonContainer"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:gravity="center_horizontal"
-            android:text="Cancel"
-            android:textAllCaps="false"
-            android:background="@drawable/rounded_button"
-            android:textColor="@color/white"
-            app:backgroundTint="@color/grey"
-            android:textAlignment="center"
-            android:layout_marginEnd="50dp"/>
+            android:layout_marginTop="16dp"
+            android:gravity="center"
+            android:orientation="horizontal">
 
-        <Button
-            android:id="@+id/saveButton"
-            android:layout_width="150dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:background="@drawable/rounded_button"
-            android:gravity="center_horizontal"
-            android:text="Save"
-            android:textAlignment="center"
-            android:textAllCaps="false"
-            android:textColor="@color/white"
-            app:backgroundTint="@color/mainBlue" />
+            <!-- Edit Button -->
+            <Button
+                android:id="@+id/btnEdit"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_marginEnd="8dp"
+                android:layout_weight="1"
+                android:background="@drawable/blue_button"
+                android:text="Edit Profile"
+                android:textColor="#FFFFFF"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <!-- Save Button -->
+            <Button
+                android:id="@+id/btnSave"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_marginEnd="4dp"
+                android:layout_weight="1"
+                android:background="@drawable/blue_button"
+                android:text="Save"
+                android:textColor="#FFFFFF"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:visibility="gone" />
+
+            <!-- Cancel Button -->
+            <Button
+                android:id="@+id/btnCancel"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_marginStart="4dp"
+                android:layout_weight="1"
+                android:background="@drawable/blue_button"
+                android:text="Cancel"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                android:backgroundTint="@color/grey"
+                android:visibility="gone" />
+
+        </LinearLayout>
+
     </LinearLayout>
+
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

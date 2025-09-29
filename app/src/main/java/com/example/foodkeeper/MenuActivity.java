@@ -63,14 +63,12 @@ public class MenuActivity extends AppCompatActivity {
         bottomNav.setSelectedItemId(R.id.nav_profileMenu);
 
         profileArrow.setOnClickListener(v -> {
-//            Intent intent = new Intent(MenuActivity.this, ManageFridgeActivity.class);
-//            startActivity(intent)
-            //finish();
+            Intent intent = new Intent(MenuActivity.this, ProfileActivity.class);
+            startActivity(intent);
         });
         fridgeArrow.setOnClickListener(v -> {
             Intent intent = new Intent(MenuActivity.this, ManageFridgeActivity.class);
             startActivity(intent);
-            finish();
         });
         mealsArrow.setOnClickListener(v -> {
            Intent intent = new Intent(MenuActivity.this, mealsViewActivity.class);

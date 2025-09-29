@@ -122,7 +122,6 @@ public class ViewMealActivity extends AppCompatActivity {
 
             Log.d("MealImage", "File exists, size: " + imageFile.length() + " bytes");
 
-            // Load the image directly from the file path
             Glide.with(this)
                     .load(imageFile)
                     .placeholder(R.drawable.place_holder)

@@ -26,7 +26,7 @@ import java.util.Objects;
 public class Database extends SQLiteOpenHelper {
     private Context context;
     private static final String DATABASE_NAME = "FoodKeeper.db";
-    private static final int DATABASE_VERSION = 16; // Increment version for schema changes
+    private static final int DATABASE_VERSION = 19; // Increment version for schema changes
     private static Database instance;
 
     private static final String TABLE_USERS = "users";
@@ -73,17 +73,15 @@ public class Database extends SQLiteOpenHelper {
     }
 
     private void fridgeUserItemTables(SQLiteDatabase db) {
-        // Users table (unchanged)
         String CREATE_USERS_TABLE = "CREATE TABLE " + TABLE_USERS + "("
                 + KEY_NAME + " TEXT,"
                 + KEY_SURNAME + " TEXT,"
                 + KEY_EMAIL + " TEXT PRIMARY KEY,"
-                + KEY_PHONE + " INTEGER,"
+                + KEY_PHONE + " TEXT,"
                 + KEY_PASSWORD + " TEXT,"
                 + KEY_PROFILE + " BLOB)";
         db.execSQL(CREATE_USERS_TABLE);
 
-        // Fridges table - now with user ownership
         String CREATE_FRIDGES_TABLE = "CREATE TABLE " + TABLE_FRIDGES + "("
                 + KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
                 + KEY_BRAND + " TEXT,"
@@ -96,7 +94,6 @@ public class Database extends SQLiteOpenHelper {
                 + "FOREIGN KEY(" + KEY_USER_EMAIL + ") REFERENCES " + TABLE_USERS + "(" + KEY_EMAIL + ") ON DELETE CASCADE)";
         db.execSQL(CREATE_FRIDGES_TABLE);
 
-        // Food items table - now belongs to fridges only
         String CREATE_FOOD_ITEMS_TABLE = "CREATE TABLE " + TABLE_FOOD_ITEMS + "("
                 + KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
                 + KEY_ITEM_NAME + " TEXT,"
@@ -128,8 +125,7 @@ public class Database extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    // USER METHODS (unchanged)
-    public void register(String name, String surname, String email, Integer phone, String password, byte[] profileImage) {
+    public void register(String name, String surname, String email, String phone, String password, byte[] profileImage) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
         cv.put(KEY_NAME, name);
@@ -154,6 +150,7 @@ public class Database extends SQLiteOpenHelper {
         c.close();
         return result;
     }
+
 
     // FRIDGE METHODS - Updated for user ownership
     public long addFridge(Fridge fridge, String userEmail) {
@@ -327,9 +324,7 @@ public class Database extends SQLiteOpenHelper {
         return count;
     }
 
-    // FOOD ITEM METHODS - Updated to work with fridge ownership
     public long addFoodItem(FoodItem item, String userEmail) {
-        // Get the current connected fridge for the user
         Fridge connectedFridge = getConnectedFridgeForUser(userEmail);
         if (connectedFridge == null) {
             Toast.makeText(context, "Please select a fridge first", Toast.LENGTH_SHORT).show();
@@ -583,13 +578,14 @@ public class Database extends SQLiteOpenHelper {
     // ... (Include all your other existing methods: meal methods, recipe methods, etc.)
     // I'll add the key ones here for completeness:
 
-    public long createMeal(String mealName, String uri) {
+    public long createMeal(Meal meal, long fridgeID) {
         SQLiteDatabase db = this.getWritableDatabase();
         try {
             ContentValues values = new ContentValues();
-            values.put("mealName", mealName);
-            if(uri!=null) {
-                values.put("mealImage", uri);
+            values.put("mealName", meal.getMealName());
+            values.put("fridgeID",fridgeID);
+            if(meal.getUri()!=null) {
+                values.put("mealImage",meal.getUri());
             }
             return db.insert("Meal", null, values);
         } finally {
@@ -803,8 +799,9 @@ public class Database extends SQLiteOpenHelper {
             String name = mealCursor.getString(mealCursor.getColumnIndexOrThrow("mealName"));
             String image = mealCursor.getString(mealCursor.getColumnIndexOrThrow("mealImage"));
             String lastUsed = mealCursor.getString(mealCursor.getColumnIndexOrThrow("lastUsed"));
+            long fridgeID = mealCursor.getLong(mealCursor.getColumnIndexOrThrow("lastUsed"));
 
-            meal = new Meal(mealID, name, R.drawable.image_placeholder);
+            meal = new Meal(mealID, name,R.drawable.place_holder, fridgeID);
             meal.setUrl(image);
             if (lastUsed != null) {
                 meal.setLastUsed(LocalDate.parse(lastUsed));
@@ -882,7 +879,9 @@ public class Database extends SQLiteOpenHelper {
                 "mealID INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 "mealName TEXT NOT NULL," +
                 "mealImage TEXT ," +
-                "lastUsed TEXT" +
+                "lastUsed TEXT," +
+                "fridgeID INTERGER NOT NULL," +
+                "FOREIGN KEY(fridgeID) REFERENCES Fridge(fridgeID) ON DELETE CASCADE"+
                 ")";
         db.execSQL(createMealTable);
 
@@ -1035,7 +1034,60 @@ public class Database extends SQLiteOpenHelper {
         cv.put(SHOPPING_COLUMN_BOUGHT, 0); // Unmark as bought
         db.update(SHOPPING_COLUMN_BOUGHT, cv, SHOPPING_COLUMN_ID + "=?", new String[]{String.valueOf(id)});
     }
+    public User loadUserByEmail(String email) {
+        if (email == null || email.trim().isEmpty()) {
+            return null;
+        }
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        User user = null;
+
+        String[] columns = {
+                KEY_NAME, KEY_SURNAME, KEY_EMAIL, KEY_PHONE, KEY_PASSWORD, KEY_PROFILE
+        };
+
+        String selection = KEY_EMAIL + " = ?";
+        String[] selectionArgs = {email};
+
+        Cursor cursor = db.query(TABLE_USERS, columns, selection, selectionArgs, null, null, null);
+
+        if (cursor.moveToFirst()) {
+            user = cursorToUser(cursor);
+        }
+
+        cursor.close();
+        db.close();
+
+        return user;
+    }
+    private User cursorToUser(Cursor cursor) {
+        User user = new User();
+
+        user.setName(cursor.getString(cursor.getColumnIndexOrThrow(KEY_NAME)));
+        user.setSurname(cursor.getString(cursor.getColumnIndexOrThrow(KEY_SURNAME)));
+        user.setEmail(cursor.getString(cursor.getColumnIndexOrThrow(KEY_EMAIL)));
+        user.setPhone(cursor.getString(cursor.getColumnIndexOrThrow(KEY_PHONE)));
+        user.setPassword(cursor.getString(cursor.getColumnIndexOrThrow(KEY_PASSWORD)));
+
+        byte[] profileImage = cursor.getBlob(cursor.getColumnIndexOrThrow(KEY_PROFILE));
+        user.setProfileImage(profileImage);
+
+        return user;
+    }
 
 
+    public int updatePassword(String email, String newPassword) {
+        SQLiteDatabase db = this.getWritableDatabase();
 
+        ContentValues values = new ContentValues();
+        values.put(KEY_PASSWORD, newPassword);
+
+        String whereClause = KEY_EMAIL + " = ?";
+        String[] whereArgs = {email};
+
+        int result = db.update(TABLE_USERS, values, whereClause, whereArgs);
+        db.close();
+
+        return result;
+    }
 }

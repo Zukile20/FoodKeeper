@@ -14,6 +14,7 @@ public class Meal implements Parcelable {
     private String mealName;
     private String url;
     private int imageResource;
+    private long fridgeID;
     private String mealType;
 
     private LocalDate lastUsed;
@@ -31,11 +32,12 @@ public class Meal implements Parcelable {
         return foodItemIDs;
     }
 
-    public Meal(long MealID, String name, int imageResource) {
+    public Meal(long MealID, String name, int imageResource,long fridgeID) {
         this.mealID = MealID;
         this.mealName = name;
         this.imageResource = imageResource;
         this.lastUsed = null;
+        this.fridgeID= fridgeID;
         this.foodItemIDs = new ArrayList<>(); // Initialize here too
     }
 

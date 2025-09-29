@@ -124,9 +124,9 @@ public class RegisterActivity extends AppCompatActivity {
             finish();
         }
 
-        db.register(name, surname, email, Integer.valueOf(phone), password, imageBlob);
+        db.register(name, surname, email, phone, password, imageBlob);
 
-        Fridge fridge = new Fridge(fridgeBrand, fridgeModel, fridgeDescription, fridgeSize, true, null);
+        Fridge fridge = new Fridge(fridgeBrand, fridgeModel, fridgeDescription, Integer.parseInt(fridgeSizeStr), true, null);
         long fridgeId = db.addFridge(fridge,email);
 
         if (fridgeId != -1) {

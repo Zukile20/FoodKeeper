@@ -109,25 +109,7 @@
             android:textSize="21sp"
             android:textStyle="bold" />
 
-        <FrameLayout
-            android:layout_width="37dp"
-            android:visibility="gone"
-            android:layout_height="37dp">
 
-            <ImageView
-                android:id="@+id/circleLayout"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:scaleType="centerCrop"
-                android:src="@drawable/circle_background_white" />
-
-            <Button
-                android:id="@+id/favBtn"
-                android:layout_width="32dp"
-                android:layout_height="31dp"
-                android:layout_gravity="center"
-                android:background="@drawable/unselected_heart" />
-        </FrameLayout>
 
 
     </LinearLayout>

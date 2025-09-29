@@ -20,7 +20,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.FoodKeeper">
         <activity
-            android:name=".ProfileActivtty"
+            android:name=".ProfileActivity"
             android:exported="false" />
         <activity
             android:name=".Fridge.AddFridgeActivity"
