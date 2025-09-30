@@ -29,7 +29,7 @@ import java.util.Objects;
 public class Database extends SQLiteOpenHelper {
     private Context context;
     private static final String DATABASE_NAME = "FoodKeeper.db";
-    private static final int DATABASE_VERSION = 20; // Increment version for schema changes
+    private static final int DATABASE_VERSION = 22; // Increment version for schema changes
     private static Database instance;
     private static final String TABLE_USERS = "users";
     private static final String TABLE_FOOD_ITEMS = "food_items";
@@ -574,7 +574,7 @@ public class Database extends SQLiteOpenHelper {
         try {
             ContentValues values = new ContentValues();
             values.put("mealName", meal.getMealName());
-            values.put("fridgeID", fridgeID);
+            values.put("fridgeID", fridgeID);  // Make sure this matches your schema
             if(meal.getUri() != null) {
                 values.put("mealImage", meal.getUri());
             }
@@ -584,16 +584,16 @@ public class Database extends SQLiteOpenHelper {
         }
     }
 
-    public List<Meal> getMealsInConnectedFridge() {
+    public List<Meal> getMealsInConnectedFridge(String userEmail) {
         List<Meal> meals = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = null;
         try {
             String query = "SELECT m.* FROM Meal m " +
                     "INNER JOIN " + TABLE_FRIDGES + " f ON m.fridgeID = f." + KEY_ID + " " +
-                    "WHERE f." + KEY_IS_LOGGED_IN + " = 1 ";
+                    "WHERE f." + KEY_IS_LOGGED_IN + " = 1 AND f."+KEY_USER_EMAIL+"=?";
 
-            cursor = db.rawQuery(query, null);
+            cursor = db.rawQuery(query, new String[]{userEmail});
 
             if (cursor.moveToFirst()) {
                 do {
@@ -617,7 +617,6 @@ public class Database extends SQLiteOpenHelper {
             if (cursor != null) {
                 cursor.close();
             }
-            db.close();
         }
     }
 
@@ -809,7 +808,7 @@ public class Database extends SQLiteOpenHelper {
             String name = mealCursor.getString(mealCursor.getColumnIndexOrThrow("mealName"));
             String image = mealCursor.getString(mealCursor.getColumnIndexOrThrow("mealImage"));
             String lastUsed = mealCursor.getString(mealCursor.getColumnIndexOrThrow("lastUsed"));
-            long fridgeID = mealCursor.getLong(mealCursor.getColumnIndexOrThrow("lastUsed"));
+            long fridgeID = mealCursor.getLong(mealCursor.getColumnIndexOrThrow("fridgeID"));
 
             meal = new Meal(mealID, name,image, fridgeID);
             if (lastUsed != null) {
@@ -887,11 +886,10 @@ public class Database extends SQLiteOpenHelper {
         String createMealTable = "CREATE TABLE Meal (" +
                 "mealID INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 "mealName TEXT NOT NULL," +
-                "mealImage TEXT ," +
+                "mealImage TEXT," +
                 "lastUsed TEXT," +
-                "fridgeID INTERGER NOT NULL," +
-                "FOREIGN KEY(fridgeID) REFERENCES Fridge(fridgeID) ON DELETE CASCADE"+
-                ")";
+                "fridgeID INTEGER NOT NULL," +
+                "FOREIGN KEY(fridgeID) REFERENCES " + TABLE_FRIDGES + "(" + KEY_ID + ") ON DELETE CASCADE)";
         db.execSQL(createMealTable);
 
         String createMealFoodItemTable = "CREATE TABLE MealFoodItem (" +
