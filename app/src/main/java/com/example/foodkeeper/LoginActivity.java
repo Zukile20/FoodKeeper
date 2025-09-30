@@ -22,6 +22,7 @@ public class LoginActivity extends AppCompatActivity {
     Button btn;
     TextView tv;
     Database db;
+    User user;
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -60,7 +61,8 @@ public class LoginActivity extends AppCompatActivity {
                 } else {
                     if (db.login(email, password) == 1) {
                         Toast.makeText(getApplicationContext(), "Login Successfully", Toast.LENGTH_SHORT).show();
-                         sess.createLoginSession(email, db.KEY_EMAIL);
+                        user = db.loadUserByEmail(email);
+                         sess.createLoginSession(email,user.getName());
                         startActivity(new Intent(LoginActivity.this, ItemsViewActivity.class));
                         finish();
                     } else {

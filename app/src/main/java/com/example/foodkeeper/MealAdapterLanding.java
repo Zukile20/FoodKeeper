@@ -27,7 +27,6 @@ public class MealAdapterLanding extends RecyclerView.Adapter<MealAdapterLanding.
     private OnClickListener onClickListener;
 
 
-
     public MealAdapterLanding(Context context ,List<Meal> meals, OnClickListener listener) {
         this.meals = meals;
         this.onClickListener = listener;

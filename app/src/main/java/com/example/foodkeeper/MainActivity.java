@@ -2,10 +2,14 @@ package com.example.foodkeeper;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.activity.result.ActivityResultLauncher;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -19,6 +23,9 @@ import com.example.foodkeeper.MealPlan.MealPlan;
 import com.example.foodkeeper.MealPlan.WeeklyViewActivity;
 import com.example.foodkeeper.Recipe.Listeners.RecipeClickListerner;
 import com.example.foodkeeper.Recipe.Models.Recipe;
+import com.example.foodkeeper.Recipe.RecipeActivity;
+import com.example.foodkeeper.Recipe.RecipeDetailsActivity;
+import com.example.foodkeeper.ViewMeals.mealsViewActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.time.LocalDate;
@@ -35,6 +42,8 @@ public class MainActivity extends AppCompatActivity {
     private RecipeAdapter recipeAdapter;
     private MealAdapterLanding adapter;
     private Database database;
+    private SessionManager sess;
+    ActivityResultLauncher<Intent> launcher;
 
 
     @Override
@@ -46,6 +55,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Initialize database
         database = new Database(this);
+        sess= new SessionManager(this);
 
         // Initialize RecyclerViews
         recipesView = findViewById(R.id.recipesView);
@@ -87,6 +97,7 @@ public class MainActivity extends AppCompatActivity {
 
         });
         bottomNav.setSelectedItemId(R.id.nav_home);
+        greetText.setText("Hi "+sess.getUserName());
 
     }
 
@@ -99,14 +110,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onRecipeClicked(String id) {
                 // Handle recipe click - navigate to recipe detail
-                Toast.makeText(MainActivity.this,
-                        "Recipe ID: " + id,
-                        Toast.LENGTH_SHORT).show();
-
-                // You can navigate to recipe detail activity here
-                // Intent intent = new Intent(LandingPageActivity.this, RecipeDetailActivity.class);
-                // intent.putExtra("recipe_id", id);
-                // startActivity(intent);
+                Intent intent = new Intent(MainActivity.this, RecipeDetailsActivity.class).putExtra("id", id);
+                startActivity(intent);
             }
         };
 
@@ -149,6 +154,22 @@ public class MainActivity extends AppCompatActivity {
                 meals.add(meal);
             }
         }
+        LinearLayout mealsEmptyState = findViewById(R.id.mealsEmptyState);
+        if (meals.isEmpty()) {
+            mealsView.setVisibility(View.GONE);
+            mealsEmptyState.setVisibility(View.VISIBLE);
+        } else {
+            mealsView.setVisibility(View.VISIBLE);
+            mealsEmptyState.setVisibility(View.GONE);
+        }
+        Button addMealPlanButton = findViewById(R.id.addMealPlanButton);
+        addMealPlanButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, WeeklyViewActivity.class);
+                startActivity(intent);
+            }
+        });
         adapter = new MealAdapterLanding(this, meals, new MealAdapterLanding.OnClickListener() {
             @Override
             public void onClick(Meal meal, int position) {

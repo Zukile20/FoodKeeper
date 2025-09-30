@@ -222,7 +222,7 @@ public class mealsViewActivity extends AppCompatActivity  {
     private List<Meal> loadData() {
 
         List<Meal> meals = new ArrayList<>();
-        meals.addAll(db.getMealsInConnectedFridge());
+        meals.addAll(db.getMealsInConnectedFridge(sess.getUserEmail()));
         return meals;
     }
     private void loadMeals() {

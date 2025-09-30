@@ -1,7 +1,5 @@
 package com.example.foodkeeper.Recipe.Listeners;
 
-;
-
 import com.example.foodkeeper.Recipe.Models.IngredientsResponse;
 
 import java.util.List;

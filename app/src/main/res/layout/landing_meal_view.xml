@@ -29,7 +29,7 @@
             android:layout_height="140dp"
             android:scaleType="centerCrop"
             android:layout_marginBottom="4dp"
-            app:srcCompat="@drawable/mango" />
+            app:srcCompat="@drawable/place_holder" />
 
         <TextView
             android:id="@+id/meal_name"
