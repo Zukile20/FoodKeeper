@@ -82,6 +82,12 @@
             android:name=".ShoppingList.MainShoppingListActivity"
             android:exported="false" />
         <activity
+            android:name=".Recipe.RecipeDetailsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".Recipe.RecipeActivity"
+            android:exported="false"/>
+        <activity
             android:name=".LoginActivity"
             android:exported="true">
             <intent-filter>

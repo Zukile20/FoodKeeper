@@ -2,24 +2,61 @@ package com.example.foodkeeper;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.foodkeeper.FoodItem.ItemsViewActivity;
+import com.example.foodkeeper.Meal.Meal;
+import com.example.foodkeeper.MealPlan.MealPlan;
+import com.example.foodkeeper.MealPlan.WeeklyViewActivity;
+import com.example.foodkeeper.Recipe.Listeners.RecipeClickListerner;
+import com.example.foodkeeper.Recipe.Models.Recipe;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+
 
 public class MainActivity extends AppCompatActivity {
 
     private BottomNavigationView bottomNav;
+    private RecyclerView recipesView;
+    TextView greetText;
+    private RecyclerView mealsView;
+    private RecipeAdapter recipeAdapter;
+    private MealAdapterLanding adapter;
+    private Database database;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
+
+
+        // Initialize database
+        database = new Database(this);
+
+        // Initialize RecyclerViews
+        recipesView = findViewById(R.id.recipesView);
+        mealsView = findViewById(R.id.mealsView);
+        mealsView = findViewById(R.id.mealsView);
+        greetText = findViewById(R.id.greetText);
+
+        // Setup Recipes RecyclerView
+        setupRecipesRecyclerView();
+        setupMealAdapter();
+
 
         bottomNav = findViewById(R.id.bottomNav);
 
@@ -51,5 +88,99 @@ public class MainActivity extends AppCompatActivity {
         });
         bottomNav.setSelectedItemId(R.id.nav_home);
 
+    }
+
+    private void setupRecipesRecyclerView() {
+        // Get random recipes from database (e.g., 5 random recipes)
+        List<Recipe> recipes = database.getRandomRecipes(5);
+
+        // Create click listener
+        RecipeClickListerner listener = new RecipeClickListerner() {
+            @Override
+            public void onRecipeClicked(String id) {
+                // Handle recipe click - navigate to recipe detail
+                Toast.makeText(MainActivity.this,
+                        "Recipe ID: " + id,
+                        Toast.LENGTH_SHORT).show();
+
+                // You can navigate to recipe detail activity here
+                // Intent intent = new Intent(LandingPageActivity.this, RecipeDetailActivity.class);
+                // intent.putExtra("recipe_id", id);
+                // startActivity(intent);
+            }
+        };
+
+        // Create and set adapter
+        recipeAdapter = new RecipeAdapter(this, recipes, listener);
+
+        recipesView.setLayoutManager(new LinearLayoutManager(
+                this,
+                LinearLayoutManager.HORIZONTAL,
+                false
+        ));
+        recipesView.setAdapter(recipeAdapter);
+    }
+    private void setupMealAdapter()
+    {
+        MealPlan plan = database.getMealPlanForDay(LocalDate.now());
+        List<Meal> meals = new ArrayList<>();
+
+        //load the meals in the meal plan
+        if(plan!=null) {
+
+            if (plan.getBreakFast() != null) {
+                Meal meal =database.getMealWithFoodItems(plan.getBreakFast());
+                meal.setMealType("Breakfast");
+                meals.add(meal);
+            }
+            if (plan.getLunch() != null) {
+                Meal meal =database.getMealWithFoodItems(plan.getLunch());
+                meal.setMealType("Lunch");
+                meals.add(meal);
+            }
+            if (plan.getDinner() != null) {
+                Meal meal =database.getMealWithFoodItems(plan.getDinner());
+                meal.setMealType("Dinner");
+                meals.add(meal);
+            }
+            if (plan.getSnack() != null) {
+                Meal meal =database.getMealWithFoodItems(plan.getSnack());
+                meal.setMealType("Snack");
+                meals.add(meal);
+            }
+        }
+        adapter = new MealAdapterLanding(this, meals, new MealAdapterLanding.OnClickListener() {
+            @Override
+            public void onClick(Meal meal, int position) {
+                Intent intent = new Intent(MainActivity.this, WeeklyViewActivity.class);
+                startActivity(intent);
+            }
+        });
+        mealsView.setAdapter(adapter);
+    }
+
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Refresh recipes when returning to this activity
+        refreshRecipes();
+    }
+
+    private void refreshRecipes() {
+        // Get new random recipes
+        List<Recipe> newRecipes = database.getRandomRecipes(5);
+        if (recipeAdapter != null) {
+            recipeAdapter.updateRecipes(newRecipes);
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        // Close database connection if needed
+        if (database != null) {
+            database.close();
+        }
     }
 }

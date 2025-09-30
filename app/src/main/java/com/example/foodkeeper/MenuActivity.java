@@ -11,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.foodkeeper.FoodItem.ItemsViewActivity;
 import com.example.foodkeeper.Fridge.ManageFridgeActivity;
 import com.example.foodkeeper.MealPlan.WeeklyViewActivity;
+import com.example.foodkeeper.Recipe.RecipeActivity;
 import com.example.foodkeeper.ShoppingList.MainShoppingListActivity;
 import com.example.foodkeeper.ViewMeals.mealsViewActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -79,8 +80,8 @@ public class MenuActivity extends AppCompatActivity {
          startActivity(intent);
         });
         recipesArrow.setOnClickListener(v -> {
-//            Intent intent = new Intent(MenuActivity.this, ManageFridgeActivity.class);
-//            startActivity(intent);
+           Intent intent = new Intent(MenuActivity.this, RecipeActivity.class);
+           startActivity(intent);
             //finish();
         });
         shoppingArrow.setOnClickListener(v -> {

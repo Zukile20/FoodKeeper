@@ -15,6 +15,6 @@
     <string name="sort_by">Sort by:</string>
     <string name="name">Name :</string>
     <string name="create_meal">Create meal</string>
-    <string name="edit_profile">Edit profile</string>
-    <string name="my_profile">My profile</string>
+    <string name="api_key">api_key</string>
+    <string name="Recipe">Recipe</string>
 </resources>

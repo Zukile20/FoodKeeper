@@ -15,5 +15,5 @@
         android:layout_width="18dp"
         android:layout_height="18dp"
         android:layout_gravity="center"
-        android:background="@drawable/add" />
+        android:background="@drawable/ic_add" />
 </FrameLayout>

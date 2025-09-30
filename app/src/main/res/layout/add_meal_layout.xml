@@ -15,7 +15,7 @@
         android:id="@+id/plusBtn"
         android:layout_width="44dp"
         android:layout_height="45dp"
-        android:background="@drawable/add"
+        android:background="@drawable/ic_add"
         android:contentDescription="Add"
 
         />

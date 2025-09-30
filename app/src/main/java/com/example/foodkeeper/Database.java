@@ -15,6 +15,11 @@ import com.example.foodkeeper.Fridge.Fridge;
 import com.example.foodkeeper.Meal.Meal;
 import com.example.foodkeeper.MealPlan.CalendarUtils;
 import com.example.foodkeeper.MealPlan.MealPlan;
+import com.example.foodkeeper.Recipe.Models.ExtendedIngredient;
+import com.example.foodkeeper.Recipe.Models.InstructionsResponse;
+import com.example.foodkeeper.Recipe.Models.Recipe;
+import com.example.foodkeeper.Recipe.Models.RecipeDetailsResponse;
+import com.example.foodkeeper.Recipe.Models.Step;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -24,13 +29,11 @@ import java.util.Objects;
 public class Database extends SQLiteOpenHelper {
     private Context context;
     private static final String DATABASE_NAME = "FoodKeeper.db";
-    private static final int DATABASE_VERSION = 19; // Increment version for schema changes
+    private static final int DATABASE_VERSION = 20; // Increment version for schema changes
     private static Database instance;
-
     private static final String TABLE_USERS = "users";
     private static final String TABLE_FOOD_ITEMS = "food_items";
     private static final String TABLE_FRIDGES = "fridges";
-
     private static final String KEY_ID = "id";
     private static final String KEY_NAME = "name";
     private static final String KEY_SURNAME = "surname";
@@ -968,6 +971,570 @@ public class Database extends SQLiteOpenHelper {
     }
 
 
+
+    public void onOpen(SQLiteDatabase db) {
+        super.onOpen(db);
+        if (!db.isReadOnly()) {
+            // Enable foreign key constraints
+            db.execSQL("PRAGMA foreign_keys=ON");
+        }
+    }
+
+    // ========================================
+    // RECIPE OPERATIONS
+    // ========================================
+
+    // Insert or update a recipe
+    // Replace the existing insertRecipe method in RecipeDatabaseHelper.java
+    public long insertRecipe(int id, String Recipe_Name, String Recipe_image, int Recipe_likes, int Cooking_time, int Recipe_servings, int fav) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        try {
+            // First check if recipe already exists and get its current favorite status
+            Cursor cursor = db.rawQuery("SELECT " + COLUMN_FAVORITE + " FROM " + TABLE_RECIPES + " WHERE " + COLUMN_ID + " = ?",
+                    new String[]{String.valueOf(id)});
+
+            int existingFavoriteStatus = 0; // Default to 0 if recipe doesn't exist
+            if (cursor.moveToFirst()) {
+                existingFavoriteStatus = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_FAVORITE));
+            }
+            cursor.close();
+
+            // Prepare values for insertion/update
+            ContentValues values = new ContentValues();
+            values.put(COLUMN_ID, id);
+            values.put(COLUMN_TITLE, Recipe_Name);
+            values.put(COLUMN_IMAGE, Recipe_image);
+            values.put(COLUMN_LIKES, Recipe_likes);
+            values.put(COLUMN_TIME, Cooking_time);
+            values.put(COLUMN_SERVINGS, Recipe_servings);
+
+            // IMPORTANT: Preserve existing favorite status, don't override with API data
+            values.put(COLUMN_FAVORITE, existingFavoriteStatus);
+
+            long result = db.insertWithOnConflict(TABLE_RECIPES, null, values, SQLiteDatabase.CONFLICT_REPLACE);
+            return result;
+
+        } finally {
+            db.close();
+        }
+    }
+
+    // Get all recipes
+    public List<Recipe> getAllRecipes() {
+        List<Recipe> recipes = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = null;
+
+        try {
+            cursor = db.rawQuery("SELECT * FROM " + TABLE_RECIPES, null);
+
+            if (cursor.moveToFirst()) {
+                do {
+                    int id = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_ID));
+                    String title = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_TITLE));
+                    String image = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_IMAGE));
+                    int likes = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_LIKES));
+                    int time = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_TIME));
+                    int servings = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_SERVINGS));
+                    int favorite = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_FAVORITE));
+
+                    Recipe recipe = new Recipe(id, title, image, likes, time, servings,favorite);
+                    // If your Recipe model has a favorite field, set it here
+                    recipes.add(recipe);
+                } while (cursor.moveToNext());
+            }
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+            db.close();
+        }
+        return recipes;
+    }
+
+    // Search recipes by title
+    public List<Recipe> searchRecipes(String query) {
+        List<Recipe> recipes = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = null;
+
+        try {
+            cursor = db.rawQuery(
+                    "SELECT * FROM " + TABLE_RECIPES + " WHERE " + COLUMN_TITLE + " LIKE ?",
+                    new String[]{"%" + query + "%"}
+            );
+
+            if (cursor.moveToFirst()) {
+                do {
+                    int id = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_ID));
+                    String title = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_TITLE));
+                    String image = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_IMAGE));
+                    int likes = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_LIKES));
+                    int time = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_TIME));
+                    int servings = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_SERVINGS));
+                    int favorite = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_FAVORITE));
+
+                    recipes.add(new Recipe(id, title, image, likes, time, servings,favorite));
+                } while (cursor.moveToNext());
+            }
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+            db.close();
+        }
+        return recipes;
+    }
+
+    public List<Recipe> searchFavoriteRecipes(String searchQuery) {
+        List<Recipe> favoriteRecipes = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = null;
+
+        try {
+            String query = "SELECT * FROM " + TABLE_RECIPES +
+                    " WHERE " + COLUMN_FAVORITE + " = 1 AND " +
+                    COLUMN_TITLE + " LIKE ?";
+            String[] selectionArgs = {"%" + searchQuery + "%"};
+
+            cursor = db.rawQuery(query, selectionArgs);
+
+            if (cursor.moveToFirst()) {
+                do {
+                    // Declare variables to store cursor data
+                    int id = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_ID));
+                    String title = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_TITLE));
+                    String image = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_IMAGE));
+                    int aggregateLikes = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_LIKES));
+                    int readyInMinutes = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_TIME));
+                    int servings = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_SERVINGS));
+                    int fav = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_FAVORITE));
+
+                    // Add recipe to list using constructor
+                    favoriteRecipes.add(new Recipe(id, title, image, aggregateLikes, readyInMinutes, servings, fav));
+                } while (cursor.moveToNext());
+            }
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+            db.close();
+        }
+
+        return favoriteRecipes;
+    }
+
+    // Toggle favorite status for a recipe
+    public boolean toggleFavorite(int recipeId, boolean isFavorite) {
+        SQLiteDatabase db = null;
+        try {
+            db = this.getWritableDatabase();
+            ContentValues values = new ContentValues();
+            values.put(COLUMN_FAVORITE, isFavorite ? 1 : 0);
+
+            int rowsAffected = db.update(TABLE_RECIPES, values, COLUMN_ID + " = ?",
+                    new String[]{String.valueOf(recipeId)});
+
+            return rowsAffected > 0;
+        } finally {
+            if (db != null) {
+                db.close();
+            }
+        }
+    }
+
+    // Get favorite recipes
+    public List<Recipe> getFavoriteRecipes() {
+        List<Recipe> recipes = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = null;
+
+        try {
+            cursor = db.rawQuery(
+                    "SELECT * FROM " + TABLE_RECIPES + " WHERE " + COLUMN_FAVORITE + " = 1",
+                    null
+            );
+
+            if (cursor.moveToFirst()) {
+                do {
+                    int id = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_ID));
+                    String title = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_TITLE));
+                    String image = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_IMAGE));
+                    int likes = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_LIKES));
+                    int time = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_TIME));
+                    int servings = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_SERVINGS));
+                    int favorite = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_FAVORITE));
+
+
+                    recipes.add(new Recipe(id, title, image, likes, time, servings,favorite));
+                } while (cursor.moveToNext());
+            }
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+            db.close();
+        }
+        return recipes;
+    }
+
+    // ========================================
+    // INGREDIENT OPERATIONS
+    // ========================================
+
+    // Insert ingredient (returns ID, or existing ID if already exists)
+    public long insertIngredient(String name) {
+        SQLiteDatabase db = null;
+        Cursor cursor = null;
+        long result = -1;
+
+        try {
+            db = this.getWritableDatabase();
+            ContentValues values = new ContentValues();
+            values.put(COLUMN_INGREDIENT_NAME, name);
+            result = db.insertWithOnConflict(TABLE_INGREDIENTS, null, values, SQLiteDatabase.CONFLICT_IGNORE);
+
+            // If the ingredient already exists, get its ID
+            if (result == -1) {
+                cursor = db.rawQuery(
+                        "SELECT " + COLUMN_INGREDIENT_ID + " FROM " + TABLE_INGREDIENTS +
+                                " WHERE " + COLUMN_INGREDIENT_NAME + " = ?",
+                        new String[]{name}
+                );
+
+                if (cursor.moveToFirst()) {
+                    result = cursor.getLong(cursor.getColumnIndexOrThrow(COLUMN_INGREDIENT_ID));
+                }
+            }
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+            if (db != null) {
+                db.close();
+            }
+        }
+        return result;
+    }
+
+    // Get ingredient ID by name
+    public long getIngredientIdByName(String name) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        long id = -1;
+        Cursor cursor = null;
+
+        try {
+            cursor = db.rawQuery(
+                    "SELECT " + COLUMN_INGREDIENT_ID + " FROM " + TABLE_INGREDIENTS +
+                            " WHERE " + COLUMN_INGREDIENT_NAME + " = ?",
+                    new String[]{name}
+            );
+
+            if (cursor.moveToFirst()) {
+                id = cursor.getLong(cursor.getColumnIndexOrThrow(COLUMN_INGREDIENT_ID));
+            }
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+            db.close();
+        }
+        return id;
+    }
+
+
+    // ========================================
+    // RECIPE-INGREDIENT RELATIONSHIP
+    // ========================================
+
+    // Link recipe to ingredient
+    public long insertRecipeIngredient(int recipeId, long ingredientId) {
+        SQLiteDatabase db = null;
+        long result = -1;
+
+        try {
+            db = this.getWritableDatabase();
+            ContentValues values = new ContentValues();
+            values.put(COLUMN_RECIPE_ID, recipeId);
+            values.put(COLUMN_INGREDIENT_ID, ingredientId);
+            result = db.insertWithOnConflict(TABLE_RECIPE_INGREDIENTS, null, values, SQLiteDatabase.CONFLICT_IGNORE);
+        } finally {
+            if (db != null) {
+                db.close();
+            }
+        }
+        return result;
+    }
+
+    // ========================================
+    // INSTRUCTION OPERATIONS
+    // ========================================
+
+    // Insert instruction
+    public long insertInstruction(int recipeId, int stepNumber, String step) {
+        SQLiteDatabase db = null;
+        long result = -1;
+
+        try {
+            db = this.getWritableDatabase();
+            ContentValues values = new ContentValues();
+            values.put(COLUMN_RECIPE_ID, recipeId);
+            values.put(COLUMN_STEP_NUMBER, stepNumber);
+            values.put(COLUMN_STEPS, step);
+            result = db.insertWithOnConflict(TABLE_INSTRUCTIONS, null, values, SQLiteDatabase.CONFLICT_REPLACE);
+        } finally {
+            if (db != null) {
+                db.close();
+            }
+        }
+        return result;
+    }
+
+    // Get instructions for a recipe
+
+    // Get cached instructions (formatted for API response)
+    public List<InstructionsResponse> getCachedInstructions(int recipeId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = null;
+        List<InstructionsResponse> result = new ArrayList<>();
+
+        try {
+            cursor = db.rawQuery(
+                    "SELECT * FROM " + TABLE_INSTRUCTIONS + " WHERE " + COLUMN_RECIPE_ID + " = ? ORDER BY " + COLUMN_STEP_NUMBER,
+                    new String[]{String.valueOf(recipeId)}
+            );
+
+            if (cursor.getCount() == 0) {
+                return null;
+            }
+
+            InstructionsResponse instructionsBlock = new InstructionsResponse();
+            instructionsBlock.name = "Cached Instructions";
+            instructionsBlock.steps = new ArrayList<>();
+
+            while (cursor.moveToNext()) {
+                Step step = new Step();
+                step.number = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_STEP_NUMBER));
+                step.step = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_STEPS));
+                instructionsBlock.steps.add(step);
+            }
+
+            result.add(instructionsBlock);
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+            db.close();
+        }
+        return result;
+    }
+
+    // Delete old instructions for a recipe
+    public int deleteInstructionsForRecipe(int recipeId) {
+        SQLiteDatabase db = null;
+        int rowsDeleted = 0;
+
+        try {
+            db = this.getWritableDatabase();
+            rowsDeleted = db.delete(TABLE_INSTRUCTIONS, COLUMN_RECIPE_ID + " = ?", new String[]{String.valueOf(recipeId)});
+        } finally {
+            if (db != null) {
+                db.close();
+            }
+        }
+        return rowsDeleted;
+    }
+
+    // ========================================
+    // ADVANCED OPERATIONS - FIXED VERSION
+    // ========================================
+
+    // Get cached recipe details (with ingredients) - formatted for API response
+    public RecipeDetailsResponse getCachedRecipeDetails(int recipeId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        RecipeDetailsResponse details = null;
+        Cursor recipeCursor = null;
+        Cursor ingredientsCursor = null;
+
+        try {
+            // Get recipe basic info
+            recipeCursor = db.rawQuery(
+                    "SELECT * FROM " + TABLE_RECIPES + " WHERE " + COLUMN_ID + " = ?",
+                    new String[]{String.valueOf(recipeId)}
+            );
+
+            if (!recipeCursor.moveToFirst()) {
+                return null;
+            }
+
+            details = new RecipeDetailsResponse();
+            details.id = recipeCursor.getInt(recipeCursor.getColumnIndexOrThrow(COLUMN_ID));
+            details.title = recipeCursor.getString(recipeCursor.getColumnIndexOrThrow(COLUMN_TITLE));
+            details.image = recipeCursor.getString(recipeCursor.getColumnIndexOrThrow(COLUMN_IMAGE));
+
+            // Add the missing fields
+            details.aggregateLikes = recipeCursor.getInt(recipeCursor.getColumnIndexOrThrow(COLUMN_LIKES));
+            details.readyInMinutes = recipeCursor.getInt(recipeCursor.getColumnIndexOrThrow(COLUMN_TIME));
+            details.servings = recipeCursor.getInt(recipeCursor.getColumnIndexOrThrow(COLUMN_SERVINGS));
+            details.fav=recipeCursor.getInt(recipeCursor.getColumnIndexOrThrow(COLUMN_FAVORITE));
+
+            // Initialize the extended ingredients list
+            details.extendedIngredients = new ArrayList<>();
+
+            // Get ingredients for this recipe
+            ingredientsCursor = db.rawQuery(
+                    "SELECT i." + COLUMN_INGREDIENT_ID + ", i." + COLUMN_INGREDIENT_NAME + " " +
+                            "FROM " + TABLE_INGREDIENTS + " i " +
+                            "JOIN " + TABLE_RECIPE_INGREDIENTS + " ri ON i." + COLUMN_INGREDIENT_ID + " = ri." + COLUMN_INGREDIENT_ID + " " +
+                            "WHERE ri." + COLUMN_RECIPE_ID + " = ?",
+                    new String[]{String.valueOf(recipeId)}
+            );
+
+            while (ingredientsCursor.moveToNext()) {
+                ExtendedIngredient ingredient = new ExtendedIngredient();
+                ingredient.id = ingredientsCursor.getInt(0);
+                ingredient.name = ingredientsCursor.getString(1);
+
+                // Initialize all fields to prevent null pointer exceptions
+                if (ingredient.meta == null) {
+                    ingredient.meta = new ArrayList<>(); // Empty list for cached data
+                }
+
+                details.extendedIngredients.add(ingredient);
+            }
+        } finally {
+            if (recipeCursor != null) {
+                recipeCursor.close();
+            }
+            if (ingredientsCursor != null) {
+                ingredientsCursor.close();
+            }
+            db.close();
+        }
+        return details;
+    }
+
+    // ========================================
+    // NEW DATA CHECKING METHODS
+    // ========================================
+
+    // Check if a recipe already has ingredients cached
+    public boolean hasIngredientsForRecipe(int recipeId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = null;
+        boolean hasIngredients = false;
+
+        try {
+            cursor = db.rawQuery(
+                    "SELECT COUNT(*) FROM " + TABLE_RECIPE_INGREDIENTS + " WHERE " + COLUMN_RECIPE_ID + " = ?",
+                    new String[]{String.valueOf(recipeId)}
+            );
+            cursor.moveToFirst();
+            int count = cursor.getInt(0);
+            hasIngredients = count > 0;
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+            db.close();
+        }
+        return hasIngredients;
+    }
+
+    // Check if a recipe already has instructions cached
+    public boolean hasInstructionsForRecipe(int recipeId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = null;
+        boolean hasInstructions = false;
+
+        try {
+            cursor = db.rawQuery(
+                    "SELECT COUNT(*) FROM " + TABLE_INSTRUCTIONS + " WHERE " + COLUMN_RECIPE_ID + " = ?",
+                    new String[]{String.valueOf(recipeId)}
+            );
+            cursor.moveToFirst();
+            int count = cursor.getInt(0);
+            hasInstructions = count > 0;
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+            db.close();
+        }
+        return hasInstructions;
+    }
+
+    // Helper method to delete ingredients for a recipe (to avoid duplicates when re-caching)
+    public int deleteIngredientsForRecipe(int recipeId) {
+        SQLiteDatabase db = null;
+        int rowsDeleted = 0;
+
+        try {
+            db = this.getWritableDatabase();
+            rowsDeleted = db.delete(TABLE_RECIPE_INGREDIENTS, COLUMN_RECIPE_ID + " = ?", new String[]{String.valueOf(recipeId)});
+        } finally {
+            if (db != null) {
+                db.close();
+            }
+        }
+        return rowsDeleted;
+    }
+
+    // Helper method to count ingredients for a recipe (for verification)
+    public int getIngredientCountForRecipe(int recipeId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = null;
+        int count = 0;
+
+        try {
+            cursor = db.rawQuery(
+                    "SELECT COUNT(*) FROM " + TABLE_RECIPE_INGREDIENTS + " WHERE " + COLUMN_RECIPE_ID + " = ?",
+                    new String[]{String.valueOf(recipeId)}
+            );
+            cursor.moveToFirst();
+            count = cursor.getInt(0);
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+            db.close();
+        }
+        return count;
+    }
+
+    /**
+     * Get random recipes from the database
+     * @param limit Number of random recipes to retrieve
+     * @return List of random Recipe objects
+     */
+    public List<Recipe> getRandomRecipes(int limit) {
+        List<Recipe> recipes = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        // Query to get random recipes
+        String query = "SELECT * FROM recipes ORDER BY RANDOM() LIMIT ?";
+        Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(limit)});
+
+        if (cursor.moveToFirst()) {
+            do {
+                int id = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_ID));
+                String title = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_TITLE));
+                String image = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_IMAGE));
+                int likes = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_LIKES));
+                int time = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_TIME));
+                int servings = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_SERVINGS));
+                int favorite = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_FAVORITE));
+
+
+                recipes.add(new Recipe(id, title, image, likes, time, servings, favorite));
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        db.close();
+
+        return recipes;
+    }
 
 
 

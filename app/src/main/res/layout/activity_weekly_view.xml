@@ -230,7 +230,7 @@
                         android:layout_width="18dp"
                         android:layout_height="18dp"
                         android:layout_gravity="center"
-                        android:background="@drawable/add" />
+                        android:background="@drawable/add_meal_plan" />
                 </FrameLayout>
 
                 <FrameLayout
@@ -266,7 +266,7 @@
                         android:layout_width="18dp"
                         android:layout_height="18dp"
                         android:layout_gravity="center"
-                        android:background="@drawable/add" />
+                        android:background="@drawable/add_meal_plan" />
                 </FrameLayout>
 
                 <FrameLayout
@@ -303,7 +303,7 @@
                         android:layout_width="18dp"
                         android:layout_height="18dp"
                         android:layout_gravity="center"
-                        android:background="@drawable/add" />
+                        android:background="@drawable/add_meal_plan" />
 
 
                 </FrameLayout>
@@ -343,7 +343,7 @@
                         android:layout_width="18dp"
                         android:layout_height="18dp"
                         android:layout_gravity="center"
-                        android:background="@drawable/add" />
+                        android:background="@drawable/add_meal_plan" />
                 </FrameLayout>
 
                 <FrameLayout

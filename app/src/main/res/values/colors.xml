@@ -14,6 +14,7 @@
     <color name="blue">#56aeff</color>
     <color name="light_pink">#fbf6f3</color>
     <color name="yellow">#ffde59</color>
+    <color name="tts_background">#F5F5F5</color>
 
 
     <style name="BLUE_LABEL" parent="Widget.AppCompat.Button">
