@@ -1,7 +1,5 @@
 package com.example.foodkeeper;
 
-import static androidx.room.RoomMasterTable.TABLE_NAME;
-
 import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.content.Context;
@@ -41,23 +39,22 @@ public class Database extends SQLiteOpenHelper {
     private static final String KEY_PASSWORD = "password";
     private static final String KEY_PROFILE = "profile_image";
 
-    // Food items - now belong to fridges only
     public static final String KEY_ITEM_NAME = "item_name";
     public static final String KEY_CATEGORY = "category";
     public static final String KEY_EXPIRY_DATE = "expiry_date";
     public static final String KEY_QUANTITY = "quantity";
     public static final String KEY_FOOD_IMAGE = "food_image";
     public static final String KEY_IS_IN_SHOPPING_LIST = "isInShoppingList";
-    public static final String KEY_FRIDGE_ID = "fridge_id"; // Foreign key to fridges
+    public static final String KEY_FRIDGE_ID = "fridge_id";
 
-    // Fridges - now belong to users
+
     private static final String KEY_BRAND = "brand";
     private static final String KEY_MODEL = "model";
     private static final String KEY_DESCRIPTION = "description";
     private static final String KEY_SIZE = "size";
     private static final String KEY_IS_LOGGED_IN = "is_logged_in";
     private static final String KEY_FRIDGE_IMAGE = "fridge_image";
-    public static final String KEY_USER_EMAIL = "user_email"; // Foreign key to users
+    public static final String KEY_USER_EMAIL = "user_email";
 
     SessionManager userSession;
 
@@ -109,7 +106,6 @@ public class Database extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        // Drop all tables in reverse dependency order
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_FOOD_ITEMS);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_FRIDGES);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_USERS);
@@ -152,7 +148,6 @@ public class Database extends SQLiteOpenHelper {
     }
 
 
-    // FRIDGE METHODS - Updated for user ownership
     public long addFridge(Fridge fridge, String userEmail) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
@@ -192,7 +187,6 @@ public class Database extends SQLiteOpenHelper {
             values.put(KEY_FRIDGE_IMAGE, fridge.getImage());
         }
 
-        // Only update fridges belonging to this user
         int result = db.update(TABLE_FRIDGES, values,
                 KEY_ID + "=? AND " + KEY_USER_EMAIL + "=?",
                 new String[]{String.valueOf(fridge.getId()), userEmail});
@@ -234,12 +228,10 @@ public class Database extends SQLiteOpenHelper {
         try {
             db.beginTransaction();
 
-            // First, log out from all fridges for this user
             ContentValues loggedOffValues = new ContentValues();
             loggedOffValues.put(KEY_IS_LOGGED_IN, 0);
             db.update(TABLE_FRIDGES, loggedOffValues, KEY_USER_EMAIL + "=?", new String[]{userEmail});
 
-            // Log into the specified fridge (only if it belongs to the user)
             ContentValues loggedInValues = new ContentValues();
             loggedInValues.put(KEY_IS_LOGGED_IN, 1);
             int rowsAffected = db.update(TABLE_FRIDGES, loggedInValues,
@@ -471,7 +463,6 @@ public class Database extends SQLiteOpenHelper {
     public boolean deleteFoodItem(int id, String userEmail) {
         SQLiteDatabase db = this.getWritableDatabase();
 
-        // Only delete items from fridges belonging to this user
         String whereClause = KEY_ID + "=? AND " + KEY_FRIDGE_ID + " IN " +
                 "(SELECT " + KEY_ID + " FROM " + TABLE_FRIDGES + " WHERE " + KEY_USER_EMAIL + "=?)";
 
@@ -575,17 +566,14 @@ public class Database extends SQLiteOpenHelper {
         return instance;
     }
 
-    // ... (Include all your other existing methods: meal methods, recipe methods, etc.)
-    // I'll add the key ones here for completeness:
-
     public long createMeal(Meal meal, long fridgeID) {
         SQLiteDatabase db = this.getWritableDatabase();
         try {
             ContentValues values = new ContentValues();
             values.put("mealName", meal.getMealName());
-            values.put("fridgeID",fridgeID);
-            if(meal.getUri()!=null) {
-                values.put("mealImage",meal.getUri());
+            values.put("fridgeID", fridgeID);
+            if(meal.getUri() != null) {
+                values.put("mealImage", meal.getUri());
             }
             return db.insert("Meal", null, values);
         } finally {
@@ -593,22 +581,41 @@ public class Database extends SQLiteOpenHelper {
         }
     }
 
-    public List<Meal> getAllMeals() {
+    public List<Meal> getMealsInConnectedFridge() {
         List<Meal> meals = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = null;
+        try {
+            String query = "SELECT m.* FROM Meal m " +
+                    "INNER JOIN " + TABLE_FRIDGES + " f ON m.fridgeID = f." + KEY_ID + " " +
+                    "WHERE f." + KEY_IS_LOGGED_IN + " = 1 ";
 
-        Cursor cursor = db.rawQuery("SELECT * FROM Meal", null);
+            cursor = db.rawQuery(query, null);
 
-        if (cursor.moveToFirst()) {
-            do {
-                long mealID = cursor.getLong(cursor.getColumnIndexOrThrow("mealID"));
-                Meal meal = getMealWithFoodItems(mealID);
-                meals.add(meal);
-            } while (cursor.moveToNext());
+            if (cursor.moveToFirst()) {
+                do {
+                    long id =cursor.getLong(cursor.getColumnIndexOrThrow("mealID"));
+                    String name = cursor.getString(cursor.getColumnIndexOrThrow("mealName"));
+
+                    String imageUri = cursor.getString(cursor.getColumnIndexOrThrow("mealImage"));
+
+                    String lastUsed = cursor.getString(cursor.getColumnIndexOrThrow("lastUsed"));
+
+                    long fridgeID = cursor.getLong(cursor.getColumnIndexOrThrow("fridgeID"));
+                    Meal meal = new Meal(id,name,imageUri,fridgeID);
+                    if(lastUsed!=null)
+                    {   meal.setLastUsed(LocalDate.parse(lastUsed));}
+                    meals.add(meal);
+                } while (cursor.moveToNext());
+            }
+
+            return meals;
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+            db.close();
         }
-
-        cursor.close();
-        return meals;
     }
 
     public MealPlan getMealPlanForDay(LocalDate planDay) {
@@ -801,8 +808,7 @@ public class Database extends SQLiteOpenHelper {
             String lastUsed = mealCursor.getString(mealCursor.getColumnIndexOrThrow("lastUsed"));
             long fridgeID = mealCursor.getLong(mealCursor.getColumnIndexOrThrow("lastUsed"));
 
-            meal = new Meal(mealID, name,R.drawable.place_holder, fridgeID);
-            meal.setUrl(image);
+            meal = new Meal(mealID, name,image, fridgeID);
             if (lastUsed != null) {
                 meal.setLastUsed(LocalDate.parse(lastUsed));
             }

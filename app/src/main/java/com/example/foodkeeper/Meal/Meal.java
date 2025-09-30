@@ -13,7 +13,6 @@ public class Meal implements Parcelable {
     private long mealID;
     private String mealName;
     private String url;
-    private int imageResource;
     private long fridgeID;
     private String mealType;
 
@@ -32,10 +31,17 @@ public class Meal implements Parcelable {
         return foodItemIDs;
     }
 
-    public Meal(long MealID, String name, int imageResource,long fridgeID) {
+    public Meal(long MealID, String name, String imageUrl,long fridgeID) {
         this.mealID = MealID;
         this.mealName = name;
-        this.imageResource = imageResource;
+        this.url =imageUrl;
+        this.lastUsed = null;
+        this.fridgeID= fridgeID;
+        this.foodItemIDs = new ArrayList<>(); // Initialize here too
+    }
+    public Meal( String name, String url,long fridgeID) {
+        this.mealName = name;
+        this.url =url;
         this.lastUsed = null;
         this.fridgeID= fridgeID;
         this.foodItemIDs = new ArrayList<>(); // Initialize here too
@@ -45,7 +51,6 @@ public class Meal implements Parcelable {
         mealID = in.readLong();
         mealName = in.readString();
         url = in.readString();
-        imageResource = in.readInt();
         lastUsed = LocalDate.parse(in.readString());
         foodItemIDs = new ArrayList<>();
         in.readStringList(foodItemIDs);
@@ -67,9 +72,6 @@ public class Meal implements Parcelable {
         return lastUsed;
     }
 
-    public int getImageResource() {
-        return imageResource;
-    }
 
     public String getUri() {
         return url;
@@ -95,9 +97,6 @@ public class Meal implements Parcelable {
         this.url = url;
     }
 
-    public void setImageResource(int imageResource) {
-        this.imageResource = imageResource;
-    }
 
     public String getMealType() {
         return mealType;
@@ -122,7 +121,6 @@ public class Meal implements Parcelable {
         dest.writeLong(mealID);
         dest.writeString(mealName);
         dest.writeString(url);
-        dest.writeInt(imageResource); // This was missing!
         dest.writeStringList(foodItemIDs);
     }
 

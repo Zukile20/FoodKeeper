@@ -186,7 +186,33 @@ public class ProfileActivity extends AppCompatActivity {
             passwordLayout.addView(horizontalLayout);
         }
     }
-
+    public static boolean isValid(String password) {
+        int f1 = 0, f2 = 0, f3 = 0;
+        if(password.length() < 8){
+            return false;
+        } else {
+            for (int p = 0; p < password.length(); p++){
+                if(Character.isLetter(password.charAt(p))){
+                    f1 = 1;
+                }
+            }
+            for (int r = 0; r < password.length(); r++){
+                if(Character.isDigit(password.charAt(r))){
+                    f2 = 1;
+                }
+            }
+            for (int s = 0; s < password.length(); s++){
+                char c = password.charAt(s);
+                if(c >= 33 && c <= 46 || c == 64){
+                    f3 = 1;
+                }
+            }
+            if (f1 == 1 && f2 == 1 && f3 == 1) {
+                return true;
+            }
+            return false;
+        }
+    }
     private void togglePasswordVisibility(EditText editText, int passwordType) {
         boolean isVisible = false;
 
@@ -425,14 +451,17 @@ public class ProfileActivity extends AppCompatActivity {
             etCurrentPassword.requestFocus();
             return;
         }
-        int result = dbHelper.updatePassword(user.getEmail(), newPassword);
-
-        if (result > 0) {
-            Toast.makeText(this, "Password changed successfully!", Toast.LENGTH_SHORT).show();
-            cancelPasswordChange();
-        } else {
-            Toast.makeText(this, "Failed to change password", Toast.LENGTH_SHORT).show();
+        if(isValid(newPassword)) {
+            int result = dbHelper.updatePassword(user.getEmail(), newPassword);
+            if (result > 0) {
+                Toast.makeText(this, "Password changed successfully!", Toast.LENGTH_SHORT).show();
+                cancelPasswordChange();
+            } else {
+                Toast.makeText(this, "Failed to change password", Toast.LENGTH_SHORT).show();
+            }
         }
+
+
     }
 
     private boolean validatePasswordChange() {

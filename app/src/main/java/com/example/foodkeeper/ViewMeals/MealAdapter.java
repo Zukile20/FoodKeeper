@@ -168,16 +168,11 @@ public class MealAdapter extends RecyclerView.Adapter<MealAdapter.MealViewHolder
             mainContent.setTranslationX(0);
             isSwipeOpen = false;
 
-            if (meal.getUri() != null) {
-                Glide.with(itemView.getContext())
-                        .load(meal.getUri())
-                        .placeholder(R.drawable.place_holder)
-                        .into(mealImageView);
-            } else if (meal.getImageResource() != 0) {
-                mealImageView.setImageResource(meal.getImageResource());
-            } else {
-                mealImageView.setImageResource(R.drawable.place_holder);
-            }
+            Glide.with(itemView.getContext())
+                    .load(meal.getUri())
+                    .placeholder(R.drawable.image_placeholder)
+                    .error(R.drawable.place_holder)
+                    .into(mealImageView);
         }
     }
 }

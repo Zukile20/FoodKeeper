@@ -1,5 +1,7 @@
 package com.example.foodkeeper.FoodItem;
 
+import androidx.annotation.NonNull;
+
 import java.io.Serializable;
 
 public class FoodItem implements Serializable {
@@ -84,5 +86,11 @@ public class FoodItem implements Serializable {
 
     public void setChecked(boolean checked) {
         this.checked = checked;
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return "● "+ name;
     }
 }

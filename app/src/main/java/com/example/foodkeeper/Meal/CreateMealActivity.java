@@ -119,7 +119,7 @@ public class CreateMealActivity extends AppCompatActivity implements FoodSelecti
         createBtn.setOnClickListener(v->
         {
             String mealName = String.valueOf(nameField.getText());
-          if(foodItemAdapter.getSelectedItemCount()==0 || mealName.length()==0)
+          if(foodItemAdapter.getSelectedItemCount()==0 || mealName.isEmpty())
           {
               if (mealName.isEmpty()) {
                   Toast.makeText(this, "Meal name cannot be empty", Toast.LENGTH_SHORT).show();
@@ -155,11 +155,11 @@ public class CreateMealActivity extends AppCompatActivity implements FoodSelecti
             imageSelectedForCurrentMeal = false;
             selectedImageUri = null;
 
-//            long mealID = db.createMeal(name, imageUri);
-//            Meal meal = new Meal(mealID, name, R.drawable.place_holder);
-
-//            meal.setFoodItemIDs(foodItemAdapter.getSelectedItemIds());
-//            db.updateMeal(meal);//creates a new meal
+            Meal meal = new Meal(name, imageUri,db.getConnectedFridgeForUser(session.getUserEmail()).getId());
+            long mealID = db.createMeal(meal,db.getConnectedFridgeForUser(session.getUserEmail()).getId());//creates a new meal and returns its assigned id
+            meal.setMealID(mealID);
+            meal.setFoodItemIDs(foodItemAdapter.getSelectedItemIds());
+            db.updateMeal(meal);//add entries to the MealFoodItem table
             return null;
         }
         catch (IOException e) {

@@ -18,12 +18,14 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.foodkeeper.Database;
 import com.example.foodkeeper.FoodkeeperUtils.SwipeRevealCallback;
 import com.example.foodkeeper.Meal.CreateMealActivity;
 import com.example.foodkeeper.Meal.Meal;
 import com.example.foodkeeper.Meal.UpdateMealActivity;
 import com.example.foodkeeper.Meal.ViewMealActivity;
 import com.example.foodkeeper.R;
+import com.example.foodkeeper.SessionManager;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.time.LocalDate;
@@ -39,7 +41,7 @@ public class mealsViewActivity extends AppCompatActivity  {
     private LinearLayout emptyStateLayout,loadingLayout;
     private Spinner sortSpinner;
     private RecyclerView mealsRecyclerView;
-    com.example.foodkeeper.Database db ;
+    Database db ;
     //Data
     private MealAdapter mealAdapter;
     private List<Meal> allMeals;
@@ -54,6 +56,7 @@ public class mealsViewActivity extends AppCompatActivity  {
 
     private int ACTIVITY_MODE =0;
     private final int SELECTION_MODE=1;
+    SessionManager sess;
 
 
     @Override
@@ -106,7 +109,7 @@ public class mealsViewActivity extends AppCompatActivity  {
                 {
                     //The selection must lead to viewing an item
                     Intent intent = new Intent(getApplicationContext() , ViewMealActivity.class);
-                    intent.putExtra("mealID",meal.getMealID());
+                    intent.putExtra("viewMeal",meal.getMealID());
                     startActivity(intent);
                 }
 
@@ -144,7 +147,8 @@ public class mealsViewActivity extends AppCompatActivity  {
     }
     private void initViews()
     {
-        db =   com.example.foodkeeper.Database.getInstance(this);
+        db =   Database.getInstance(this);
+        sess=new SessionManager(this);
 
         backButton = findViewById(R.id.backButton);
         sortSpinner = findViewById(R.id.sortSpinner);
@@ -215,10 +219,10 @@ public class mealsViewActivity extends AppCompatActivity  {
         }
         mealAdapter.notifyDataSetChanged();
     }
-    private List<Meal> getSampleMeals() {
+    private List<Meal> loadData() {
 
         List<Meal> meals = new ArrayList<>();
-        meals.addAll(db.getAllMeals());
+        meals.addAll(db.getMealsInConnectedFridge());
         return meals;
     }
     private void loadMeals() {
@@ -228,7 +232,7 @@ public class mealsViewActivity extends AppCompatActivity  {
             try {
                 Thread.sleep(1000); // Simulate network delay
 
-                List<Meal> meals = getSampleMeals();
+                List<Meal> meals = loadData();
 
 
                 runOnUiThread(() -> {
