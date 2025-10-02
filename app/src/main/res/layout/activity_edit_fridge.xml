@@ -46,7 +46,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/linearLayout"
         app:layout_constraintVertical_bias="0.0"
-        app:srcCompat="@drawable/circle_background_blue" />
+        app:srcCompat="@drawable/circle_background_white" />
 
     <ImageView
         android:id="@+id/imageView6"
