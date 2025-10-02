@@ -76,7 +76,12 @@ public class MainActivity extends AppCompatActivity {
             if(id == R.id.nav_home){
 
                 return true;
-            } else if(id == R.id.nav_search || id == R.id.nav_view){
+            } else if(id == R.id.nav_search){
+                startActivity(new Intent(MainActivity.this, SearchActivity.class));
+                overridePendingTransition(0, 0);
+                finish();
+                return true;
+            }else if(id == R.id.nav_view){
                 startActivity(new Intent(MainActivity.this, ItemsViewActivity.class));
                 overridePendingTransition(0, 0);
                 finish();
@@ -97,7 +102,7 @@ public class MainActivity extends AppCompatActivity {
 
         });
         bottomNav.setSelectedItemId(R.id.nav_home);
-        greetText.setText("Hi "+sess.getUserName());
+        greetText.setText("Hi "+ sess.getUserName().substring(0, 1).toUpperCase() + sess.getUserName().substring(1));
 
     }
 

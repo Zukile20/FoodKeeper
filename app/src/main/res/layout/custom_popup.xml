@@ -11,6 +11,7 @@
         android:layout_height="wrap_content"
         android:text="Category"
         android:textSize="18sp"
+        android:textColor="@color/black"
         android:layout_gravity="center_horizontal"
         android:textStyle="bold"/>
 

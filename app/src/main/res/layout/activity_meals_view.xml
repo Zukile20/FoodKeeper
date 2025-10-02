@@ -84,7 +84,6 @@
 
     <!-- Meals List -->
 
-
     <!-- Empty State (Initially Hidden) -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/mealsRecyclerView"

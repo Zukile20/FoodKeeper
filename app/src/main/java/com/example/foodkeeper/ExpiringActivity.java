@@ -65,12 +65,18 @@ public class ExpiringActivity extends AppCompatActivity {
                 overridePendingTransition(0, 0);
                 finish();
                 return true;
-            } else if(id == R.id.nav_search || id == R.id.nav_view){
+            } else if(id == R.id.nav_search){
+                startActivity(new Intent(ExpiringActivity.this, SearchActivity.class));
+                overridePendingTransition(0, 0);
+                finish();
+                return true;
+            } else if(id == R.id.nav_view){
                 startActivity(new Intent(ExpiringActivity.this, ItemsViewActivity.class));
                 overridePendingTransition(0, 0);
                 finish();
                 return true;
-            } else if(id == R.id.nav_expiring) {
+            }
+            else if(id == R.id.nav_expiring) {
 
                 return true;
             } else if (id == R.id.nav_profileMenu) {

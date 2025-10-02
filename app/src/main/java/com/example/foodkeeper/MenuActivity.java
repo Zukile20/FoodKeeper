@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -43,12 +44,18 @@ public class MenuActivity extends AppCompatActivity {
                 overridePendingTransition(0, 0);
                 finish();
                 return true;
-            } else if(id == R.id.nav_search || id == R.id.nav_view){
+            } else if(id == R.id.nav_view){
                 startActivity(new Intent(MenuActivity.this, ItemsViewActivity.class));
                 overridePendingTransition(0, 0);
                 finish();
                 return true;
-            } else if(id == R.id.nav_expiring) {
+            } else if(id == R.id.nav_search){
+                startActivity(new Intent(MenuActivity.this, SearchActivity.class));
+                overridePendingTransition(0, 0);
+                finish();
+                return true;
+            }
+            else if(id == R.id.nav_expiring) {
                 startActivity(new Intent(MenuActivity.this, ExpiringActivity.class));
                 overridePendingTransition(0, 0);
                 finish();
@@ -90,13 +97,29 @@ public class MenuActivity extends AppCompatActivity {
            // finish();
         });
         logoutArrow.setOnClickListener(v -> {
-            SessionManager userSession = new SessionManager(this);
-            Intent intent = new Intent(MenuActivity.this, LoginActivity.class);
-            userSession.logoutUser();
-            startActivity(intent);
-            finish();
+            showLogoutDialog();
         });
     }
+
+    private void showLogoutDialog() {
+        LogoutDialog logoutDialog = new LogoutDialog(this, new LogoutDialog.OnLogoutListener() {
+            @Override
+            public void onLogoutConfirmed() {
+                SessionManager userSession = new SessionManager(MenuActivity.this);
+                Intent intent = new Intent(MenuActivity.this, LoginActivity.class);
+                userSession.logoutUser();
+                startActivity(intent);
+                finish();
+            }
+
+            @Override
+            public void onCancel() {
+                Toast.makeText(MenuActivity.this, "Logout cancelled", Toast.LENGTH_SHORT).show();
+            }
+        });
+        logoutDialog.show();
+    }
+
     @Override
     protected void onResume() {
         super.onResume();

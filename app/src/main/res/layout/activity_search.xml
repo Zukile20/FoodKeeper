@@ -8,7 +8,7 @@
     android:background="@color/white">
 
     <LinearLayout
-        android:id="@+id/searchContainerExp"
+        android:id="@+id/searchContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
@@ -38,7 +38,7 @@
                     android:src="@drawable/ic_search" />
 
                 <EditText
-                    android:id="@+id/search_barExp"
+                    android:id="@+id/search_bar"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -54,12 +54,66 @@
         </com.google.android.material.card.MaterialCardView>
     </LinearLayout>
 
+    <LinearLayout
+        android:id="@+id/tabs"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_below="@id/searchContainer"
+        android:orientation="horizontal"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp">
+
+        <TextView
+            android:id="@+id/allTab"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:gravity="center"
+            android:text="All"
+            android:textColor="@color/black"
+            android:textSize="16sp" />
+
+        <View
+            android:layout_width="1dp"
+            android:layout_height="24dp"
+            android:layout_gravity="center"
+            android:background="#E0E0E0" />
+
+        <Spinner
+            android:id="@+id/categoryTab"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="Category"
+            android:textColor="@color/black"
+            android:textSize="16sp" />
+
+        <View
+            android:layout_width="1dp"
+            android:layout_height="24dp"
+            android:layout_gravity="center"
+            android:background="#E0E0E0" />
+
+        <TextView
+            android:id="@+id/soonToExpireTab"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:gravity="center"
+            android:text="Soon-to-expire"
+            android:textColor="@color/black"
+            android:textSize="16sp" />
+    </LinearLayout>
+
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerViewExp"
+        android:id="@+id/recyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/searchContainerExp"
-        android:layout_above="@id/bottomNavExp"
+        android:layout_below="@id/tabs"
+        android:layout_above="@id/bottomNav"
         android:clipToPadding="false"
         android:horizontalSpacing="16dp"
         android:numColumns="2"
@@ -67,11 +121,11 @@
         android:verticalSpacing="16dp"/>
 
     <LinearLayout
-        android:id="@+id/emptyStateExp"
+        android:id="@+id/emptyState"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/searchContainerExp"
-        android:layout_above="@id/bottomNavExp"
+        android:layout_below="@id/tabs"
+        android:layout_above="@id/bottomNav"
         android:gravity="center"
         android:orientation="vertical"
         android:padding="32dp"
@@ -84,7 +138,7 @@
             app:tint="@color/mainBlue" />
 
         <TextView
-            android:id="@+id/emptyTextExp"
+            android:id="@+id/emptyText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
@@ -94,8 +148,21 @@
             android:textSize="18sp"/>
     </LinearLayout>
 
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabAddItem"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginEnd="33dp"
+        android:layout_marginBottom="87dp"
+        android:contentDescription="Add item"
+        app:backgroundTint="@color/mainBlue"
+        app:srcCompat="@drawable/ic_add"
+        app:tint="#FFFFFF"/>
+
     <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/bottomNavExp"
+        android:id="@+id/bottomNav"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
@@ -106,6 +173,5 @@
         app:menu="@menu/nav_menu"
         app:itemIconSize="30dp"
         android:elevation="8dp" />
-
 
 </RelativeLayout>

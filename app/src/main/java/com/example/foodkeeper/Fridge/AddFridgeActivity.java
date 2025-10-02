@@ -25,13 +25,15 @@ import java.io.IOException;
 
 public class AddFridgeActivity extends AppCompatActivity {
     private static final int PICK_IMAGE_REQUEST = 1;
+    private static final int CAMERA_REQUEST = 2;
     private ShapeableImageView fridgeImage;
     private EditText brandEditText, modelEditText, descriptionEditText, numberEditText;
-    private ImageButton btnIncrement, btnDecrement;
+    private ImageButton btnIncrement, btnDecrement, cameraIconButton;
     private Button addFridgeButton;
     private Button backBtn;
     private Bitmap selectedImage;
     private int fridgeSize = 0;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,6 +47,7 @@ public class AddFridgeActivity extends AppCompatActivity {
         numberEditText = findViewById(R.id.numberEditText);
         btnIncrement = findViewById(R.id.btnIncrement);
         btnDecrement = findViewById(R.id.btnDecrement);
+        cameraIconButton = findViewById(R.id.cameraIconButton);
         addFridgeButton = findViewById(R.id.addFridgeButton);
         backBtn = findViewById(R.id.backBtn);
         numberEditText.setText(String.valueOf(fridgeSize));
@@ -53,6 +56,13 @@ public class AddFridgeActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 openImagePicker();
+            }
+        });
+
+        cameraIconButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showImageSourceDialog();
             }
         });
 
@@ -87,9 +97,11 @@ public class AddFridgeActivity extends AppCompatActivity {
                 addFridge();
             }
         });
+
         numberEditText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 try {
@@ -98,38 +110,90 @@ public class AddFridgeActivity extends AppCompatActivity {
                     fridgeSize = 0;
                 }
             }
+
             @Override
             public void afterTextChanged(Editable s){}
-                });
+        });
     }
-    private void openImagePicker() {
+
+    private void showImageSourceDialog() {
+        String[] options = {"Take Photo", "Choose from Gallery", "Cancel"};
+
+        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this);
+        builder.setTitle("Add Fridge Photo");
+        builder.setItems(options, (dialog, which) -> {
+            switch (which) {
+                case 0:
+                    openCamera();
+                    break;
+                case 1:
+                    openGallery();
+                    break;
+                case 2:
+                    dialog.dismiss();
+                    break;
+            }
+        });
+        builder.show();
+    }
+
+    private void openGallery() {
         Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         startActivityForResult(intent, PICK_IMAGE_REQUEST);
+    }
+
+    private void openCamera() {
+        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        if (intent.resolveActivity(getPackageManager()) != null) {
+            startActivityForResult(intent, CAMERA_REQUEST);
+        } else {
+            Toast.makeText(this, "No camera app found", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void openImagePicker() {
+        openGallery();
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null) {
-            Uri imageUri = data.getData();
-            try {
-                selectedImage = MediaStore.Images.Media.getBitmap(getContentResolver(), imageUri);
-                fridgeImage.setImageBitmap(selectedImage);
-            } catch (IOException e) {
-                e.printStackTrace();
-                Toast.makeText(this, "Error loading image", Toast.LENGTH_SHORT).show();
+        if (resultCode == RESULT_OK) {
+            if (requestCode == PICK_IMAGE_REQUEST && data != null) {
+                Uri imageUri = data.getData();
+                try {
+                    selectedImage = MediaStore.Images.Media.getBitmap(getContentResolver(), imageUri);
+                    fridgeImage.setImageBitmap(selectedImage);
+                    Toast.makeText(this, "Fridge image selected", Toast.LENGTH_SHORT).show();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    Toast.makeText(this, "Error loading image", Toast.LENGTH_SHORT).show();
+                }
+            } else if (requestCode == CAMERA_REQUEST && data != null) {
+                Bundle extras = data.getExtras();
+                if (extras != null) {
+                    selectedImage = (Bitmap) extras.get("data");
+                    fridgeImage.setImageBitmap(selectedImage);
+                    Toast.makeText(this, "Fridge photo taken", Toast.LENGTH_SHORT).show();
+                }
             }
         }
     }
+
     private void addFridge() {
         String brand = brandEditText.getText().toString().trim();
         String model = modelEditText.getText().toString().trim();
         String description = descriptionEditText.getText().toString().trim();
         String sizeStr = numberEditText.getText().toString().trim();
 
-        if (brand.isEmpty() || model.isEmpty() || fridgeSize <= 0) {
-            Toast.makeText(this, "Please fill in all details", Toast.LENGTH_SHORT).show();
+        if (brand.isEmpty() || model.isEmpty()) {
+            Toast.makeText(this, "Please fill in brand and model", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if(fridgeSize <= 0){
+            Toast.makeText(this, "Size must be greater than 0", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -149,7 +213,10 @@ public class AddFridgeActivity extends AppCompatActivity {
 
         setResult(RESULT_OK, resultIntent);
         finish();
+
+        Toast.makeText(this, "Fridge added successfully", Toast.LENGTH_SHORT).show();
     }
+
     @Override
     protected void onDestroy(){
         super.onDestroy();

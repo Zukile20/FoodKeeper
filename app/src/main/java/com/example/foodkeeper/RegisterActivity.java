@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -24,12 +25,15 @@ import java.io.IOException;
 public class RegisterActivity extends AppCompatActivity {
     TextInputEditText edName, edSurname, edEmail, edPhone, edPassword, edConfirm, edFridgeBrand, edFridgeModel, edFridgeSize, edFridgeDescription;
     Button createBtn;
-    TextView txtSignIn, uploadImageTxt;
+    TextView txtSignIn;
+    ImageButton uploadImageBtn;
     Database db;
     ImageView profileImage;
     Bitmap profileBitmap;
     Uri imageUri;
     static final int PICK_IMAGE_REQUEST = 100;
+    static final int CAMERA_REQUEST = 101;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,7 +43,7 @@ public class RegisterActivity extends AppCompatActivity {
         db = new Database(this);
 
         profileImage = findViewById(R.id.profileImageView);
-        uploadImageTxt = findViewById(R.id.uploadImageButton);
+        uploadImageBtn = findViewById(R.id.uploadImageButton);
         edName = findViewById(R.id.nameEditText);
         edSurname = findViewById(R.id.surnameEditText);
         edEmail = findViewById(R.id.emailEditText);
@@ -61,7 +65,12 @@ public class RegisterActivity extends AppCompatActivity {
             }
         });
 
-        uploadImageTxt.setOnClickListener(v -> OpenImagePicker());
+        uploadImageBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showImagePickerOptions();
+            }
+        });
 
         createBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -69,6 +78,25 @@ public class RegisterActivity extends AppCompatActivity {
                 registerUser();
             }
         });
+    }
+
+    private void showImagePickerOptions() {
+        openGallery();
+    }
+
+    private void openGallery() {
+        Intent intent = new Intent(Intent.ACTION_PICK);
+        intent.setType("image/*");
+        startActivityForResult(intent, PICK_IMAGE_REQUEST);
+    }
+
+    private void openCamera() {
+        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        if (intent.resolveActivity(getPackageManager()) != null) {
+            startActivityForResult(intent, CAMERA_REQUEST);
+        } else {
+            Toast.makeText(this, "No camera app found", Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void registerUser() {
@@ -83,12 +111,6 @@ public class RegisterActivity extends AppCompatActivity {
         String fridgeSizeStr = edFridgeSize.getText().toString();
         String fridgeDescription = edFridgeDescription.getText().toString();
 
-        byte[] imageBlob;
-        if(profileBitmap != null)
-            imageBlob = imageToBlob(profileBitmap);
-        else
-            imageBlob = null;
-
         if(name.length() == 0 || surname.length() == 0 || email.length() == 0 ||
                 password.length() == 0 || confirm.length() == 0 ||
                 fridgeBrand.length() == 0 || fridgeModel.length() == 0 || fridgeSizeStr.length() == 0) {
@@ -101,9 +123,7 @@ public class RegisterActivity extends AppCompatActivity {
             return;
         }
 
-        Integer fridgeSize = null;
-        String phone = phoneStr;
-        if (!phone.matches("\\d+")) {
+        if (!phoneStr.matches("\\d+")) {
             Toast.makeText(getApplicationContext(), "Please enter a valid phone number", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -117,34 +137,36 @@ public class RegisterActivity extends AppCompatActivity {
 
         if(isEmailExists(email)) {
             Toast.makeText(getApplicationContext(), "Email already registered", Toast.LENGTH_SHORT).show();
-
             Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
             intent.putExtra("USER_EMAIL", email);
             startActivity(intent);
             finish();
+            return;
         }
 
-        db.register(name, surname, email, phone, password, imageBlob);
+        byte[] imageBlob = null;
+        if(profileBitmap != null) {
+            imageBlob = imageToBlob(profileBitmap);
+        }
+
+        db.register(name, surname, email, phoneStr, password, imageBlob);
 
         Fridge fridge = new Fridge(fridgeBrand, fridgeModel, fridgeDescription, Integer.parseInt(fridgeSizeStr), true, null);
-        long fridgeId = db.addFridge(fridge,email);
+        long fridgeId = db.addFridge(fridge, email);
 
         if (fridgeId != -1) {
             Toast.makeText(getApplicationContext(), "Registered Successfully with your first fridge!", Toast.LENGTH_SHORT).show();
-
             Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
             intent.putExtra("USER_EMAIL", email);
             startActivity(intent);
             finish();
         } else {
-            Toast.makeText(getApplicationContext(), "Registration failed", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), "Registration completed but fridge addition failed", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
+            intent.putExtra("USER_EMAIL", email);
+            startActivity(intent);
+            finish();
         }
-    }
-
-    private void OpenImagePicker() {
-        Intent intent = new Intent(Intent.ACTION_PICK);
-        intent.setType("image/*");
-        startActivityForResult(intent, PICK_IMAGE_REQUEST);
     }
 
     private boolean isEmailExists(String email) {
@@ -193,14 +215,24 @@ public class RegisterActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.getData() != null) {
-            imageUri = data.getData();
-            try {
-                profileBitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), imageUri);
-                profileImage.setImageBitmap(profileBitmap);
-            } catch (IOException e) {
-                e.printStackTrace();
-                Toast.makeText(this, "Failed to load image", Toast.LENGTH_SHORT).show();
+        if (resultCode == RESULT_OK) {
+            if (requestCode == PICK_IMAGE_REQUEST && data != null && data.getData() != null) {
+                imageUri = data.getData();
+                try {
+                    profileBitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), imageUri);
+                    profileImage.setImageBitmap(profileBitmap);
+                    Toast.makeText(this, "Profile image selected", Toast.LENGTH_SHORT).show();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    Toast.makeText(this, "Failed to load image", Toast.LENGTH_SHORT).show();
+                }
+            } else if (requestCode == CAMERA_REQUEST && data != null) {
+                Bundle extras = data.getExtras();
+                if (extras != null) {
+                    profileBitmap = (Bitmap) extras.get("data");
+                    profileImage.setImageBitmap(profileBitmap);
+                    Toast.makeText(this, "Profile photo taken", Toast.LENGTH_SHORT).show();
+                }
             }
         }
     }

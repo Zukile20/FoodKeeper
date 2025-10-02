@@ -1,4 +1,4 @@
-package com.example.foodkeeper.FoodItem;
+package com.example.foodkeeper;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
@@ -23,12 +23,16 @@ import com.example.foodkeeper.CustomSpinnerAdapter;
 import com.example.foodkeeper.Database;
 import com.example.foodkeeper.ExpiringActivity;
 
+import com.example.foodkeeper.FoodItem.AddItemActivity;
+import com.example.foodkeeper.FoodItem.FoodItem;
+import com.example.foodkeeper.FoodItem.FoodItemAdapter;
+import com.example.foodkeeper.FoodItem.ItemsViewActivity;
+import com.example.foodkeeper.FoodItem.ViewAnItemActivity;
 import com.example.foodkeeper.LoginActivity;
 import com.example.foodkeeper.MainActivity;
 import com.example.foodkeeper.MenuActivity;
 import com.example.foodkeeper.NotificationHelper;
 import com.example.foodkeeper.R;
-import com.example.foodkeeper.SearchActivity;
 import com.example.foodkeeper.SessionManager;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -42,12 +46,13 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
-public class ItemsViewActivity extends AppCompatActivity {
+public class SearchActivity extends AppCompatActivity {
+    private EditText searchEditText;
     private LinearLayout emptyState;
     private FoodItemAdapter foodItemAdapter;
     private List<FoodItem> allFoodItems;
     private FloatingActionButton fabAddItem;
-    private TextView categoryTab, soonToExpireTab, allTab, empty;
+    private TextView soonToExpireTab, allTab, empty;
     private Database db;
     private BottomNavigationView bottomNav;
     private Spinner spinnerCategory;
@@ -58,7 +63,7 @@ public class ItemsViewActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_items_view);
+        setContentView(R.layout.activity_search);
 
         db = new Database(this);
         session= new SessionManager(this);
@@ -71,6 +76,7 @@ public class ItemsViewActivity extends AppCompatActivity {
             return;
         }
 
+        searchEditText = findViewById(R.id.search_bar);
         recyclerView = findViewById(R.id.recyclerView);
         fabAddItem = findViewById(R.id.fabAddItem);
         allTab = findViewById(R.id.allTab);
@@ -88,26 +94,26 @@ public class ItemsViewActivity extends AppCompatActivity {
             int id = item.getItemId();
 
             if(id == R.id.nav_home){
-                startActivity(new Intent(ItemsViewActivity.this, MainActivity.class));
+                startActivity(new Intent(SearchActivity.this, MainActivity.class));
                 overridePendingTransition(0, 0);
                 finish();
                 return true;
             } else if(id == R.id.nav_search){
-                startActivity(new Intent(ItemsViewActivity.this, SearchActivity.class));
+
+                return true;
+            } else if(id == R.id.nav_view){
+                startActivity(new Intent(SearchActivity.this, ItemsViewActivity.class));
                 overridePendingTransition(0, 0);
                 finish();
                 return true;
-            } else if(id == R.id.nav_view){
-
-                return true;
             }
             else if(id == R.id.nav_expiring) {
-                startActivity(new Intent(ItemsViewActivity.this, ExpiringActivity.class));
+                startActivity(new Intent(SearchActivity.this, ExpiringActivity.class));
                 overridePendingTransition(0, 0);
                 finish();
                 return true;
             } else if (id == R.id.nav_profileMenu) {
-                startActivity(new Intent(ItemsViewActivity.this, MenuActivity.class));
+                startActivity(new Intent(SearchActivity.this, MenuActivity.class));
                 overridePendingTransition(0, 0);
                 finish();
                 return true;
@@ -116,7 +122,7 @@ public class ItemsViewActivity extends AppCompatActivity {
             }
 
         });
-        bottomNav.setSelectedItemId(R.id.nav_view);
+        bottomNav.setSelectedItemId(R.id.nav_search);
 
         loadFoodItems();
 
@@ -127,6 +133,18 @@ public class ItemsViewActivity extends AppCompatActivity {
             }
         });
 
+        searchEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void afterTextChanged(Editable s) {}
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                filterItems(s.toString(),"");
+            }
+        });
         AdapterView.OnItemSelectedListener categorySpinnerListener = new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -155,7 +173,7 @@ public class ItemsViewActivity extends AppCompatActivity {
         setupSpinnerCategory(categorySpinnerListener);
         soonToExpireTab.setOnClickListener(v -> {
             spinnerCategory.setOnItemSelectedListener(null);
-            allTab.setTextColor(getResources().getColor(android.R.color.black));
+
             soonToExpireTab.setTextColor(getResources().getColor(android.R.color.darker_gray));
             spinnerCategory.getBackground().setColorFilter(ContextCompat.getColor(this, R.color.black), PorterDuff.Mode.SRC_ATOP);
             spinnerCategory.setSelection(0);
@@ -169,7 +187,7 @@ public class ItemsViewActivity extends AppCompatActivity {
         fabAddItem.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(ItemsViewActivity.this, AddItemActivity.class));
+                startActivity(new Intent(SearchActivity.this, AddItemActivity.class));
             }
         });
         allTab.performClick();

@@ -43,9 +43,11 @@ public class AddItemActivity extends AppCompatActivity {
     RadioGroup radioBtns;
     Database db;
     ShapeableImageView foodImage;
+    ImageButton cameraIconButton;
     Bitmap selectedImage;
     Button btnMinus, btnPlus, btnSavePopup, btnCancelPopup, btnSave, backBtn;
     SessionManager session;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,11 +65,16 @@ public class AddItemActivity extends AppCompatActivity {
         btnSave = findViewById(R.id.saveButton);
         backBtn = findViewById(R.id.backBtn);
         foodImage = findViewById(R.id.foodImage);
+        cameraIconButton = findViewById(R.id.cameraIconButton);
 
         foodImage.setOnClickListener(v -> {
             checkPermissionsAndOpenImageDialog();
         });
-        
+
+        cameraIconButton.setOnClickListener(v -> {
+            checkPermissionsAndOpenImageDialog();
+        });
+
         edCategory.setOnClickListener(v -> {
             showPopUp();
         });
@@ -110,14 +117,19 @@ public class AddItemActivity extends AppCompatActivity {
             }
 
             long added = db.addFoodItem(new FoodItem(name, category, expiryDate, quantity, imageBytes),session.getUserEmail());
-            if(added > 0)
+            if(added > 0) {
+                Toast.makeText(this, "Food item added successfully", Toast.LENGTH_SHORT).show();
                 startActivity(new Intent(this, ItemsViewActivity.class));
+            } else {
+                Toast.makeText(this, "Failed to add food item", Toast.LENGTH_SHORT).show();
+            }
         });
 
         backBtn.setOnClickListener(v -> {
             startActivity(new Intent(this, ItemsViewActivity.class));
         });
     }
+
     private void checkPermissionsAndOpenImageDialog() {
         List<String> permissionsNeeded = new ArrayList<>();
 
@@ -146,6 +158,7 @@ public class AddItemActivity extends AppCompatActivity {
             showImageDialog();
         }
     }
+
     private void showImageDialog() {
         final CharSequence[] options = {"Take Photo", "Choose from Gallery", "Remove Photo", "Cancel"};
 
@@ -157,6 +170,8 @@ public class AddItemActivity extends AppCompatActivity {
                     Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                     if (cameraIntent.resolveActivity(getPackageManager()) != null) {
                         startActivityForResult(cameraIntent, CAMERA_REQUEST);
+                    } else {
+                        Toast.makeText(this, "No camera app found", Toast.LENGTH_SHORT).show();
                     }
                     break;
                 case 1:
@@ -167,6 +182,7 @@ public class AddItemActivity extends AppCompatActivity {
                 case 2:
                     selectedImage = null;
                     foodImage.setImageResource(R.drawable.image_placeholder);
+                    Toast.makeText(this, "Photo removed", Toast.LENGTH_SHORT).show();
                     break;
                 case 3:
                     dialog.dismiss();
@@ -175,6 +191,7 @@ public class AddItemActivity extends AppCompatActivity {
         });
         builder.show();
     }
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -182,6 +199,12 @@ public class AddItemActivity extends AppCompatActivity {
         if (requestCode == PERMISSION_REQUEST_CODE) {
             if (grantResults.length > 0) {
                 boolean allGranted = true;
+                for (int result : grantResults) {
+                    if (result != PackageManager.PERMISSION_GRANTED) {
+                        allGranted = false;
+                        break;
+                    }
+                }
 
                 if (allGranted) {
                     showImageDialog();
@@ -191,6 +214,7 @@ public class AddItemActivity extends AppCompatActivity {
             }
         }
     }
+
     private void showPopUp() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         View popupView = getLayoutInflater().inflate(R.layout.custom_popup, null);
@@ -218,6 +242,7 @@ public class AddItemActivity extends AppCompatActivity {
         });
         dialog.show();
     }
+
     private void showCalendar() {
         final Calendar calendar = Calendar.getInstance();
         int year = calendar.get(Calendar.YEAR);
@@ -233,16 +258,20 @@ public class AddItemActivity extends AppCompatActivity {
         );
         datePickerDialog.show();
     }
+
     private void updateQuantityViews() {
         tvQuantity.setText(String.valueOf(quantity));
     }
+
     public int getQuantity() {
         return quantity;
     }
+
     public void setQuantity(int quantity) {
         this.quantity = Math.max(0, Math.min(quantity, 999999));
         updateQuantityViews();
     }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -254,14 +283,25 @@ public class AddItemActivity extends AppCompatActivity {
                     selectedImage = MediaStore.Images.Media.getBitmap(
                             this.getContentResolver(), selectedImageUri);
                     foodImage.setImageBitmap(selectedImage);
+                    Toast.makeText(this, "Image selected", Toast.LENGTH_SHORT).show();
                 } catch (IOException e) {
                     e.printStackTrace();
+                    Toast.makeText(this, "Error loading image", Toast.LENGTH_SHORT).show();
                 }
             } else if (requestCode == CAMERA_REQUEST && data != null) {
                 selectedImage = (Bitmap) data.getExtras().get("data");
                 foodImage.setImageBitmap(selectedImage);
+                Toast.makeText(this, "Photo taken", Toast.LENGTH_SHORT).show();
             }
         }
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (selectedImage != null && !selectedImage.isRecycled()) {
+            selectedImage.recycle();
+            selectedImage = null;
+        }
+    }
 }
