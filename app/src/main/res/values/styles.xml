@@ -22,7 +22,7 @@
         <item name="android:windowCloseOnTouchOutside">false</item>
     </style>
 
-    <style name="PopupTheme" parent="Theme.AppCompat.Dialog">
+    <style name="PopupTheme" parent="Theme.AppCompat.Light.Dialog.Alert">
         <item name="android:windowIsFloating">true</item>
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:windowNoTitle">true</item>
@@ -30,6 +30,7 @@
         <item name="android:backgroundDimEnabled">true</item>
         <item name="android:windowCloseOnTouchOutside">false</item>
     </style>
+
 
     <style name="MyActionButtonStyle" parent="@style/Widget.AppCompat.ActionButton">
         <item name="android:minWidth">64dp</item>

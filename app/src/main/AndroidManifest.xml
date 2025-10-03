@@ -66,14 +66,17 @@
             android:exported="false" />
         <activity
             android:name=".ViewMeals.mealsViewActivity"
+
             android:exported="false" />
         <activity
             android:name=".MealPlan.MealPlanActivity"
             android:theme="@style/PopupTheme"
-            android:windowSoftInputMode="adjustPan" />
+            android:label=""
+            android:exported="false" />
         <activity android:name=".MealPlan.WeeklyViewActivity" />
         <activity
             android:name=".MealPlan.MonthlyViewActivity"
+            android:label=""
             android:theme="@style/PopupTheme"
             android:windowSoftInputMode="adjustPan" />
         <activity android:name=".Meal.FullView" />

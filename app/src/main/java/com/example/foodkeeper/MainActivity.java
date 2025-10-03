@@ -20,6 +20,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.foodkeeper.FoodItem.ItemsViewActivity;
 import com.example.foodkeeper.Meal.Meal;
 import com.example.foodkeeper.MealPlan.MealPlan;
+import com.example.foodkeeper.MealPlan.MonthlyViewActivity;
 import com.example.foodkeeper.MealPlan.WeeklyViewActivity;
 import com.example.foodkeeper.Recipe.Listeners.RecipeClickListerner;
 import com.example.foodkeeper.Recipe.Models.Recipe;
@@ -125,6 +126,12 @@ public class MainActivity extends AppCompatActivity {
         ));
         recipesView.setAdapter(recipeAdapter);
     }
+    public void showProfileActivity(View view)
+    {
+        Intent intent = new Intent(this, ProfileActivity.class);
+        startActivity(intent);
+    }
+
     private void setupMealAdapter()
     {
         MealPlan plan = database.getMealPlanForDay(LocalDate.now());

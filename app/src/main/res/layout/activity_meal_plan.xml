@@ -57,8 +57,8 @@
 
             <Button
                 android:id="@+id/breakFastBtn"
-                android:layout_width="18dp"
-                android:layout_height="18dp"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
                 android:layout_gravity="center"
                 android:background="@drawable/add_meal_plan" />
         </FrameLayout>
@@ -103,8 +103,8 @@
 
             <Button
                 android:id="@+id/lunchBtn"
-                android:layout_width="18dp"
-                android:layout_height="18dp"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
                 android:layout_gravity="center"
                 android:background="@drawable/add_meal_plan" />
         </FrameLayout>
@@ -149,8 +149,8 @@
 
             <Button
                 android:id="@+id/DinnerBtn"
-                android:layout_width="18dp"
-                android:layout_height="18dp"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
                 android:layout_gravity="center"
                 android:background="@drawable/add_meal_plan" />
         </FrameLayout>
@@ -194,8 +194,8 @@
 
             <Button
                 android:id="@+id/snackBtn"
-                android:layout_width="18dp"
-                android:layout_height="18dp"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
                 android:layout_gravity="center"
                 android:background="@drawable/add_meal_plan" />
         </FrameLayout>

@@ -46,8 +46,8 @@
 
     <ImageView
         android:id="@+id/imageView8"
-        android:layout_width="match_parent"
-        android:layout_height="724dp"
+        android:layout_width="410dp"
+        android:layout_height="695dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
@@ -58,9 +58,8 @@
 
     <RelativeLayout
         android:id="@+id/imageSection"
-        android:layout_width="200dp"
-        android:layout_height="200dp"
-        android:layout_marginTop="20dp"
+        android:layout_width="265dp"
+        android:layout_height="244dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/headerLayout">
@@ -75,8 +74,8 @@
 
         <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/profileImageView"
-            android:layout_width="160dp"
-            android:layout_height="160dp"
+            android:layout_width="203dp"
+            android:layout_height="194dp"
             android:layout_centerInParent="true"
             android:scaleType="centerCrop"
             android:src="@drawable/image_placeholder"
@@ -130,7 +129,6 @@
                 android:id="@+id/etName"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
-                android:background="@drawable/white_textbox"
                 android:enabled="false"
                 android:textColor="@color/black"
                 android:hint="Enter your name"
@@ -159,7 +157,6 @@
                 android:id="@+id/etSurname"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
-                android:background="@drawable/white_textbox"
                 android:enabled="false"
                 android:textColor="@color/black"
 
@@ -190,7 +187,6 @@
                 android:id="@+id/etEmail"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
-                android:background="@drawable/white_textbox"
                 android:enabled="false"
                 android:focusable="false"
                 android:hint="Enter your email"
@@ -220,7 +216,6 @@
                 android:id="@+id/etPhone"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
-                android:background="@drawable/white_textbox"
                 android:enabled="false"
                 android:hint="Enter your phone number"
                 android:inputType="phone"
@@ -270,8 +265,7 @@
                     android:id="@+id/etCurrentPassword"
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
-                    android:background="@drawable/white_textbox"
-                    android:hint="Enter current password"
+                        android:hint="Enter current password"
                     android:inputType="textPassword"
                     android:padding="12dp"
                     android:textSize="16sp" />
@@ -299,8 +293,7 @@
                     android:id="@+id/etNewPassword"
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
-                    android:background="@drawable/white_textbox"
-                    android:hint="Enter new password"
+                        android:hint="Enter new password"
                     android:inputType="textPassword"
                     android:padding="12dp"
                     android:textSize="16sp" />
@@ -328,8 +321,7 @@
                     android:id="@+id/etConfirmPassword"
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
-                    android:background="@drawable/white_textbox"
-                    android:hint="Confirm new password"
+                        android:hint="Confirm new password"
                     android:inputType="textPassword"
                     android:padding="12dp"
                     android:textSize="16sp" />
@@ -372,18 +364,7 @@
                 android:textStyle="bold" />
 
             <!-- Save Button -->
-            <Button
-                android:id="@+id/btnSave"
-                android:layout_width="0dp"
-                android:layout_height="48dp"
-                android:layout_marginEnd="4dp"
-                android:layout_weight="1"
-                android:background="@drawable/blue_button"
-                android:text="Save"
-                android:textColor="#FFFFFF"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:visibility="gone" />
+
 
             <!-- Cancel Button -->
             <Button
@@ -397,6 +378,18 @@
                 android:textColor="@color/white"
                 android:textSize="16sp"
                 android:backgroundTint="@color/grey"
+                android:visibility="gone" />
+            <Button
+                android:id="@+id/btnSave"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_marginEnd="4dp"
+                android:layout_weight="1"
+                android:background="@drawable/blue_button"
+                android:text="Save"
+                android:textColor="#FFFFFF"
+                android:textSize="16sp"
+                android:textStyle="bold"
                 android:visibility="gone" />
 
         </LinearLayout>

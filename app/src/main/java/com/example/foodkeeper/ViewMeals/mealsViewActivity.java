@@ -1,6 +1,7 @@
 package com.example.foodkeeper.ViewMeals;
 
 import android.annotation.SuppressLint;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.MotionEvent;
@@ -10,20 +11,24 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.foodkeeper.Database;
+import com.example.foodkeeper.FoodkeeperUtils.DeleteConfirmationDialog;
 import com.example.foodkeeper.FoodkeeperUtils.SwipeRevealCallback;
 import com.example.foodkeeper.Meal.CreateMealActivity;
 import com.example.foodkeeper.Meal.Meal;
 import com.example.foodkeeper.Meal.UpdateMealActivity;
 import com.example.foodkeeper.Meal.ViewMealActivity;
+import com.example.foodkeeper.MealPlan.CalendarUtils;
 import com.example.foodkeeper.R;
 import com.example.foodkeeper.SessionManager;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -91,7 +96,81 @@ public class mealsViewActivity extends AppCompatActivity  {
 
             @Override
             public void onItemDelete(Meal meal, int position) {
-                db.deleteMeal(meal);
+                try {
+                    db.deleteMeal(meal);
+                    showDeleteConfirmation(meal,position,"");
+                } catch (Exception e) {
+                    showDeleteConfirmation(meal,position,e.getMessage());
+                }
+            }
+            public void showDeleteConfirmation(Meal meal,int position,String message) {
+                if (position >= 0 && position < filteredMeals.size()) {
+
+                    DeleteConfirmationDialog dialog = DeleteConfirmationDialog.newInstance("meal",message,"Delete all");
+
+                    dialog.setOnDeleteConfirmListener(new DeleteConfirmationDialog.OnDeleteConfirmListener() {
+                        @Override
+                        public void onDeleteConfirmed() {
+                            db.deleteMealPlansForMeal((int) meal.getMealID());
+
+                            // Then delete the meal
+                            try {
+                                db.deleteMeal(meal);
+                                mealAdapter.notifyItemRemoved(position);
+                                Toast.makeText(mealsViewActivity.this,
+                                        "Meal removed from meal plans and deleted",
+                                        Toast.LENGTH_SHORT).show();
+                            } catch (Exception e) {
+                                Toast.makeText(mealsViewActivity.this,
+                                        "Error: " + e.getMessage(),
+                                        Toast.LENGTH_SHORT).show();
+                            }
+                            filteredMeals.remove(position);
+                            mealAdapter.notifyItemRemoved(position);
+                            mealAdapter.notifyItemRangeChanged(position, filteredMeals.size());
+                            Toast.makeText(mealsViewActivity.this, "Meal deleted", Toast.LENGTH_SHORT).show();
+                        }
+
+                        @Override
+                        public void onDeleteCancelled() {
+                            mealAdapter.notifyItemChanged(position);
+                            mealAdapter.closeSwipeButtons();
+                        }
+                    });
+
+                        dialog.show(mealsViewActivity.this.getSupportFragmentManager(), "delete_dialog");
+                }
+
+            }
+
+            private void showMealInUseDialog(Meal meal, int position, String message) {
+                new AlertDialog.Builder(mealsViewActivity.this)
+                        .setTitle("Cannot Delete Meal")
+                        .setMessage(message + ". Do you want to remove this meal from all meal plans and delete it?")
+                        .setPositiveButton("Delete All", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                // Remove meal from all meal plans first
+                                db.deleteMealPlansForMeal((int) meal.getMealID());
+
+                                // Then delete the meal
+                                try {
+                                    db.deleteMeal(meal);
+                                    filteredMeals.remove(position);
+                                    mealAdapter.notifyItemRemoved(position);
+                                    Toast.makeText(mealsViewActivity.this,
+                                            "Meal removed from meal plans and deleted",
+                                            Toast.LENGTH_SHORT).show();
+                                } catch (Exception e) {
+                                    Toast.makeText(mealsViewActivity.this,
+                                            "Error: " + e.getMessage(),
+                                            Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        })
+                        .setNegativeButton("Cancel", null)
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .show();
             }
 
             @Override
@@ -230,7 +309,7 @@ public class mealsViewActivity extends AppCompatActivity  {
 
         new Thread(() -> {
             try {
-                Thread.sleep(1000); // Simulate network delay
+                Thread.sleep(100); // Simulate network delay
 
                 List<Meal> meals = loadData();
 
@@ -265,7 +344,7 @@ public class mealsViewActivity extends AppCompatActivity  {
 
     private void hideLoadingState() {
         loadingLayout.setVisibility(View.GONE);
-        mealsRecyclerView.setVisibility(View.VISIBLE);
+    //    mealsRecyclerView.setVisibility(View.VISIBLE);
     }
 
     private void updateEmptyState() {
@@ -285,7 +364,6 @@ public class mealsViewActivity extends AppCompatActivity  {
 
         if (requestCode == REQUEST_CREATE_MEAL && resultCode == RESULT_OK) {
             loadMeals();
-
         }
     }
 

@@ -70,6 +70,7 @@ public class WeeklyViewActivity extends AppCompatActivity implements CalendarAda
         if (CalendarUtils.selectedDate == null) {
             CalendarUtils.selectedDate = LocalDate.now();
         }
+
         initWidgets();
         initLayouts();
         setUpListeners();
@@ -239,7 +240,7 @@ public class WeeklyViewActivity extends AppCompatActivity implements CalendarAda
         deleteBtn.setOnClickListener(View->
         {
             //delete the meal plan for the selected date
-            DeleteConfirmationDialog dialog =DeleteConfirmationDialog.newInstance("Meal plan");
+            DeleteConfirmationDialog dialog =DeleteConfirmationDialog.newInstance("Meal plan","","");
 
 
             dialog.setOnDeleteConfirmListener(new DeleteConfirmationDialog.OnDeleteConfirmListener() {

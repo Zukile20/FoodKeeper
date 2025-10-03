@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.foodkeeper.FoodkeeperUtils.DeleteConfirmationDialog;
+import com.example.foodkeeper.FoodkeeperUtils.SwipeRevealCallback;
 import com.example.foodkeeper.Meal.Meal;
 import com.example.foodkeeper.R;
 
@@ -25,6 +26,8 @@ public class MealAdapter extends RecyclerView.Adapter<MealAdapter.MealViewHolder
 
     private List<Meal> meals;
     private Context context;
+    private SwipeRevealCallback swipeCallback;
+
     public interface OnItemActionListener {
         void onItemEdit(Meal meal, int position);
         void onItemDelete(Meal meal, int position);
@@ -33,12 +36,15 @@ public class MealAdapter extends RecyclerView.Adapter<MealAdapter.MealViewHolder
 
     private OnItemActionListener onItemActionListener;
 
-
-
     public MealAdapter(Context context ,List<Meal> meals, OnItemActionListener listener) {
         this.meals = meals;
         this.onItemActionListener = listener;
-        this.context =context;
+        this.context = context;
+    }
+
+    // Method to set the swipe callback reference
+    public void setSwipeCallback(SwipeRevealCallback callback) {
+        this.swipeCallback = callback;
     }
 
     @NonNull
@@ -58,57 +64,36 @@ public class MealAdapter extends RecyclerView.Adapter<MealAdapter.MealViewHolder
     public Context getContext() {
         return context;
     }
+
     @Override
     public int getItemCount() {
         return meals.size();
     }
 
-    public void updateMeals(List<Meal> newMeals)
-    {
+    public void updateMeals(List<Meal> newMeals) {
         this.meals = newMeals;
         notifyDataSetChanged();
     }
+
     public void deleteItem(int position) {
         if (position >= 0 && position < meals.size()) {
-            showDeleteConfirmation( position);
-            onItemActionListener.onItemDelete(meals.get(position),position);
+            onItemActionListener.onItemDelete(meals.get(position), position);
         }
     }
+
     public void editItem(int position) {
         if (position >= 0 && position < meals.size() && onItemActionListener != null) {
             onItemActionListener.onItemEdit(meals.get(position), position);
         }
         notifyItemChanged(position);
     }
-    public void showDeleteConfirmation(int position) {
-        if (position >= 0 && position < meals.size()) {
 
-            DeleteConfirmationDialog dialog = DeleteConfirmationDialog.newInstance("meal");
-
-            dialog.setOnDeleteConfirmListener(new DeleteConfirmationDialog.OnDeleteConfirmListener() {
-                @Override
-                public void onDeleteConfirmed() {
-                    meals.remove(position);
-                    notifyItemRemoved(position);
-                    notifyItemRangeChanged(position, meals.size());
-
-                    if (context instanceof AppCompatActivity) {
-                        Toast.makeText(context,"Meal deleted", Toast.LENGTH_SHORT).show();
-                    }
-                }
-
-                @Override
-                public void onDeleteCancelled() {
-                    notifyItemChanged(position);
-                }
-            });
-
-            if (context instanceof AppCompatActivity) {
-                dialog.show(((AppCompatActivity) context).getSupportFragmentManager(), "delete_dialog");
-            }
+    public void closeSwipeButtons() {
+        if (swipeCallback != null) {
+            swipeCallback.closeOpenSwipe();
         }
-
     }
+
     @SuppressLint("ResourceAsColor")
     class MealViewHolder extends RecyclerView.ViewHolder {
         private ImageView mealImageView;
@@ -118,7 +103,6 @@ public class MealAdapter extends RecyclerView.Adapter<MealAdapter.MealViewHolder
         private ImageButton deleteButton;
 
         private boolean isSwipeOpen = false;
-
 
         public MealViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -139,11 +123,14 @@ public class MealAdapter extends RecyclerView.Adapter<MealAdapter.MealViewHolder
                 if (!isSwipeOpen) {
                     int position = getAdapterPosition();
                     if (position != RecyclerView.NO_POSITION && onItemActionListener != null) {
-                        onItemActionListener.onItemClick(meals.get(position),position);
+                        onItemActionListener.onItemClick(meals.get(position), position);
                     }
                 } else {
                     // Close swipe if open
-                    isSwipeOpen=false;
+                    isSwipeOpen = false;
+                    if (swipeCallback != null) {
+                        swipeCallback.closeOpenSwipe();
+                    }
                 }
             });
 
@@ -176,4 +163,3 @@ public class MealAdapter extends RecyclerView.Adapter<MealAdapter.MealViewHolder
         }
     }
 }
-

@@ -8,16 +8,6 @@
     android:background="@color/blue">
 
 
-    <ImageView
-        android:id="@+id/imageView4"
-        android:layout_width="265dp"
-        android:layout_height="244dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.168"
-        app:srcCompat="@drawable/circle_background_white" />
 
     <ImageView
         android:id="@+id/imageView6"
@@ -29,54 +19,67 @@
         app:layout_constraintHorizontal_bias="0.571"
         app:layout_constraintStart_toStartOf="parent"
         />
-
-    <com.google.android.material.imageview.ShapeableImageView
-        android:id="@+id/mealImage"
-        android:layout_width="207dp"
-        android:layout_height="198dp"
-        android:layout_gravity="center"
-        android:layout_marginTop="16dp"
-        android:scaleType="centerCrop"
-        android:backgroundTint="@color/black"
-        app:layout_constraintBottom_toBottomOf="@+id/imageView4"
+    <RelativeLayout
+        android:id="@+id/imageSection"
+        android:layout_width="265dp"
+        android:layout_height="244dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/imageView4"
-        app:layout_constraintVertical_bias="0.371"
-        app:shapeAppearanceOverlay="@style/CircleImageView"
-        app:srcCompat="@drawable/image_placeholder" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.168">
 
-    <Button
-        android:id="@+id/loadPicture"
-        android:layout_width="36dp"
-        android:layout_height="33dp"
-        android:layout_marginTop="152dp"
 
-        android:layout_marginEnd="90dp"
-        android:background="@drawable/camera"
-        app:layout_constraintEnd_toEndOf="@+id/imageView6"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="@+id/mealImage"
-        app:layout_constraintTop_toTopOf="@+id/imageView4" />
+        <ImageView
+            android:id="@+id/imageView4"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            android:src="@drawable/circle_background_white" />
+
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/mealImage"
+            android:layout_width="203dp"
+            android:layout_height="194dp"
+            android:layout_centerInParent="true"
+            android:scaleType="centerCrop"
+            android:src="@drawable/image_placeholder"
+            app:shapeAppearanceOverlay="@style/CircleImageView" />
+
+        <!-- Camera button -->
+        <Button
+            android:id="@+id/loadPicture"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_alignEnd="@+id/mealImage"
+            android:layout_alignBottom="@+id/mealImage"
+            android:layout_marginEnd="-8dp"
+            android:layout_marginBottom="-8dp"
+            android:background="@drawable/camera"
+            tools:visibility="visible" />
+
+    </RelativeLayout>
+
+
+
 
 
     <LinearLayout
         android:id="@+id/linearLayout"
-        android:layout_width="353dp"
-        android:layout_height="38dp"
+        android:layout_width="355dp"
+        android:layout_height="57dp"
         android:layout_gravity="center"
         android:layout_marginStart="28dp"
         android:orientation="horizontal"
-        app:layout_constraintBottom_toTopOf="@+id/imageView4"
+        app:layout_constraintBottom_toTopOf="@+id/imageSection"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.21">
 
         <Button
             android:id="@+id/backBtn"
-            android:layout_width="37dp"
-            android:layout_height="37dp"
+            android:layout_width="47dp"
+            android:layout_height="47dp"
             android:background="@drawable/back_white_arrow"
             android:contentDescription="back button" />
 
@@ -102,36 +105,24 @@
         app:layout_constraintStart_toStartOf="parent">
 
         <LinearLayout
+            android:id="@+id/linearLayout4"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-
+            android:padding="20dp"
+            android:layout_marginTop="-20dp"
             android:orientation="vertical"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent">
 
-
-            <TextView
-                android:id="@+id/textView8"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="32dp"
-                android:layout_marginTop="4dp"
-                android:padding="10dp"
-                android:text="@string/name"
-                android:textColor="@color/black"
-                android:textSize="20sp"
-                android:textStyle="bold" />
-
-            <com.google.android.material.textfield.TextInputLayout
+        <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/textInputLayout3"
-                android:layout_width="306dp"
+                android:layout_width="match_parent"
                 android:layout_height="47dp"
-                android:background="@drawable/white_textbox"
+                android:layout_gravity="center"
+                android:layout_margin="10dp"
                 app:boxBackgroundMode="none"
                 app:hintEnabled="false"
-                android:layout_margin="10dp"
-                android:layout_gravity="center"
                 app:layout_constraintBottom_toTopOf="@+id/textView9"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -140,17 +131,9 @@
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/nameField"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="@null"
-
+                    android:layout_height="wrap_content"
                     android:hint="Name"
-                    android:inputType="text"
-                    android:maxLines="1"
-                    android:padding="10dp"
-                    android:textColor="@color/black"
-                    android:textColorHint="#b8b8b8"
-                    android:textSize="16sp"
-                    android:textStyle="bold" />
+                    android:inputType="textCapWords" />
 
                 <TextView
                     android:id="@+id/textView9"
@@ -165,37 +148,44 @@
                     android:textStyle="bold" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/searchLayout"
-                android:layout_width="307dp"
-                android:layout_height="50dp"
-                android:layout_gravity="center"
-                android:layout_margin="10dp"
-                android:background="@drawable/white_textbox"
-                android:padding="10dp"
-                app:boxBackgroundMode="none"
-                app:hintEnabled="false"
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:padding="20dp"
+                app:cardCornerRadius="24dp"
+                app:cardElevation="0dp"
+                app:strokeColor="#E0E0E0"
+                app:strokeWidth="1dp">
 
-                app:startIconDrawable="@drawable/ic_search"
-                app:startIconTint="@color/blue">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/searchField"
-                    android:layout_width="290dp"
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:background="@null"
                     android:gravity="center_vertical"
-                    android:hint="Search item"
-                    android:inputType="text"
+                    android:orientation="horizontal"
+                    android:paddingStart="16dp">
 
-                    android:maxLines="1"
-                    android:paddingHorizontal="16dp"
-                    android:textColor="#000000"
-                    android:textColorHint="#b8b8b8"
-                    android:textSize="16sp"
-                    android:textStyle="bold" />
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_search" />
 
-            </com.google.android.material.textfield.TextInputLayout>
+                    <EditText
+                        android:id="@+id/searchField"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="8dp"
+                        android:hint="@string/search_item"
+                        android:textColorHint="@color/light_grey"
+                        android:textColor="@color/black"
+                        android:textSize="16sp"
+                        android:inputType="text"
+                        android:maxLines="1"
+                        android:background="@null"/>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -234,25 +224,29 @@
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerView"
                 android:layout_width="match_parent"
-                android:layout_margin="10dp"
                 android:layout_height="262dp"
                 android:layout_gravity="center"
-                android:padding="10dp"
 
                 />
 
             <Button
                 android:id="@+id/createBtn"
-                android:layout_width="123dp"
-                android:layout_height="43dp"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_alignBottom="@+id/linearLayout4"
                 android:layout_gravity="center"
+                android:layout_marginBottom="444dp"
                 android:background="@drawable/blue_button"
-                android:text="Create"
+                android:text="Create meal"
+                android:layout_margin="20dp"
                 android:textAllCaps="false"
                 android:textColor="#ffffff"
                 android:textSize="20sp"
                 android:textStyle="bold" />
+
         </LinearLayout>
+
+
     </RelativeLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

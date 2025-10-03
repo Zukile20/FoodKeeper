@@ -19,9 +19,13 @@ import androidx.fragment.app.DialogFragment;
 
 import com.example.foodkeeper.R;
 
+import java.util.Objects;
+
 public class DeleteConfirmationDialog extends DialogFragment {
     private String itemName;
     private OnDeleteConfirmListener listener;
+    private String message;
+    private String delete_button_text;
 
     public interface OnDeleteConfirmListener {
         void onDeleteConfirmed();
@@ -29,10 +33,12 @@ public class DeleteConfirmationDialog extends DialogFragment {
         void onDeleteCancelled();
     }
 
-    public static DeleteConfirmationDialog newInstance(String itemName) {
+    public static DeleteConfirmationDialog newInstance(String itemName,String message,String delete_button_text) {
         DeleteConfirmationDialog dialog = new DeleteConfirmationDialog();
         Bundle args = new Bundle();
         args.putString("item_name", itemName);
+        args.putString("message", message);
+        args.putString("delete_button_text", delete_button_text);
         dialog.setArguments(args);
         return dialog;
     }
@@ -42,6 +48,8 @@ public class DeleteConfirmationDialog extends DialogFragment {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             itemName = getArguments().getString("item_name");
+            message = getArguments().getString("message");
+            delete_button_text = getArguments().getString("delete_button_text");
         }
         setStyle(DialogFragment.STYLE_NO_TITLE, android.R.style.Theme_Translucent_NoTitleBar);
     }
@@ -61,17 +69,21 @@ public class DeleteConfirmationDialog extends DialogFragment {
         Button noButton = view.findViewById(R.id.btn_no);
         Button yesDeleteButton = view.findViewById(R.id.btn_yes_delete);
         View dialogContainer = view.findViewById(R.id.dialog_container);
+        if (!Objects.equals(message, "")) {
 
-        String title = "Are you sure you want to delete the " + itemName + "?";
-        titleText.setText(title);
 
+            titleText.setText(message);
+            yesDeleteButton.setText(delete_button_text);
+        } else {
+            String title = "Are you sure you want to delete the " + itemName + "?";
+            titleText.setText(title);
+        }
         noButton.setOnClickListener(v -> {
             if (listener != null) {
                 listener.onDeleteCancelled();
             }
             dismissWithAnimation();
         });
-
         yesDeleteButton.setOnClickListener(v -> {
             if (listener != null) {
                 listener.onDeleteConfirmed();

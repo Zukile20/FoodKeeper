@@ -29,6 +29,7 @@ public class SwipeRevealCallback extends ItemTouchHelper.SimpleCallback {
     private Context context;
     private int currentSwipedPosition = -1;
     private boolean buttonsRevealed = false;
+    private RecyclerView recyclerView;
 
     public SwipeRevealCallback(MealAdapter adapter) {
         super(0, ItemTouchHelper.RIGHT);
@@ -51,6 +52,10 @@ public class SwipeRevealCallback extends ItemTouchHelper.SimpleCallback {
     @Override
     public int getMovementFlags(@NonNull RecyclerView recyclerView,
                                 @NonNull RecyclerView.ViewHolder viewHolder) {
+        if (this.recyclerView == null) {
+            this.recyclerView = recyclerView;
+        }
+
         if (viewHolder.getAdapterPosition() == RecyclerView.NO_POSITION) {
             return 0;
         }
@@ -97,7 +102,6 @@ public class SwipeRevealCallback extends ItemTouchHelper.SimpleCallback {
     }
 
     private void drawButtons(Canvas c, View itemView, float dX, int itemHeight) {
-        // Draw Delete button (left-most when swiped right)
         buttonPaint.setColor(deleteColor);
         float deleteLeft = itemView.getLeft();
         float deleteRight = itemView.getLeft() + buttonWidth;
@@ -151,8 +155,6 @@ public class SwipeRevealCallback extends ItemTouchHelper.SimpleCallback {
     public float getSwipeVelocityThreshold(float defaultValue) {
         return defaultValue * 5f;
     }
-
-    // Handle button clicks
     public boolean handleButtonClick(RecyclerView recyclerView, float x, float y) {
         if (!buttonsRevealed || currentSwipedPosition == -1) return false;
 
@@ -202,7 +204,11 @@ public class SwipeRevealCallback extends ItemTouchHelper.SimpleCallback {
             resetSwipeState(viewHolder);
         }
     }
-
+    public void closeOpenSwipe() {
+        if (recyclerView != null) {
+            closeOpenSwipe(recyclerView);
+        }
+    }
 
     private int dpToPx(int dp) {
         return (int) (dp * context.getResources().getDisplayMetrics().density);

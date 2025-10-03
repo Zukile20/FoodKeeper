@@ -20,21 +20,13 @@
         app:layout_constraintVertical_bias="0.555"
         tools:context=".MealPlan.WeeklyViewActivity">
 
-        <RelativeLayout
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="30dp"
+            android:background="@color/white"
+            android:elevation="2dp"
             android:padding="0dp">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
-                android:text="Meal plan"
-                android:textColor="@android:color/black"
-                android:textSize="20sp"
-                android:textStyle="bold" />
-
             <Button
                 android:id="@+id/back_button"
                 android:layout_width="37dp"
@@ -42,8 +34,20 @@
                 android:layout_alignParentStart="true"
                 android:layout_marginStart="9dp"
                 android:background="@drawable/blue_arrow" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:text="Meal plan"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:textColor="@android:color/black"
+                android:textSize="20sp"
+                android:textStyle="bold" />
 
-        </RelativeLayout>
+
+
+        </LinearLayout>
 
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
@@ -189,7 +193,7 @@
             android:layout_marginStart="14sp"
             android:layout_marginBottom="16dp"
             android:text="Thursday,10 April"
-            android:textColor="@color/black"
+            android:textColor="@color/blue"
             android:textSize="20sp"
             android:textStyle="bold" />
 
@@ -209,8 +213,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:background="@null"
-                    android:text="Breakfast"
-                    android:textColor="@color/grey"
+                    android:text="@string/breakfast"
+                    android:textColor="@color/black"
                     android:textSize="20sp"
                     android:textStyle="bold" />
 
@@ -245,8 +249,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:background="@null"
-                    android:text="Lunch"
-                    android:textColor="@color/grey"
+                    android:text="@string/lunch"
+                    android:textColor="@color/black"
                     android:textSize="20sp"
                     android:textStyle="bold" />
 
@@ -282,8 +286,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:background="@null"
-                    android:text="Dinner"
-                    android:textColor="@color/grey"
+                    android:text="@string/dinner"
+                    android:textColor="@color/black"
                     android:textSize="20sp"
                     android:textStyle="bold" />
 
@@ -321,8 +325,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:background="@null"
-                    android:text="Snack"
-                    android:textColor="@color/grey"
+                    android:text="@string/snack"
+                    android:textColor="@color/black"
                     android:textSize="20sp"
                     android:textStyle="bold" />
 
@@ -363,7 +367,7 @@
                     android:layout_marginTop="20dp"
                     android:background="@drawable/grey_button"
                     android:backgroundTint="@color/grey"
-                    android:text="Clear Plan"
+                    android:text="@string/clear_plan"
                     android:textAllCaps="false"
                     android:textColor="@color/white"
                     android:textSize="18dp"
@@ -382,7 +386,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
-        android:contentDescription="Add item"
+        android:contentDescription="@string/add_item"
         android:onClick="newMealPlanAction"
         app:backgroundTint="@color/blue"
         app:layout_constraintBottom_toBottomOf="parent"
