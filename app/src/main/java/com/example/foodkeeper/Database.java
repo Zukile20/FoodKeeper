@@ -877,12 +877,49 @@ public class Database extends SQLiteOpenHelper {
         }
     }
 
-    public void deleteMeal(Meal meal) {
-        SQLiteDatabase db = this.getWritableDatabase();
-        db.delete("Meal", "mealID =?", new String[]{String.valueOf(meal.getMealID())});
+    public void deleteMeal(Meal meal) throws Exception {
+        SQLiteDatabase db = this.getReadableDatabase();
+        long mealID = meal.getMealID();
+
+        Cursor cursor = db.rawQuery(
+                "SELECT COUNT(*) FROM MealPlan WHERE breakfastMealID = ? OR lunchMealID = ? OR dinnerMealID = ? OR snackMealID = ?",
+                new String[]{String.valueOf(mealID), String.valueOf(mealID), String.valueOf(mealID), String.valueOf(mealID)}
+        );
+        cursor.moveToFirst();
+        int count = cursor.getInt(0);
+        cursor.close();
+
+        if (count > 0) {
+            throw new Exception("This meal is currently used in " + count + " meal plan(s)");
+        }
+
+        // If not in use, proceed with deletion
+        db = this.getWritableDatabase();
+        db.delete("Meal", "mealID = ?", new String[]{String.valueOf(mealID)});
+        db.close();
     }
+    public void deleteMealPlansForMeal(int mealID) {
+        SQLiteDatabase db = this.getWritableDatabase();
 
+        // Set all references to this meal to NULL in the MealPlan table
+        ContentValues values = new ContentValues();
+        values.putNull("breakfastMealID");
+        db.update("MealPlan", values, "breakfastMealID = ?", new String[]{String.valueOf(mealID)});
 
+        values.clear();
+        values.putNull("lunchMealID");
+        db.update("MealPlan", values, "lunchMealID = ?", new String[]{String.valueOf(mealID)});
+
+        values.clear();
+        values.putNull("dinnerMealID");
+        db.update("MealPlan", values, "dinnerMealID = ?", new String[]{String.valueOf(mealID)});
+
+        values.clear();
+        values.putNull("snackMealID");
+        db.update("MealPlan", values, "snackMealID = ?", new String[]{String.valueOf(mealID)});
+
+        db.close();
+    }
     private void createMealPlanMealTables(SQLiteDatabase db) {
         String createMealTable = "CREATE TABLE Meal (" +
                 "mealID INTEGER PRIMARY KEY AUTOINCREMENT, " +
