@@ -126,19 +126,16 @@ public class ProfileActivity extends AppCompatActivity {
     private void createPasswordToggleButtons() {
         // Create toggle buttons for password visibility
         btnToggleCurrentPassword = new ImageButton(this);
-        btnToggleCurrentPassword.setImageResource(android.R.drawable.ic_menu_view);
         btnToggleCurrentPassword.setBackground(null);
         btnToggleCurrentPassword.setPadding(8, 8, 8, 8);
         btnToggleCurrentPassword.setOnClickListener(v -> togglePasswordVisibility(etCurrentPassword, 1));
 
         btnToggleNewPassword = new ImageButton(this);
-        btnToggleNewPassword.setImageResource(android.R.drawable.ic_menu_view);
         btnToggleNewPassword.setBackground(null);
         btnToggleNewPassword.setPadding(8, 8, 8, 8);
         btnToggleNewPassword.setOnClickListener(v -> togglePasswordVisibility(etNewPassword, 2));
 
         btnToggleConfirmPassword = new ImageButton(this);
-        btnToggleConfirmPassword.setImageResource(android.R.drawable.ic_menu_view);
         btnToggleConfirmPassword.setBackground(null);
         btnToggleConfirmPassword.setPadding(8, 8, 8, 8);
         btnToggleConfirmPassword.setOnClickListener(v -> togglePasswordVisibility(etConfirmPassword, 3));
@@ -380,6 +377,9 @@ public class ProfileActivity extends AppCompatActivity {
         btnSave.setVisibility(View.VISIBLE);
         btnCancel.setVisibility(View.VISIBLE);
         btnChangePassword.setText("Cancel Password Change");
+        btnChangePassword.setBackground(ContextCompat.getDrawable(this, R.drawable.grey_button));
+        btnChangePassword.setBackgroundColor(ContextCompat.getColor(this, R.color.red));
+        btnChangePassword.setTextColor(ContextCompat.getColor(this, R.color.white));
         titleHeader.setText("Change Password");
 
         // Clear and reset password fields
@@ -400,6 +400,8 @@ public class ProfileActivity extends AppCompatActivity {
         btnSave.setVisibility(View.GONE);
         btnCancel.setVisibility(View.GONE);
         btnChangePassword.setText("Change Password");
+        btnChangePassword.setBackground(ContextCompat.getDrawable(this, R.drawable.grey_button));
+        btnChangePassword.setTextColor(ContextCompat.getColor(this, R.color.dark_blue));
         titleHeader.setText("My Profile");
 
         // Reset edit mode if it was active
@@ -423,10 +425,6 @@ public class ProfileActivity extends AppCompatActivity {
         isCurrentPasswordVisible = false;
         isNewPasswordVisible = false;
         isConfirmPasswordVisible = false;
-
-        btnToggleCurrentPassword.setImageResource(android.R.drawable.ic_menu_view);
-        btnToggleNewPassword.setImageResource(android.R.drawable.ic_menu_view);
-        btnToggleConfirmPassword.setImageResource(android.R.drawable.ic_menu_view);
 
         etCurrentPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
         etNewPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
