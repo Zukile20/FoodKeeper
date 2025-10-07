@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -35,7 +36,7 @@ public class RecipeActivity extends AppCompatActivity {
     SearchView searchView;
 
     // Filter buttons
-    Button btnAllRecipes, btnFavoritesOnly;
+    TextView btnAllRecipes, btnFavoritesOnly;
     LinearLayout layoutEmptyFavorites;
 
     // Filter state
@@ -137,7 +138,7 @@ public class RecipeActivity extends AppCompatActivity {
         if (showingFavoritesOnly) {
             // Favorites button is active
             btnFavoritesOnly.setBackgroundTintList(getResources().getColorStateList(R.color.blue));
-            btnFavoritesOnly.setTextColor(getResources().getColor(R.color.white));
+            btnFavoritesOnly.setTextColor(getResources().getColor(android.R.color.darker_gray));
 
             // All recipes button is inactive
             btnAllRecipes.setBackgroundTintList(getResources().getColorStateList(R.color.light_pink));
@@ -145,7 +146,7 @@ public class RecipeActivity extends AppCompatActivity {
         } else {
             // All recipes button is active
             btnAllRecipes.setBackgroundTintList(getResources().getColorStateList(R.color.blue));
-            btnAllRecipes.setTextColor(getResources().getColor(R.color.white));
+            btnAllRecipes.setTextColor(getResources().getColor(android.R.color.darker_gray));
 
             // Favorites button is inactive
             btnFavoritesOnly.setBackgroundTintList(getResources().getColorStateList(R.color.light_pink));
