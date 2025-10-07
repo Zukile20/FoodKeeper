@@ -13,7 +13,6 @@
     <androidx.appcompat.widget.Toolbar
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize">
-
         <RelativeLayout
             android:gravity="center_vertical"
             android:layout_width="match_parent"
@@ -88,15 +87,16 @@
     </LinearLayout>
 
     <!-- RecyclerView -->
+
+    <!-- Empty State for No Favorites -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_random"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
         android:layout_margin="4dp"
-        android:layout_marginTop="8dp" />
+        android:layout_marginTop="8dp"
+        android:layout_weight="1" />
 
-    <!-- Empty State for No Favorites -->
     <LinearLayout
         android:id="@+id/layout_empty_favorites"
         android:layout_width="match_parent"
