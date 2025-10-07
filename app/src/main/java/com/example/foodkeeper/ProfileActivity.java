@@ -5,10 +5,12 @@ import android.app.AlertDialog;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.ColorStateList;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
@@ -251,8 +253,7 @@ public class ProfileActivity extends AppCompatActivity {
         dbHelper = new Database(this);
     }
 
-    private void setupClickListeners() {
-      backBtn.setOnClickListener(v->finish());
+    private void setupClickListeners() {backBtn.setOnClickListener(v->finish());
         loadPicture.setOnClickListener(v -> showImagePickerDialog());
         btnEdit.setOnClickListener(v -> enableEditMode());
 
@@ -378,7 +379,7 @@ public class ProfileActivity extends AppCompatActivity {
         btnCancel.setVisibility(View.VISIBLE);
         btnChangePassword.setText("Cancel Password Change");
         btnChangePassword.setBackground(ContextCompat.getDrawable(this, R.drawable.grey_button));
-        btnChangePassword.setBackgroundColor(ContextCompat.getColor(this, R.color.red));
+        btnChangePassword.setBackgroundTintList(ColorStateList.valueOf(Color.RED));
         btnChangePassword.setTextColor(ContextCompat.getColor(this, R.color.white));
         titleHeader.setText("Change Password");
 
@@ -401,6 +402,10 @@ public class ProfileActivity extends AppCompatActivity {
         btnCancel.setVisibility(View.GONE);
         btnChangePassword.setText("Change Password");
         btnChangePassword.setBackground(ContextCompat.getDrawable(this, R.drawable.grey_button));
+        btnChangePassword.setBackgroundTintList(ColorStateList.valueOf(
+                ContextCompat.getColor(this, R.color.light_pink)
+        ));
+
         btnChangePassword.setTextColor(ContextCompat.getColor(this, R.color.dark_blue));
         titleHeader.setText("My Profile");
 
@@ -572,6 +577,8 @@ public class ProfileActivity extends AppCompatActivity {
                 user.setName(etName.getText().toString().trim());
                 user.setSurname(etSurname.getText().toString().trim());
                 user.setPhone(etPhone.getText().toString().trim());
+                SessionManager sess= new SessionManager(this);
+                sess.createLoginSession(user.getEmail(),user.getName());
                 disableEditMode();
             } else {
                 Toast.makeText(this, "Failed to update profile", Toast.LENGTH_SHORT).show();

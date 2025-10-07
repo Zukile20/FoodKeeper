@@ -103,10 +103,13 @@ public class MainActivity extends AppCompatActivity {
 
         });
         bottomNav.setSelectedItemId(R.id.nav_home);
-        greetText.setText("Hi "+ sess.getUserName().substring(0, 1).toUpperCase() + sess.getUserName().substring(1));
-
+        refreshgreetTxt();
     }
 
+    private void refreshgreetTxt() {
+
+        greetText.setText("Hi, "+ sess.getUserName());
+    }
     private void setupRecipesRecyclerView() {
         // Get random recipes from database (e.g., 5 random recipes)
         List<Recipe> recipes = database.getRandomRecipes(5);
@@ -198,6 +201,9 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
         // Refresh recipes when returning to this activity
         refreshRecipes();
+        refreshMealPlan();
+        refreshgreetTxt();
+
     }
 
     private void refreshRecipes() {
@@ -208,6 +214,16 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private void refreshMealPlan() {
+        // Get new random recipes
+        setupMealAdapter();
+    }
+    public void showAllRecipes(View v)
+    {
+        startActivity(new Intent(this,RecipeActivity.class));
+    }
+
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -216,4 +232,5 @@ public class MainActivity extends AppCompatActivity {
             database.close();
         }
     }
+
 }
