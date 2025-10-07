@@ -20,8 +20,8 @@
 
         <ImageButton
             android:id="@+id/backFridgeBtn"
-            android:layout_width="37dp"
-            android:layout_height="37dp"
+            android:layout_width="47dp"
+            android:layout_height="47dp"
             android:contentDescription="back button"
             android:background="@drawable/circle_background_blue"
             android:src="@drawable/ic_arrow_back"

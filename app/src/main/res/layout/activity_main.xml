@@ -92,6 +92,19 @@
                 android:textSize="20sp"
                 android:textStyle="bold" />
 
+            <TextView
+                android:id="@+id/tvSeeAll"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="showAllRecipes"
+                android:text="See all"
+                android:drawableEnd="@drawable/ic_arrow_forward"
+                android:drawablePadding="8dp"
+                android:textSize="18sp"
+                android:padding="8dp" />
+
+
+
         </LinearLayout>
 
         <androidx.recyclerview.widget.RecyclerView

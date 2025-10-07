@@ -5,10 +5,12 @@ import android.app.AlertDialog;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.ColorStateList;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
@@ -126,19 +128,16 @@ public class ProfileActivity extends AppCompatActivity {
     private void createPasswordToggleButtons() {
         // Create toggle buttons for password visibility
         btnToggleCurrentPassword = new ImageButton(this);
-        btnToggleCurrentPassword.setImageResource(android.R.drawable.ic_menu_view);
         btnToggleCurrentPassword.setBackground(null);
         btnToggleCurrentPassword.setPadding(8, 8, 8, 8);
         btnToggleCurrentPassword.setOnClickListener(v -> togglePasswordVisibility(etCurrentPassword, 1));
 
         btnToggleNewPassword = new ImageButton(this);
-        btnToggleNewPassword.setImageResource(android.R.drawable.ic_menu_view);
         btnToggleNewPassword.setBackground(null);
         btnToggleNewPassword.setPadding(8, 8, 8, 8);
         btnToggleNewPassword.setOnClickListener(v -> togglePasswordVisibility(etNewPassword, 2));
 
         btnToggleConfirmPassword = new ImageButton(this);
-        btnToggleConfirmPassword.setImageResource(android.R.drawable.ic_menu_view);
         btnToggleConfirmPassword.setBackground(null);
         btnToggleConfirmPassword.setPadding(8, 8, 8, 8);
         btnToggleConfirmPassword.setOnClickListener(v -> togglePasswordVisibility(etConfirmPassword, 3));
@@ -254,8 +253,7 @@ public class ProfileActivity extends AppCompatActivity {
         dbHelper = new Database(this);
     }
 
-    private void setupClickListeners() {
-      backBtn.setOnClickListener(v->finish());
+    private void setupClickListeners() {backBtn.setOnClickListener(v->finish());
         loadPicture.setOnClickListener(v -> showImagePickerDialog());
         btnEdit.setOnClickListener(v -> enableEditMode());
 
@@ -380,6 +378,9 @@ public class ProfileActivity extends AppCompatActivity {
         btnSave.setVisibility(View.VISIBLE);
         btnCancel.setVisibility(View.VISIBLE);
         btnChangePassword.setText("Cancel Password Change");
+        btnChangePassword.setBackground(ContextCompat.getDrawable(this, R.drawable.grey_button));
+        btnChangePassword.setBackgroundTintList(ColorStateList.valueOf(Color.RED));
+        btnChangePassword.setTextColor(ContextCompat.getColor(this, R.color.white));
         titleHeader.setText("Change Password");
 
         // Clear and reset password fields
@@ -400,6 +401,12 @@ public class ProfileActivity extends AppCompatActivity {
         btnSave.setVisibility(View.GONE);
         btnCancel.setVisibility(View.GONE);
         btnChangePassword.setText("Change Password");
+        btnChangePassword.setBackground(ContextCompat.getDrawable(this, R.drawable.grey_button));
+        btnChangePassword.setBackgroundTintList(ColorStateList.valueOf(
+                ContextCompat.getColor(this, R.color.light_pink)
+        ));
+
+        btnChangePassword.setTextColor(ContextCompat.getColor(this, R.color.dark_blue));
         titleHeader.setText("My Profile");
 
         // Reset edit mode if it was active
@@ -423,10 +430,6 @@ public class ProfileActivity extends AppCompatActivity {
         isCurrentPasswordVisible = false;
         isNewPasswordVisible = false;
         isConfirmPasswordVisible = false;
-
-        btnToggleCurrentPassword.setImageResource(android.R.drawable.ic_menu_view);
-        btnToggleNewPassword.setImageResource(android.R.drawable.ic_menu_view);
-        btnToggleConfirmPassword.setImageResource(android.R.drawable.ic_menu_view);
 
         etCurrentPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
         etNewPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
@@ -574,6 +577,8 @@ public class ProfileActivity extends AppCompatActivity {
                 user.setName(etName.getText().toString().trim());
                 user.setSurname(etSurname.getText().toString().trim());
                 user.setPhone(etPhone.getText().toString().trim());
+                SessionManager sess= new SessionManager(this);
+                sess.createLoginSession(user.getEmail(),user.getName());
                 disableEditMode();
             } else {
                 Toast.makeText(this, "Failed to update profile", Toast.LENGTH_SHORT).show();
