@@ -7,6 +7,7 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Patterns;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -128,10 +129,15 @@ public class RegisterActivity extends AppCompatActivity {
             return;
         }
 
-        if(!isValid(password)) {
+        if(!isValidPassword(password)) {
             Toast.makeText(getApplicationContext(),
                     "Password must be at least 8 characters with letter, digit and special symbol",
                     Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if(!isValidEmail(email)){
+            Toast.makeText(getApplicationContext(), "Please enter a valid email address", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -177,7 +183,11 @@ public class RegisterActivity extends AppCompatActivity {
         return exists;
     }
 
-    public static boolean isValid(String password) {
+    public boolean isValidEmail(String email){
+        return email != null && Patterns.EMAIL_ADDRESS.matcher(email).matches();
+    }
+
+    public static boolean isValidPassword(String password) {
         int f1 = 0, f2 = 0, f3 = 0;
         if(password.length() < 8){
             return false;

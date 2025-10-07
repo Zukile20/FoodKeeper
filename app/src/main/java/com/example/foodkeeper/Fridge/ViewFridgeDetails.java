@@ -119,6 +119,13 @@ public class ViewFridgeDetails extends AppCompatActivity implements DeleteDialog
         }
     }
     private void deleteFridge() {
+        ArrayList<Fridge> allFridges = new ArrayList<>(db.getUserFridges(session.getUserEmail()));
+
+        if (allFridges.size() <= 1) {
+            Toast.makeText(this, "Cannot delete the only fridge in the system", Toast.LENGTH_LONG).show();
+            return;
+        }
+
         FragmentManager fm = getSupportFragmentManager();
         DeleteDialog deleteDialog = DeleteDialog.newInstance(currentFridge.getBrand() + " " + currentFridge.getModel());
         deleteDialog.setOnDeleteConfirmListener(this);

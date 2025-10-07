@@ -224,9 +224,7 @@
             android:layout_width="150dp"
             android:layout_height="wrap_content"
             android:background="@drawable/rounded_button"
-            android:gravity="center"
             android:text="Save"
-            android:textAlignment="center"
             android:textAllCaps="false"
             android:textColor="@color/white"
             app:backgroundTint="@color/mainBlue" />
