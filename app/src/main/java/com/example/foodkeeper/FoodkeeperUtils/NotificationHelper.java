@@ -14,7 +14,7 @@ import android.widget.RemoteViews;
 import androidx.core.app.NotificationCompat;
 
 import com.example.foodkeeper.FoodItem.FoodItem;
-import com.example.foodkeeper.MainActivity;
+import com.example.foodkeeper.LandingPageActivity;
 import com.example.foodkeeper.R;
 
 public class NotificationHelper {
@@ -25,7 +25,7 @@ public class NotificationHelper {
     public static void showLowStockNotification(Context context, FoodItem item) {
         NotificationManager notificationManager = createNotificationChannel(context);
 
-        Intent intent = new Intent(context, MainActivity.class);
+        Intent intent = new Intent(context, LandingPageActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 
         PendingIntent pendingIntent = PendingIntent.getActivity(

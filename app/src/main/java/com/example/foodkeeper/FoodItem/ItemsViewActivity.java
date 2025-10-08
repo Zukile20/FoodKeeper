@@ -4,11 +4,8 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -24,7 +21,7 @@ import com.example.foodkeeper.Database;
 import com.example.foodkeeper.ExpiringActivity;
 
 import com.example.foodkeeper.LoginActivity;
-import com.example.foodkeeper.MainActivity;
+import com.example.foodkeeper.LandingPageActivity;
 import com.example.foodkeeper.MenuActivity;
 import com.example.foodkeeper.NotificationHelper;
 import com.example.foodkeeper.R;
@@ -88,7 +85,7 @@ public class ItemsViewActivity extends AppCompatActivity {
             int id = item.getItemId();
 
             if(id == R.id.nav_home){
-                startActivity(new Intent(ItemsViewActivity.this, MainActivity.class));
+                startActivity(new Intent(ItemsViewActivity.this, LandingPageActivity.class));
                 overridePendingTransition(0, 0);
                 finish();
                 return true;

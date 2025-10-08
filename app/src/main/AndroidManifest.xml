@@ -44,7 +44,7 @@
             android:name=".MenuActivity"
             android:exported="false" />
         <activity
-            android:name=".MainActivity"
+            android:name=".LandingPageActivity"
             android:exported="false" />
         <activity
             android:name=".FoodItem.ViewAnItemActivity"
@@ -69,7 +69,6 @@
             android:exported="false" />
         <activity
             android:name=".ViewMeals.mealsViewActivity"
-
             android:exported="false" />
         <activity
             android:name=".MealPlan.MealPlanActivity"

@@ -6,27 +6,21 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.foodkeeper.FoodItem.ItemsViewActivity;
 import com.example.foodkeeper.Meal.Meal;
 import com.example.foodkeeper.MealPlan.MealPlan;
-import com.example.foodkeeper.MealPlan.MonthlyViewActivity;
 import com.example.foodkeeper.MealPlan.WeeklyViewActivity;
 import com.example.foodkeeper.Recipe.Listeners.RecipeClickListerner;
 import com.example.foodkeeper.Recipe.Models.Recipe;
 import com.example.foodkeeper.Recipe.RecipeActivity;
 import com.example.foodkeeper.Recipe.RecipeDetailsActivity;
-import com.example.foodkeeper.ViewMeals.mealsViewActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.time.LocalDate;
@@ -34,7 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class MainActivity extends AppCompatActivity {
+public class LandingPageActivity extends AppCompatActivity {
 
     private BottomNavigationView bottomNav;
     private RecyclerView recipesView;
@@ -45,8 +39,7 @@ public class MainActivity extends AppCompatActivity {
     private Database database;
     private SessionManager sess;
     ActivityResultLauncher<Intent> launcher;
-
-
+    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -78,22 +71,22 @@ public class MainActivity extends AppCompatActivity {
 
                 return true;
             } else if(id == R.id.nav_search){
-                startActivity(new Intent(MainActivity.this, SearchActivity.class));
+                startActivity(new Intent(LandingPageActivity.this, SearchActivity.class));
                 overridePendingTransition(0, 0);
                 finish();
                 return true;
             }else if(id == R.id.nav_view){
-                startActivity(new Intent(MainActivity.this, ItemsViewActivity.class));
+                startActivity(new Intent(LandingPageActivity.this, ItemsViewActivity.class));
                 overridePendingTransition(0, 0);
                 finish();
                 return true;
             } else if(id == R.id.nav_expiring) {
-                startActivity(new Intent(MainActivity.this, ExpiringActivity.class));
+                startActivity(new Intent(LandingPageActivity.this, ExpiringActivity.class));
                 overridePendingTransition(0, 0);
                 finish();
                 return true;
             } else if (id == R.id.nav_profileMenu) {
-                startActivity(new Intent(MainActivity.this, MenuActivity.class));
+                startActivity(new Intent(LandingPageActivity.this, MenuActivity.class));
                 overridePendingTransition(0, 0);
                 finish();
                 return true;
@@ -105,7 +98,6 @@ public class MainActivity extends AppCompatActivity {
         bottomNav.setSelectedItemId(R.id.nav_home);
         refreshgreetTxt();
     }
-
     private void refreshgreetTxt() {
 
         greetText.setText("Hi, "+ sess.getUserName());
@@ -119,7 +111,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onRecipeClicked(String id) {
                 // Handle recipe click - navigate to recipe detail
-                Intent intent = new Intent(MainActivity.this, RecipeDetailsActivity.class).putExtra("id", id);
+                Intent intent = new Intent(LandingPageActivity.this, RecipeDetailsActivity.class).putExtra("id", id);
                 startActivity(intent);
             }
         };
@@ -134,14 +126,11 @@ public class MainActivity extends AppCompatActivity {
         ));
         recipesView.setAdapter(recipeAdapter);
     }
-    public void showProfileActivity(View view)
-    {
+    public void showProfileActivity(View view) {
         Intent intent = new Intent(this, ProfileActivity.class);
         startActivity(intent);
     }
-
-    private void setupMealAdapter()
-    {
+    private void setupMealAdapter() {
         MealPlan plan = database.getMealPlanForDay(LocalDate.now());
         List<Meal> meals = new ArrayList<>();
 
@@ -181,21 +170,19 @@ public class MainActivity extends AppCompatActivity {
         addMealPlanButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, WeeklyViewActivity.class);
+                Intent intent = new Intent(LandingPageActivity.this, WeeklyViewActivity.class);
                 startActivity(intent);
             }
         });
         adapter = new MealAdapterLanding(this, meals, new MealAdapterLanding.OnClickListener() {
             @Override
             public void onClick(Meal meal, int position) {
-                Intent intent = new Intent(MainActivity.this, WeeklyViewActivity.class);
+                Intent intent = new Intent(LandingPageActivity.this, WeeklyViewActivity.class);
                 startActivity(intent);
             }
         });
         mealsView.setAdapter(adapter);
     }
-
-
     @Override
     protected void onResume() {
         super.onResume();
@@ -205,7 +192,6 @@ public class MainActivity extends AppCompatActivity {
         refreshgreetTxt();
 
     }
-
     private void refreshRecipes() {
         // Get new random recipes
         List<Recipe> newRecipes = database.getRandomRecipes(5);
@@ -213,7 +199,6 @@ public class MainActivity extends AppCompatActivity {
             recipeAdapter.updateRecipes(newRecipes);
         }
     }
-
     private void refreshMealPlan() {
         // Get new random recipes
         setupMealAdapter();
@@ -222,8 +207,6 @@ public class MainActivity extends AppCompatActivity {
     {
         startActivity(new Intent(this,RecipeActivity.class));
     }
-
-
     @Override
     protected void onDestroy() {
         super.onDestroy();

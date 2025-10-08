@@ -24,7 +24,7 @@ public class NotificationHelper {
     public static void showExpiringItemNotification(Context context, FoodItem item) {
         NotificationManager notificationManager = createNotificationChannel(context);
 
-        Intent intent = new Intent(context, MainActivity.class);
+        Intent intent = new Intent(context, LandingPageActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 
         PendingIntent pendingIntent = PendingIntent.getActivity(

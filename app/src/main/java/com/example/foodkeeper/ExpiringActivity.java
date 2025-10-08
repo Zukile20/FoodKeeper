@@ -61,7 +61,7 @@ public class ExpiringActivity extends AppCompatActivity {
             int id = item.getItemId();
 
             if(id == R.id.nav_home){
-                startActivity(new Intent(ExpiringActivity.this, MainActivity.class));
+                startActivity(new Intent(ExpiringActivity.this, LandingPageActivity.class));
                 overridePendingTransition(0, 0);
                 finish();
                 return true;

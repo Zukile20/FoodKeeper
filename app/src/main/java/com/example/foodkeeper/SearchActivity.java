@@ -19,21 +19,11 @@ import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.foodkeeper.CustomSpinnerAdapter;
-import com.example.foodkeeper.Database;
-import com.example.foodkeeper.ExpiringActivity;
-
 import com.example.foodkeeper.FoodItem.AddItemActivity;
 import com.example.foodkeeper.FoodItem.FoodItem;
 import com.example.foodkeeper.FoodItem.FoodItemAdapter;
 import com.example.foodkeeper.FoodItem.ItemsViewActivity;
 import com.example.foodkeeper.FoodItem.ViewAnItemActivity;
-import com.example.foodkeeper.LoginActivity;
-import com.example.foodkeeper.MainActivity;
-import com.example.foodkeeper.MenuActivity;
-import com.example.foodkeeper.NotificationHelper;
-import com.example.foodkeeper.R;
-import com.example.foodkeeper.SessionManager;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -94,7 +84,7 @@ public class SearchActivity extends AppCompatActivity {
             int id = item.getItemId();
 
             if(id == R.id.nav_home){
-                startActivity(new Intent(SearchActivity.this, MainActivity.class));
+                startActivity(new Intent(SearchActivity.this, LandingPageActivity.class));
                 overridePendingTransition(0, 0);
                 finish();
                 return true;
