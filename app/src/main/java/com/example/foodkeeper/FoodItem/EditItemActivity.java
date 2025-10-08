@@ -73,6 +73,7 @@ public class EditItemActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_item);
+        setContentView(R.layout.activity_edit_item);
 
         db = new Database(this);
         session = new SessionManager(this);
@@ -245,7 +246,7 @@ public class EditItemActivity extends AppCompatActivity {
             tvQuantity.setText(String.valueOf(currentQuantity));
             if(currentQuantity==thresholdQuantity)//low stock quantity
             {
-                NotificationHelper.showExpiringItemNotification(this,currentItem);
+                NotificationHelper.showLowStockNotification(this,currentItem);
             }
         } else {
             Toast.makeText(this, "Quantity cannot be less than 1 or delete item", Toast.LENGTH_SHORT).show();

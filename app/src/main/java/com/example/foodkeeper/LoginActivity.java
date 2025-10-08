@@ -63,7 +63,7 @@ public class LoginActivity extends AppCompatActivity {
                         Toast.makeText(getApplicationContext(), "Login Successfully", Toast.LENGTH_SHORT).show();
                         user = db.loadUserByEmail(email);
                          sess.createLoginSession(email,user.getName());
-                        startActivity(new Intent(LoginActivity.this, LandingPageActivity.class));
+                        startActivity(new Intent(LoginActivity.this, ItemsViewActivity.class));
                         finish();
                     } else {
                         Toast.makeText(getApplicationContext(), "Invalid Email Address and Password", Toast.LENGTH_SHORT).show();

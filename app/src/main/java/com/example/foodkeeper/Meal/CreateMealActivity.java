@@ -26,7 +26,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.foodkeeper.FoodItem.FoodItem;
-import com.example.foodkeeper.FoodkeeperUtils.NotificationHelper;
 import com.example.foodkeeper.R;
 import com.example.foodkeeper.SessionManager;
 

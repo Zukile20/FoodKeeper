@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -13,6 +14,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.foodkeeper.FoodItem.ItemsViewActivity;
 import com.example.foodkeeper.Meal.Meal;
 import com.example.foodkeeper.MealPlan.MealPlan;
@@ -34,12 +36,15 @@ public class LandingPageActivity extends AppCompatActivity {
     private RecyclerView recipesView;
     TextView greetText;
     private RecyclerView mealsView;
+    private ImageView profileImage;
     private RecipeAdapter recipeAdapter;
     private MealAdapterLanding adapter;
     private Database database;
     private SessionManager sess;
     ActivityResultLauncher<Intent> launcher;
-    
+    User user;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,12 +55,14 @@ public class LandingPageActivity extends AppCompatActivity {
         // Initialize database
         database = new Database(this);
         sess= new SessionManager(this);
+        user= database.loadUserByEmail(sess.getUserEmail());
 
         // Initialize RecyclerViews
         recipesView = findViewById(R.id.recipesView);
         mealsView = findViewById(R.id.mealsView);
         mealsView = findViewById(R.id.mealsView);
         greetText = findViewById(R.id.greetText);
+        profileImage = findViewById(R.id.profileImageView);
 
         // Setup Recipes RecyclerView
         setupRecipesRecyclerView();
@@ -97,7 +104,9 @@ public class LandingPageActivity extends AppCompatActivity {
         });
         bottomNav.setSelectedItemId(R.id.nav_home);
         refreshgreetTxt();
+        refreshProfileFoto();
     }
+
     private void refreshgreetTxt() {
 
         greetText.setText("Hi, "+ sess.getUserName());
@@ -126,11 +135,14 @@ public class LandingPageActivity extends AppCompatActivity {
         ));
         recipesView.setAdapter(recipeAdapter);
     }
-    public void showProfileActivity(View view) {
+    public void showProfileActivity(View view)
+    {
         Intent intent = new Intent(this, ProfileActivity.class);
         startActivity(intent);
     }
-    private void setupMealAdapter() {
+
+    private void setupMealAdapter()
+    {
         MealPlan plan = database.getMealPlanForDay(LocalDate.now());
         List<Meal> meals = new ArrayList<>();
 
@@ -183,15 +195,34 @@ public class LandingPageActivity extends AppCompatActivity {
         });
         mealsView.setAdapter(adapter);
     }
+
+
     @Override
     protected void onResume() {
         super.onResume();
         // Refresh recipes when returning to this activity
+
+        refresh();
+    }
+
+    private void refresh() {
+        user = database.loadUserByEmail(sess.getUserEmail());
         refreshRecipes();
         refreshMealPlan();
         refreshgreetTxt();
+        refreshProfileFoto();
+    }
+
+    private void refreshProfileFoto()
+    {
+            Glide.with(this)
+                    .load(user.getProfileImage())
+                    .placeholder(R.drawable.ic_profile)
+                    .error(R.drawable.ic_profile)
+                    .into(profileImage);
 
     }
+
     private void refreshRecipes() {
         // Get new random recipes
         List<Recipe> newRecipes = database.getRandomRecipes(5);
@@ -199,6 +230,7 @@ public class LandingPageActivity extends AppCompatActivity {
             recipeAdapter.updateRecipes(newRecipes);
         }
     }
+
     private void refreshMealPlan() {
         // Get new random recipes
         setupMealAdapter();
@@ -207,6 +239,8 @@ public class LandingPageActivity extends AppCompatActivity {
     {
         startActivity(new Intent(this,RecipeActivity.class));
     }
+
+
     @Override
     protected void onDestroy() {
         super.onDestroy();

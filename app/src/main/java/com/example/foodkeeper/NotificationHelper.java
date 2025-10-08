@@ -14,15 +14,59 @@ import android.widget.RemoteViews;
 import androidx.core.app.NotificationCompat;
 
 import com.example.foodkeeper.FoodItem.FoodItem;
+import com.example.foodkeeper.LandingPageActivity;
+import com.example.foodkeeper.R;
 
 public class NotificationHelper {
-    private static final String LOW_CHANNEL_ID = "expiring_items_channel";
-    private static final String CHANNEL_NAME = "Expiration Alerts";
-    private static final String CHANNEL_DESCRIPTION = "Notifications for items about to expire";
+    // Channel IDs
+    private static final String LOW_STOCK_CHANNEL_ID = "low_stock_channel";
+    private static final String EXPIRING_CHANNEL_ID = "expiring_items_channel";
+
+    // Channel Names
+    private static final String LOW_STOCK_CHANNEL_NAME = "Low Stock Alerts";
+    private static final String EXPIRING_CHANNEL_NAME = "Expiration Alerts";
+
+    // Channel Descriptions
+    private static final String LOW_STOCK_CHANNEL_DESC = "Notifications for items running low on stock";
+    private static final String EXPIRING_CHANNEL_DESC = "Notifications for items about to expire";
+
+    // Default image
     private static final int DEFAULT_IMAGE_RESOURCE = R.drawable.image_placeholder;
 
+    public static void showLowStockNotification(Context context, FoodItem item) {
+        NotificationManager notificationManager = createNotificationChannels(context);
+
+        NotificationCompat.Builder builder = createBaseNotification(
+                context,
+                LOW_STOCK_CHANNEL_ID,
+                "Low Stock!",
+                item.getName() + " is running low"
+        );
+
+        addCustomView(context, builder, item, "Low Stock!",
+                item.getName() + " is running low");
+
+        int notificationId = generateNotificationId(item, "LOW_STOCK");
+        notificationManager.notify(notificationId, builder.build());
+    }
     public static void showExpiringItemNotification(Context context, FoodItem item) {
-        NotificationManager notificationManager = createNotificationChannel(context);
+        NotificationManager notificationManager = createNotificationChannels(context);
+
+        NotificationCompat.Builder builder = createBaseNotification(
+                context,
+                EXPIRING_CHANNEL_ID,
+                "Expiring Soon!",
+                item.getName() + " is about to expire"
+        );
+
+        addCustomView(context, builder, item, "Expiring Soon!",
+                item.getName() + " is about to expire");
+
+        int notificationId = generateNotificationId(item, "EXPIRING");
+        notificationManager.notify(notificationId, builder.build());
+    }
+    private static NotificationCompat.Builder createBaseNotification(
+            Context context, String channelId, String title, String message) {
 
         Intent intent = new Intent(context, LandingPageActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -34,24 +78,28 @@ public class NotificationHelper {
                 PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT
         );
 
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, LOW_CHANNEL_ID)
+        return new NotificationCompat.Builder(context, channelId)
                 .setSmallIcon(R.drawable.ic_notification)
-                .setContentTitle("Expiring Soon!")
-                .setContentText(item.getName() + " is about to expire")
+                .setContentTitle(title)
+                .setContentText(message)
                 .setContentIntent(pendingIntent)
                 .setAutoCancel(true)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .setCategory(NotificationCompat.CATEGORY_REMINDER);
-
+    }
+    @SuppressLint("RemoteViewLayout")
+    private static void addCustomView(Context context, NotificationCompat.Builder builder,
+                                      FoodItem item, String title, String message) {
         try {
-            @SuppressLint("RemoteViewLayout")
             RemoteViews customView = new RemoteViews(context.getPackageName(), R.layout.notification);
-            customView.setTextViewText(R.id.title, "Expiring Soon!");
-            customView.setTextViewText(R.id.textMessage, item.getName() + " is about to expire");
-            customView.setImageViewResource(R.id.noti_logo_view, R.drawable.logo_background);
+            customView.setTextViewText(R.id.title, title);
+            customView.setTextViewText(R.id.textMessage, message);
+            customView.setImageViewResource(R.id.noti_logo_view, R.mipmap.app_logo);
 
+            // Set food item image
             if (item.getImage() != null && item.getImage().length > 0) {
-                Bitmap bitmap = BitmapFactory.decodeByteArray(item.getImage(), 0, item.getImage().length);
+                Bitmap bitmap = BitmapFactory.decodeByteArray(
+                        item.getImage(), 0, item.getImage().length);
                 customView.setImageViewBitmap(R.id.foodItemImage, bitmap);
             } else {
                 customView.setImageViewResource(R.id.foodItemImage, DEFAULT_IMAGE_RESOURCE);
@@ -62,31 +110,44 @@ public class NotificationHelper {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-        int notificationId = item.getId() != 0 ? item.getId() : item.getName().hashCode();
-        notificationManager.notify(notificationId, builder.build());
     }
 
-    private static NotificationManager createNotificationChannel(Context context) {
+    private static NotificationManager createNotificationChannels(Context context) {
         NotificationManager notificationManager =
                 (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel channel = new NotificationChannel(
-                    LOW_CHANNEL_ID,
-                    CHANNEL_NAME,
+            // Low Stock Channel
+            NotificationChannel lowStockChannel = new NotificationChannel(
+                    LOW_STOCK_CHANNEL_ID,
+                    LOW_STOCK_CHANNEL_NAME,
                     NotificationManager.IMPORTANCE_DEFAULT
             );
+            lowStockChannel.setDescription(LOW_STOCK_CHANNEL_DESC);
+            lowStockChannel.enableVibration(true);
+            lowStockChannel.setShowBadge(true);
 
-            channel.setDescription(CHANNEL_DESCRIPTION);
-            channel.enableVibration(true);
-            channel.setShowBadge(true);
+            // Expiring Items Channel
+            NotificationChannel expiringChannel = new NotificationChannel(
+                    EXPIRING_CHANNEL_ID,
+                    EXPIRING_CHANNEL_NAME,
+                    NotificationManager.IMPORTANCE_DEFAULT
+            );
+            expiringChannel.setDescription(EXPIRING_CHANNEL_DESC);
+            expiringChannel.enableVibration(true);
+            expiringChannel.setShowBadge(true);
 
-            notificationManager.createNotificationChannel(channel);
+            notificationManager.createNotificationChannel(lowStockChannel);
+            notificationManager.createNotificationChannel(expiringChannel);
         }
 
         return notificationManager;
     }
 
 
+    private static int generateNotificationId(FoodItem item, String type) {
+        int baseId = item.getId() != 0 ? item.getId() : item.getName().hashCode();
+        int offset = type.equals("LOW_STOCK") ? 100000 : 200000;
+        return baseId + offset;
+    }
 }
