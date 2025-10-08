@@ -6,7 +6,6 @@
     android:layout_height="match_parent"
     android:background="@color/blue">
 
-    <!-- Header Section -->
     <LinearLayout
         android:id="@+id/headerLayout"
         android:layout_width="match_parent"
@@ -42,11 +41,10 @@
 
     </LinearLayout>
 
-    <!-- Profile Image Section -->
 
     <ImageView
         android:id="@+id/imageView8"
-        android:layout_width="410dp"
+        android:layout_width="match_parent"
         android:layout_height="695dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -81,18 +79,20 @@
             android:src="@drawable/image_placeholder"
             app:shapeAppearanceOverlay="@style/CircleImageView" />
 
-        <!-- Camera button -->
-        <Button
+
+        <ImageButton
             android:id="@+id/loadPicture"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
-            android:layout_alignEnd="@+id/profileImageView"
-            android:layout_alignBottom="@+id/profileImageView"
-            android:layout_marginEnd="-8dp"
-            android:layout_marginBottom="-8dp"
-            android:background="@drawable/camera"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@android:drawable/ic_menu_camera"
+            android:background="@drawable/camera_icon_background"
+            android:contentDescription="food photo"
+            android:layout_alignBottom="@id/profileImageView"
+            android:layout_alignEnd="@id/profileImageView"
+            android:layout_marginBottom="8dp"
             android:visibility="gone"
-            tools:visibility="visible" />
+            android:layout_marginEnd="8dp"/>
+
 
     </RelativeLayout>
 

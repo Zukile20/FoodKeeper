@@ -14,9 +14,7 @@ public class User implements Serializable {
     private String password;
     private byte[] profileImage;
 
-    // Constructors
     public User() {
-        // Default constructor
     }
 
     public User(String name, String surname, String email, String phone, String password) {
@@ -97,46 +95,10 @@ public class User implements Serializable {
         }
     }
 
-    public String getInitials() {
-        StringBuilder initials = new StringBuilder();
-        if (name != null && !name.isEmpty()) {
-            initials.append(name.charAt(0));
-        }
-        if (surname != null && !surname.isEmpty()) {
-            initials.append(surname.charAt(0));
-        }
-        return initials.toString().toUpperCase();
-    }
+
 
     public boolean hasProfileImage() {
         return profileImage != null && profileImage.length > 0;
-    }
-
-    public Bitmap getProfileImageBitmap() {
-        if (hasProfileImage()) {
-            return BitmapFactory.decodeByteArray(profileImage, 0, profileImage.length);
-        }
-        return null;
-    }
-
-    public void setProfileImageFromBitmap(Bitmap bitmap) {
-        if (bitmap != null) {
-            ByteArrayOutputStream stream = new ByteArrayOutputStream();
-            bitmap.compress(Bitmap.CompressFormat.PNG, 90, stream);
-            this.profileImage = stream.toByteArray();
-        } else {
-            this.profileImage = null;
-        }
-    }
-
-    public boolean isValidEmail() {
-        return email != null && android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches();
-    }
-    public boolean hasRequiredFields() {
-        return name != null && !name.trim().isEmpty() &&
-                surname != null && !surname.trim().isEmpty() &&
-                email != null && !email.trim().isEmpty() &&
-                password != null && !password.trim().isEmpty();
     }
 
     @Override

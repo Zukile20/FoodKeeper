@@ -9,6 +9,7 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -53,13 +54,13 @@ public class UpdateMealActivity extends AppCompatActivity implements FoodSelecti
     private ImageView mealImage;
     private EditText searchText;
     private TextView counterTextViewer;
-    private Button saveBtn,loadImage,backBtn,fullViewBtn;
+    private Button saveBtn,backBtn,fullViewBtn;
+    private ImageButton loadImage;
     private Database db ;
     private SessionManager session;
     FoodSelectionAdapter adapter ;
     private boolean imageSelectedForCurrentMeal = false;
     private Uri selectedImageUri ;
-    private  final int FULL_VIEW_REQUEST_CODE = 1001;
     ActivityResultLauncher<Intent> fullViewLauncher;
     private void iniWidgets()
     {

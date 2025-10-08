@@ -20,6 +20,16 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.FoodKeeper">
         <activity
+            android:name=".SplashActivity"
+            android:theme="@style/Theme.Splash"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
             android:name=".SearchActivity"
             android:exported="false" />
         <activity
@@ -72,9 +82,9 @@
             android:exported="false" />
         <activity
             android:name=".MealPlan.MealPlanActivity"
-            android:theme="@style/PopupTheme"
+            android:exported="false"
             android:label=""
-            android:exported="false" />
+            android:theme="@style/PopupTheme" />
         <activity android:name=".MealPlan.WeeklyViewActivity" />
         <activity
             android:name=".MealPlan.MonthlyViewActivity"
@@ -94,12 +104,8 @@
             android:exported="false" />
         <activity
             android:name=".LoginActivity"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+            android:exported="false">
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
     </application>
 

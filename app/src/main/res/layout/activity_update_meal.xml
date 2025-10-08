@@ -21,7 +21,7 @@
 
     <ImageView
         android:id="@+id/imageView6"
-        android:layout_width="417dp"
+        android:layout_width="match_parent"
         android:layout_height="669dp"
         app:srcCompat="@drawable/white_background"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -30,35 +30,40 @@
         app:layout_constraintStart_toStartOf="parent"
         />
 
-    <com.google.android.material.imageview.ShapeableImageView
-        android:id="@+id/mealImage"
-        android:layout_width="207dp"
-        android:layout_height="198dp"
-        android:layout_gravity="center"
-        android:layout_marginTop="16dp"
-        android:scaleType="centerCrop"
-        android:backgroundTint="@color/black"
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="@+id/imageView4"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/imageView4"
-        app:layout_constraintVertical_bias="0.371"
-        app:shapeAppearanceOverlay="@style/CircleImageView"
-        app:srcCompat="@drawable/image_placeholder" />
+        app:layout_constraintVertical_bias="0.371">
 
-    <Button
-        android:id="@+id/loadPicture"
-        android:layout_width="36dp"
-        android:layout_height="33dp"
-        android:layout_marginTop="152dp"
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/mealImage"
+            android:layout_width="207dp"
+            android:layout_height="198dp"
+            android:layout_gravity="center"
+            android:layout_marginTop="16dp"
+            android:scaleType="centerCrop"
+            android:backgroundTint="@color/black"
+            app:shapeAppearanceOverlay="@style/CircleImageView"
+            app:srcCompat="@drawable/image_placeholder"/>
 
-        android:layout_marginEnd="90dp"
-        android:background="@drawable/camera"
-        app:layout_constraintEnd_toEndOf="@+id/imageView6"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="@+id/mealImage"
-        app:layout_constraintTop_toTopOf="@+id/imageView4" />
+        <ImageButton
+            android:id="@+id/loadPicture"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@android:drawable/ic_menu_camera"
+            android:background="@drawable/camera_icon_background"
+            android:contentDescription="food photo"
+            android:layout_alignBottom="@id/mealImage"
+            android:layout_alignEnd="@id/mealImage"
+            android:layout_marginBottom="8dp"
+            android:layout_marginEnd="8dp"/>
+
+    </RelativeLayout>
 
 
     <LinearLayout
@@ -146,42 +151,37 @@
                     android:textStyle="bold" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <com.google.android.material.card.MaterialCardView
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/searchLayout"
                 android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:padding="20dp"
-                app:cardCornerRadius="24dp"
-                app:cardElevation="0dp"
-                app:strokeColor="#E0E0E0"
-                app:strokeWidth="1dp">
+                android:layout_height="50dp"
+                android:layout_gravity="center"
+                android:layout_margin="10dp"
+                android:background="@drawable/white_textbox"
+                android:padding="10dp"
+                app:boxBackgroundMode="none"
+                app:hintEnabled="false"
 
-                <LinearLayout
+                app:startIconDrawable="@android:drawable/ic_menu_search"
+                app:startIconTint="@color/blue">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/searchField"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
+                    android:background="@null"
                     android:gravity="center_vertical"
-                    android:orientation="horizontal"
-                    android:paddingStart="16dp">
+                    android:hint="Search item"
+                    android:inputType="text"
 
-                    <ImageView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:src="@drawable/ic_search" />
+                    android:maxLines="1"
+                    android:paddingHorizontal="16dp"
+                    android:textColor="#000000"
+                    android:textColorHint="#b8b8b8"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
 
-                    <EditText
-                        android:id="@+id/searchField"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:layout_marginStart="8dp"
-                        android:hint="@string/search_item"
-                        android:textColorHint="@color/light_grey"
-                        android:textColor="@color/black"
-                        android:textSize="16sp"
-                        android:inputType="text"
-                        android:maxLines="1"
-                        android:background="@null"/>
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
+            </com.google.android.material.textfield.TextInputLayout>
 
 
 
@@ -234,11 +234,12 @@
                 android:layout_height="48dp"
                 android:layout_alignBottom="@+id/linearLayout4"
                 android:layout_gravity="center"
-                android:layout_marginBottom="444dp"
                 android:background="@drawable/blue_button"
                 android:text="@string/save_meal"
-                android:layout_margin="20dp"
                 android:textAllCaps="false"
+                android:layout_marginRight="20dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginBottom="20dp"
                 android:textColor="#ffffff"
                 android:textSize="20sp"
                 android:textStyle="bold" />

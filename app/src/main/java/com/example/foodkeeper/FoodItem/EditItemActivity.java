@@ -29,6 +29,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import com.example.foodkeeper.Database;
+import com.example.foodkeeper.NotificationHelper;
 import com.example.foodkeeper.R;
 import com.example.foodkeeper.SessionManager;
 import com.google.android.material.imageview.ShapeableImageView;
@@ -58,6 +59,8 @@ public class EditItemActivity extends AppCompatActivity {
     private ImageButton cameraIconButton;
     private Button btnMinus, btnPlus, btnCancel, btnSave, btnClose;
     private Bitmap selectedImage;
+    int thresholdQuantity=1;
+
     private Calendar calendar;
     private DatePickerDialog datePickerDialog;
     private Dialog categoryDialog;
@@ -240,6 +243,10 @@ public class EditItemActivity extends AppCompatActivity {
         if (currentQuantity > 1) {
             currentQuantity--;
             tvQuantity.setText(String.valueOf(currentQuantity));
+            if(currentQuantity==thresholdQuantity)//low stock quantity
+            {
+                NotificationHelper.showExpiringItemNotification(this,currentItem);
+            }
         } else {
             Toast.makeText(this, "Quantity cannot be less than 1 or delete item", Toast.LENGTH_SHORT).show();
         }

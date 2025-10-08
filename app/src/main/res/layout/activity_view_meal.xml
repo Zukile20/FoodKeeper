@@ -21,7 +21,7 @@
 
     <ImageView
         android:id="@+id/imageView6"
-        android:layout_width="417dp"
+        android:layout_width="match_parent"
         android:layout_height="669dp"
         app:srcCompat="@drawable/white_background"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -114,8 +114,9 @@
 
     </LinearLayout>
 <LinearLayout
-    android:layout_width="wrap_content"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:padding="16dp"
     app:layout_constraintEnd_toEndOf="parent"
     app:layout_constraintHorizontal_bias="0.487"
     app:layout_constraintStart_toStartOf="parent"
@@ -124,7 +125,7 @@
 
     <ListView
         android:id="@+id/customListView"
-        android:layout_width="370dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:clickable="true"
         android:divider="@color/white"

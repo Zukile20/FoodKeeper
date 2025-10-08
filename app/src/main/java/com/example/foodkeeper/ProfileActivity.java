@@ -24,6 +24,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -44,7 +45,8 @@ import java.security.NoSuchAlgorithmException;
 public class ProfileActivity extends AppCompatActivity {
 
     private ShapeableImageView profileImage;
-    private Button loadPicture, backBtn;
+    private Button backBtn;
+    private ImageButton loadPicture;
     private TextView titleHeader;
     private EditText etName, etSurname, etEmail, etPhone;
     private Button btnSave, btnEdit, btnCancel, btnChangePassword;
@@ -558,12 +560,20 @@ public class ProfileActivity extends AppCompatActivity {
             values.put(KEY_PHONE, etPhone.getText().toString().trim());
 
             // Handle profile image
-            Drawable drawable = profileImage.getDrawable();
-            if (drawable instanceof BitmapDrawable) {
-                Bitmap bitmap = ((BitmapDrawable) drawable).getBitmap();
+            if (selectedImageUri != null) {
+                Bitmap selectedImage = MediaStore.Images.Media.getBitmap(
+                        this.getContentResolver(), selectedImageUri);
+                profileImage.setImageBitmap(selectedImage);
+
                 ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                bitmap.compress(Bitmap.CompressFormat.PNG, 90, stream);
-                values.put(KEY_PROFILE, stream.toByteArray());
+                selectedImage.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                byte[] imageBytes = stream.toByteArray();
+
+                values.put(KEY_PROFILE, imageBytes);
+            }
+            else
+            {
+             values.put(KEY_PROFILE, (byte[]) null);
             }
 
             String whereClause = KEY_EMAIL + " = ?";
@@ -636,6 +646,7 @@ public class ProfileActivity extends AppCompatActivity {
                     break;
                 case 2:
                     profileImage.setImageResource(R.drawable.image_placeholder);
+                    selectedImageUri=null;
                     break;
             }
         });
@@ -665,6 +676,8 @@ public class ProfileActivity extends AppCompatActivity {
         startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE_REQUEST);
     }
 
+    private Uri selectedImageUri;
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -672,6 +685,7 @@ public class ProfileActivity extends AppCompatActivity {
         if (resultCode == RESULT_OK) {
             if (requestCode == PICK_IMAGE_REQUEST && data != null && data.getData() != null) {
                 Uri imageUri = data.getData();
+                selectedImageUri = imageUri;
                 try {
                     Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), imageUri);
                     Bitmap scaledBitmap = getScaledBitmap(bitmap, 300, 300);

@@ -42,42 +42,38 @@
 </LinearLayout>
 
 
-        <com.google.android.material.card.MaterialCardView
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:padding="20dp"
-            app:cardCornerRadius="24dp"
-            app:cardElevation="0dp"
-            app:strokeColor="#E0E0E0"
-            app:strokeWidth="1dp">
 
-            <LinearLayout
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/searchLayout"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:paddingStart="16dp">
+                android:layout_height="50dp"
+                android:layout_gravity="center"
+                android:layout_margin="10dp"
+                android:background="@drawable/white_textbox"
+                android:padding="10dp"
+                app:boxBackgroundMode="none"
+                app:hintEnabled="false"
 
-                <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:src="@drawable/ic_search" />
+                app:startIconDrawable="@android:drawable/ic_menu_search"
+                app:startIconTint="@color/blue">
 
-                <EditText
+                <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/searchField"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_marginStart="8dp"
-                    android:hint="@string/search_item"
-                    android:textColorHint="@color/light_grey"
-                    android:textColor="@color/black"
-                    android:textSize="16sp"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@null"
+                    android:gravity="center_vertical"
+                    android:hint="Search item"
                     android:inputType="text"
+
                     android:maxLines="1"
-                    android:background="@null"/>
-            </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
+                    android:paddingHorizontal="16dp"
+                    android:textColor="#000000"
+                    android:textColorHint="#b8b8b8"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+            </com.google.android.material.textfield.TextInputLayout>
 
 
         <TextView

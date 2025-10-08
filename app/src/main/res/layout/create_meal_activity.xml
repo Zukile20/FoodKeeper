@@ -21,7 +21,7 @@
 
     <ImageView
         android:id="@+id/imageView6"
-        android:layout_width="417dp"
+        android:layout_width="match_parent"
         android:layout_height="669dp"
         app:srcCompat="@drawable/white_background"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -30,37 +30,40 @@
         app:layout_constraintStart_toStartOf="parent"
         />
 
-    <com.google.android.material.imageview.ShapeableImageView
-        android:id="@+id/mealImage"
-        android:layout_width="207dp"
-        android:layout_height="198dp"
-        android:layout_gravity="center"
-        android:layout_marginTop="16dp"
-        android:scaleType="centerCrop"
-        android:backgroundTint="@color/black"
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="@+id/imageView4"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/imageView4"
-        app:layout_constraintVertical_bias="0.371"
-        app:shapeAppearanceOverlay="@style/CircleImageView"
-        app:srcCompat="@drawable/image_placeholder" />
+        app:layout_constraintVertical_bias="0.371">
 
-    <Button
-        android:id="@+id/loadPicture"
-        android:layout_width="36dp"
-        android:layout_height="33dp"
-        android:layout_marginTop="152dp"
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/mealImage"
+            android:layout_width="207dp"
+            android:layout_height="198dp"
+            android:layout_gravity="center"
+            android:layout_marginTop="16dp"
+            android:scaleType="centerCrop"
+            android:backgroundTint="@color/black"
+            app:shapeAppearanceOverlay="@style/CircleImageView"
+            app:srcCompat="@drawable/image_placeholder"/>
 
-        android:layout_marginEnd="90dp"
-        android:background="@drawable/camera"
-        app:layout_constraintEnd_toEndOf="@+id/imageView6"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="@+id/mealImage"
-        app:layout_constraintTop_toTopOf="@+id/imageView4" />
+        <ImageButton
+            android:id="@+id/loadPicture"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@android:drawable/ic_menu_camera"
+            android:background="@drawable/camera_icon_background"
+            android:contentDescription="food photo"
+            android:layout_alignBottom="@id/mealImage"
+            android:layout_alignEnd="@id/mealImage"
+            android:layout_marginBottom="8dp"
+            android:layout_marginEnd="8dp"/>
 
-
+    </RelativeLayout>
     <LinearLayout
         android:id="@+id/linearLayout"
         android:layout_width="353dp"
@@ -104,7 +107,8 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-
+            android:padding="20dp"
+            android:layout_marginTop="-20dp"
             android:orientation="vertical"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -244,7 +248,7 @@
             <Button
                 android:id="@+id/createBtn"
                 android:layout_width="match_parent"
-                android:layout_height="43dp"
+                android:layout_height="48dp"
                 android:layout_gravity="center"
                 android:background="@drawable/blue_button"
                 android:text="Create"

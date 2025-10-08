@@ -8,8 +8,8 @@
 
     <LinearLayout
         android:id="@+id/main"
-        android:layout_width="410dp"
-        android:layout_height="800dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:orientation="vertical"
         android:padding="0dp"
         app:layout_constraintBottom_toBottomOf="parent"

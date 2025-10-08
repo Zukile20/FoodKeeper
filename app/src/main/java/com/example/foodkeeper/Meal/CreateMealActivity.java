@@ -11,6 +11,7 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -44,7 +45,7 @@ public class CreateMealActivity extends AppCompatActivity implements FoodSelecti
     private EditText searchText;
     private EditText nameField;
     private RecyclerView recyclerView;
-    private Button loadImageBtn;
+    private ImageButton loadImageBtn;
     private ImageView mealImage;
     private Button backBtn,createBtn;
     private Uri selectedImageUri;
