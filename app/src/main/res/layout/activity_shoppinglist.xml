@@ -49,16 +49,13 @@
     <!-- Empty State View -->
     <LinearLayout
         android:id="@+id/empty_state_layout"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:gravity="center"
         android:padding="32dp"
         android:visibility="gone"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/header_section"
-        app:layout_constraintBottom_toBottomOf="parent">
+        android:layout_centerInParent="true">
 
         <!-- Shopping Cart Icon (optional) -->
         <ImageView

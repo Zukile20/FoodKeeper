@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -18,7 +19,7 @@ import com.example.foodkeeper.ViewMeals.mealsViewActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class MenuActivity extends AppCompatActivity {
-    private ImageView profileArrow, fridgeArrow, mealsArrow, mealPlanArrow, recipesArrow, shoppingArrow, logoutArrow;
+    private LinearLayout myProfileOptions, manageRefrigeratorsOption, viewMealsOption, mealPlanOption, recipesOption, shoppingListOption, logOutOption;
     private BottomNavigationView bottomNav;
     @SuppressLint("WrongViewCast")
     @Override
@@ -28,13 +29,13 @@ public class MenuActivity extends AppCompatActivity {
         setContentView(R.layout.activity_menu);
 
         bottomNav = findViewById(R.id.bottomNav);
-        profileArrow = findViewById(R.id.myProfileOptions).findViewById(R.id.profileArrow);
-        fridgeArrow = findViewById(R.id.manageRefrigeratorsOption).findViewById(R.id.fridgeArrow);
-        mealsArrow = findViewById(R.id.viewMealsOption).findViewById(R.id.mealsArrow);
-        mealPlanArrow = findViewById(R.id.mealPlanOption).findViewById(R.id.mealPlansArrow);
-        recipesArrow = findViewById(R.id.recipesOption).findViewById(R.id.recipesArrow);
-        shoppingArrow = findViewById(R.id.shoppingListOption).findViewById(R.id.shoppingArrow);
-        logoutArrow = findViewById(R.id.logOutOption).findViewById(R.id.logoutArrow);
+        myProfileOptions = findViewById(R.id.myProfileOptions);
+        manageRefrigeratorsOption = findViewById(R.id.manageRefrigeratorsOption);
+        viewMealsOption = findViewById(R.id.viewMealsOption);
+        mealPlanOption = findViewById(R.id.mealPlanOption);
+        recipesOption = findViewById(R.id.recipesOption);
+        shoppingListOption = findViewById(R.id.shoppingListOption);
+        logOutOption = findViewById(R.id.logOutOption);
 
         bottomNav.setOnNavigationItemSelectedListener(item ->{
             int id = item.getItemId();
@@ -70,33 +71,37 @@ public class MenuActivity extends AppCompatActivity {
         });
         bottomNav.setSelectedItemId(R.id.nav_profileMenu);
 
-        profileArrow.setOnClickListener(v -> {
+        myProfileOptions.setOnClickListener(v -> {
             Intent intent = new Intent(MenuActivity.this, ProfileActivity.class);
             startActivity(intent);
         });
-        fridgeArrow.setOnClickListener(v -> {
+
+        manageRefrigeratorsOption.setOnClickListener(v -> {
             Intent intent = new Intent(MenuActivity.this, ManageFridgeActivity.class);
             startActivity(intent);
         });
-        mealsArrow.setOnClickListener(v -> {
-           Intent intent = new Intent(MenuActivity.this, mealsViewActivity.class);
-         startActivity(intent);
+
+        viewMealsOption.setOnClickListener(v -> {
+            Intent intent = new Intent(MenuActivity.this, mealsViewActivity.class);
+            startActivity(intent);
         });
-        mealPlanArrow.setOnClickListener(v -> {
-        Intent intent = new Intent(MenuActivity.this, WeeklyViewActivity.class);
-         startActivity(intent);
+
+        mealPlanOption.setOnClickListener(v -> {
+            Intent intent = new Intent(MenuActivity.this, WeeklyViewActivity.class);
+            startActivity(intent);
         });
-        recipesArrow.setOnClickListener(v -> {
-           Intent intent = new Intent(MenuActivity.this, RecipeActivity.class);
-           startActivity(intent);
-            //finish();
+
+        recipesOption.setOnClickListener(v -> {
+            Intent intent = new Intent(MenuActivity.this, RecipeActivity.class);
+            startActivity(intent);
         });
-        shoppingArrow.setOnClickListener(v -> {
+
+        shoppingListOption.setOnClickListener(v -> {
             Intent intent = new Intent(MenuActivity.this, MainShoppingListActivity.class);
             startActivity(intent);
-           // finish();
         });
-        logoutArrow.setOnClickListener(v -> {
+
+        logOutOption.setOnClickListener(v -> {
             showLogoutDialog();
         });
     }

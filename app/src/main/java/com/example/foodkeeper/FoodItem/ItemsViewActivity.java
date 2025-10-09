@@ -62,11 +62,11 @@ public class ItemsViewActivity extends AppCompatActivity {
 
         SessionManager userSession = new SessionManager(this);
 
-        if (!userSession.isLoggedIn()) {
-            startActivity(new Intent(this, LoginActivity.class));
-            finish();
-            return;
-        }
+        //if (!userSession.isLoggedIn()) {
+          //  startActivity(new Intent(this, LoginActivity.class));
+            //finish();
+           // return;
+        //}
 
         recyclerView = findViewById(R.id.recyclerView);
         fabAddItem = findViewById(R.id.fabAddItem);

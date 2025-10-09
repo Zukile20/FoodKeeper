@@ -65,7 +65,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
                     android:background="@drawable/white_blue_textbox"
-                    android:text="Yes, Delete"
+                    android:text="Yes, logout"
                     android:textColor="@color/mainBlue"
                     android:textSize="16sp"
                     android:textAllCaps="false"

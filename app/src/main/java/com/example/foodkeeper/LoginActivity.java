@@ -1,11 +1,13 @@
 package com.example.foodkeeper;
 
 import android.annotation.SuppressLint;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -16,6 +18,9 @@ import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.foodkeeper.FoodItem.ItemsViewActivity;
+import com.example.foodkeeper.Recipe.Listeners.RandomRecipeResponseListener;
+import com.example.foodkeeper.Recipe.Models.RandomRecipeApiResponse;
+import com.example.foodkeeper.Recipe.RequestManager;
 
 public class LoginActivity extends AppCompatActivity {
     EditText edEmail, edPassword;
@@ -23,6 +28,7 @@ public class LoginActivity extends AppCompatActivity {
     TextView tv;
     Database db;
     User user;
+    String userEmail;
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -42,7 +48,7 @@ public class LoginActivity extends AppCompatActivity {
 
 
             if (isEmailExists(sess.getUserEmail())) {
-                startActivity(new Intent(this, ItemsViewActivity.class));
+                startActivity(new Intent(this, LandingPageActivity.class));
                 finish();
                 return;
             } else {
@@ -63,8 +69,8 @@ public class LoginActivity extends AppCompatActivity {
                         Toast.makeText(getApplicationContext(), "Login Successfully", Toast.LENGTH_SHORT).show();
                         user = db.loadUserByEmail(email);
                          sess.createLoginSession(email,user.getName());
-                        startActivity(new Intent(LoginActivity.this, ItemsViewActivity.class));
-                        finish();
+                         userEmail=email;
+                         recipe();
                     } else {
                         Toast.makeText(getApplicationContext(), "Invalid Email Address and Password", Toast.LENGTH_SHORT).show();
                     }
@@ -104,5 +110,44 @@ public class LoginActivity extends AppCompatActivity {
         boolean exists = cursor.getCount() > 0;
         cursor.close();
         return exists;
+    }
+    private  void  recipe() {
+// In your login activity after successful login
+       ; // or however you get user email
+
+        RequestManager requestManager = new RequestManager(this);
+
+// Show a loading dialog
+        ProgressDialog progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage("Setting up your recipes...");
+        progressDialog.setCancelable(false);
+        progressDialog.show();
+
+// Fetch recipes for this specific user (first time only)
+        requestManager.getRandomRecipesForUser(new RandomRecipeResponseListener() {
+            @Override
+            public void didFetch(RandomRecipeApiResponse response, String message) {
+                progressDialog.dismiss();
+                Log.d("Login", message);
+                Toast.makeText(LoginActivity.this, "Recipes loaded!", Toast.LENGTH_SHORT).show();
+
+                // Navigate to main activity
+                Intent intent = new Intent(LoginActivity.this, LandingPageActivity.class);
+                startActivity(intent);
+                finish();
+            }
+
+            @Override
+            public void didError(String message) {
+                progressDialog.dismiss();
+                Log.e("Login", "Error: " + message);
+                Toast.makeText(LoginActivity.this, "Error loading recipes: " + message, Toast.LENGTH_SHORT).show();
+
+                // Still navigate - they can try again later
+                Intent intent = new Intent(LoginActivity.this, LandingPageActivity.class);
+                startActivity(intent);
+                finish();
+            }
+        }, null, userEmail); // Pass user email as the last parameter
     }
 }
