@@ -8,34 +8,35 @@
 
     <LinearLayout
         android:id="@+id/linearLayout"
-        android:layout_width="0dp"
-        android:layout_height="48dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginTop="25dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:padding="16dp"
+        android:gravity="center_vertical"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintEnd_toEndOf="parent">
 
         <Button
             android:id="@+id/btnGoBack"
-            android:layout_width="37dp"
-            android:layout_height="37dp"
-            android:contentDescription="back button"
-            android:background="@drawable/back_white_arrow"
-            android:clickable="true" />
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:background="@drawable/back_white_arrow" />
 
         <TextView
-            android:id="@+id/textView"
-            android:layout_width="144dp"
-            android:layout_height="32dp"
+            android:id="@+id/titleHeader"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:gravity="center"
             android:text="Refrigerator Details"
-            android:textColor="#ffffffff"
-            android:textSize="21sp"
-            android:textStyle="bold" />
+            android:textColor="#FFFFFF"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:gravity="center" />
+
+        <View
+            android:layout_width="45dp"
+            android:layout_height="45dp" />
     </LinearLayout>
 
     <ImageView

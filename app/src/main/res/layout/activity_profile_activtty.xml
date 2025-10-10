@@ -19,10 +19,9 @@
 
         <Button
             android:id="@+id/backBtn"
-            android:layout_width="47dp"
-            android:layout_height="47dp"
-            android:background="@drawable/back_white_arrow"
-            android:contentDescription="Back button" />
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:background="@drawable/back_white_arrow" />
 
         <TextView
             android:id="@+id/titleHeader"
@@ -36,8 +35,8 @@
             android:gravity="center" />
 
         <View
-            android:layout_width="40dp"
-            android:layout_height="40dp" />
+            android:layout_width="45dp"
+            android:layout_height="45dp" />
 
     </LinearLayout>
 

@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -64,6 +65,7 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapte
             if (isChecked1) {
                 myDB.UpdateItemShoppingList(Integer.parseInt(itemId.get(position)));
                 holder.item_Name.setPaintFlags(holder.item_Name.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+                Toast.makeText(context, "Don’t forget to add items to your fridge!",Toast.LENGTH_LONG).show();
             } else {
                 myDB.UpdateItemBackShoppingList(Integer.parseInt(itemId.get(position)));
                 holder.item_Name.setPaintFlags(holder.item_Name.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
