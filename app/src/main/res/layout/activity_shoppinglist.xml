@@ -10,32 +10,31 @@
         android:id="@+id/header_section"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:background="@color/white"
-        android:elevation="2dp"
-        android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:padding="16dp">
+        android:padding="16dp"
+        android:gravity="center_vertical"
+        android:layout_marginTop="35dp"
+        android:background="@color/white"
+        android:elevation="2dp">
 
         <Button
             android:id="@+id/back_btn"
-            android:layout_width="45dp"
-            android:layout_height="45dp"
+            android:layout_width="37dp"
+            android:layout_height="37dp"
             android:background="@drawable/back_arrow"
-            android:backgroundTint="@color/blue" />
+            android:scaleType="center"/>
 
         <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:id="@+id/textView"
+            android:layout_width="351dp"
+            android:layout_height="37dp"
+            android:layout_gravity="center"
             android:layout_weight="1"
-            android:gravity="center"
             android:text="Shopping List"
-            android:textSize="24sp"
-            android:textStyle="bold"/>
-
-        <View
-            android:layout_width="45dp"
-            android:layout_height="45dp" />
+            android:textAlignment="center"
+            android:textColor="@color/black"
+            android:textSize="20sp"
+            android:textStyle="bold" />
 
     </LinearLayout>
 
@@ -50,13 +49,16 @@
     <!-- Empty State View -->
     <LinearLayout
         android:id="@+id/empty_state_layout"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:gravity="center"
         android:padding="32dp"
         android:visibility="gone"
-        android:layout_centerInParent="true">
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/header_section"
+        app:layout_constraintBottom_toBottomOf="parent">
 
         <!-- Shopping Cart Icon (optional) -->
         <ImageView

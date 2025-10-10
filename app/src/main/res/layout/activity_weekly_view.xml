@@ -23,29 +23,27 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
+            android:layout_marginBottom="30dp"
             android:background="@color/white"
             android:elevation="2dp"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
             android:padding="16dp">
             <Button
                 android:id="@+id/back_button"
-                android:layout_width="45dp"
-                android:layout_height="45dp"
-                android:background="@drawable/back_arrow"
-                android:backgroundTint="@color/blue" />
+                android:layout_width="37dp"
+                android:layout_height="37dp"
+                android:layout_alignParentStart="true"
+                android:layout_marginStart="9dp"
+                android:background="@drawable/blue_arrow" />
             <TextView
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:text="Meal plan"
                 android:layout_weight="1"
                 android:gravity="center"
-                android:text="Meal plan"
-                android:textSize="24sp"
+                android:textColor="@android:color/black"
+                android:textSize="20sp"
                 android:textStyle="bold" />
-            <View
-                android:layout_width="45dp"
-                android:layout_height="45dp" />
 
 
 
@@ -205,7 +203,7 @@
 
             <LinearLayout
                 android:id="@+id/populatedStateView"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="20dp"
 
@@ -233,15 +231,16 @@
 
                     <Button
                         android:id="@+id/breakFastBtn"
-                        android:layout_width="18dp"
-                        android:layout_height="18dp"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
                         android:layout_gravity="center"
                         android:background="@drawable/add_meal_plan" />
                 </FrameLayout>
 
                 <FrameLayout
                     android:id="@+id/breakFastDisplay"
-                    android:layout_width="wrap_content"
+                    android:visibility="gone"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 
 
@@ -269,15 +268,15 @@
 
                     <Button
                         android:id="@+id/lunchBtn"
-                        android:layout_width="18dp"
-                        android:layout_height="18dp"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
                         android:layout_gravity="center"
                         android:background="@drawable/add_meal_plan" />
                 </FrameLayout>
 
                 <FrameLayout
                     android:id="@+id/lunchDisplay"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:visibility="gone">
 
@@ -306,8 +305,8 @@
 
                     <Button
                         android:id="@+id/DinnerBtn"
-                        android:layout_width="18dp"
-                        android:layout_height="18dp"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
                         android:layout_gravity="center"
                         android:background="@drawable/add_meal_plan" />
 
@@ -316,7 +315,7 @@
 
                 <FrameLayout
                     android:id="@+id/dinnerDisplay"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:visibility="gone">
 
@@ -346,15 +345,15 @@
 
                     <Button
                         android:id="@+id/snackBtn"
-                        android:layout_width="18dp"
-                        android:layout_height="18dp"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
                         android:layout_gravity="center"
                         android:background="@drawable/add_meal_plan" />
                 </FrameLayout>
 
                 <FrameLayout
                     android:id="@+id/snackDisplay"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:visibility="gone">
 

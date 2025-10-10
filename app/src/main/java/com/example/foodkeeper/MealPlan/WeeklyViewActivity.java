@@ -82,7 +82,6 @@ public class WeeklyViewActivity extends AppCompatActivity implements CalendarAda
     }
 
     private void initWidgets() {
-        //get the Database instance
         db = Database.getInstance(this);
 
         backBtn = findViewById(R.id.back_button);
@@ -304,12 +303,11 @@ public class WeeklyViewActivity extends AppCompatActivity implements CalendarAda
         setWeekView();
     }
     private void showMealLayout(ViewGroup container, Meal meal, ViewGroup placeholder) throws IOException {
-        if(meal!=null) {
+        if(meal != null) {
             placeholder.setVisibility(GONE);
             container.setVisibility(VISIBLE);
             container.setMinimumHeight(50);
             View mealView = LayoutInflater.from(this).inflate(R.layout.meal_event_cell, container, false);
-
             TextView mealName = mealView.findViewById(R.id.eventCellTV);
             ImageView mealImage = mealView.findViewById(R.id.mealImageView);
             ImageView optButton = mealView.findViewById(R.id.editMealBtn);
@@ -438,8 +436,14 @@ public class WeeklyViewActivity extends AppCompatActivity implements CalendarAda
 
         }
         else
+
         {
-            addButton.setVisibility(VISIBLE);
+
+            if(selectedDate.isBefore(LocalDate.now())) {
+                addButton.setVisibility(View.INVISIBLE);
+            } else {
+                addButton.setVisibility(View.VISIBLE);
+            }
             populatedState.setVisibility(GONE);
         }
     }
