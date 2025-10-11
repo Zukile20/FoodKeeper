@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     style="18sp"
     android:layout_width="match_parent"
-    android:layout_marginTop="10dp"
     android:layout_height="match_parent"
     android:background="@color/blue">
 
@@ -50,6 +49,7 @@
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="47dp"
+        android:layout_marginTop="20dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
@@ -61,8 +61,8 @@
 
             <Button
                 android:id="@+id/backBtn"
-                android:layout_width="37dp"
-                android:layout_height="37dp"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
                 android:background="@drawable/back_white_arrow"
                 android:contentDescription="back button" />
 

@@ -20,11 +20,10 @@
 
         <ImageButton
             android:id="@+id/backFridgeBtn"
-            android:layout_width="47dp"
-            android:layout_height="47dp"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
             android:contentDescription="back button"
-            android:background="@drawable/circle_background_blue"
-            android:src="@drawable/ic_arrow_back"
+            android:background="@drawable/back_arrow"
             android:scaleType="center"/>
 
         <TextView
@@ -34,7 +33,7 @@
             android:gravity="center"
             android:text="Refrigerators"
             android:textColor="@color/black"
-            android:textSize="34sp"
+            android:textSize="20dp"
             android:textStyle="bold" />
     </LinearLayout>
 
