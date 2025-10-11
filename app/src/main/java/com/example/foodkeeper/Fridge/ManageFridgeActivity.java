@@ -63,8 +63,7 @@ public class ManageFridgeActivity extends AppCompatActivity {
             }
         });
         backBtn = findViewById(R.id.backFridgeBtn);
-        backBtn.setOnClickListener(v -> {
-            startActivity(new Intent(this, MenuActivity.class));});
+        backBtn.setOnClickListener(v -> finish());
     }
 
     private void refreshList() {

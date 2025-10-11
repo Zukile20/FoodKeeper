@@ -65,7 +65,7 @@
                     android:text="No"
                     android:textAllCaps="false"
                     android:textColor="@color/white"
-                    android:textSize="16sp"
+                    android:textSize="18sp"
                     android:textStyle="bold"
                     android:elevation="0dp"
                     android:stateListAnimator="@null" />
@@ -77,7 +77,7 @@
                     android:background="@drawable/white_blue_textbox"
                     android:text="Yes, Delete"
                     android:textColor="@color/mainBlue"
-                    android:textSize="16sp"
+                    android:textSize="18sp"
                     android:textAllCaps="false"
                     android:textStyle="normal"
                     android:elevation="0dp"

@@ -5,37 +5,40 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
+    android:layout_marginTop="20dp"
     tools:context=".LandingPageActivity">
 
     <LinearLayout
         android:id="@+id/fridgeLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="16dp"
-        android:gravity="center_vertical"
-        android:layout_marginTop="35dp"
+        android:layout_alignParentTop="true"
         android:background="@color/white"
-        android:elevation="2dp">
+        android:elevation="2dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:padding="16dp">
 
         <ImageButton
             android:id="@+id/backFridgeBtn"
-            android:layout_width="47dp"
-            android:layout_height="47dp"
-            android:contentDescription="back button"
-            android:background="@drawable/circle_background_blue"
-            android:src="@drawable/ic_arrow_back"
-            android:scaleType="center"/>
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:background="@drawable/back_arrow"
+            android:backgroundTint="@color/blue" />
 
         <TextView
-            android:id="@+id/titleTextView"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:gravity="center"
             android:text="Refrigerators"
-            android:textColor="@color/black"
-            android:textSize="34sp"
+            android:textSize="24sp"
             android:textStyle="bold" />
+
+        <!-- Spacer to balance the layout -->
+        <View
+            android:layout_width="45dp"
+            android:layout_height="45dp" />
     </LinearLayout>
 
     <TextView

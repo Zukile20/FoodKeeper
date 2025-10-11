@@ -243,10 +243,10 @@
             android:id="@+id/createProfileButton"
             android:layout_width="match_parent"
             android:layout_height="48dp"
-            android:text="CREATE ACCOUNT"
-            android:textAllCaps="true"
+            android:text="Create account"
+            android:textAllCaps="false"
             android:textColor="@android:color/white"
-            android:textSize="16sp"
+            android:textSize="18sp"
             android:background="@drawable/rounded_button"/>
 
         <LinearLayout

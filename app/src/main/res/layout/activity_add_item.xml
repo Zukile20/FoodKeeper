@@ -218,7 +218,7 @@
         android:textAllCaps="false"
         android:textColor="@color/white"
         app:backgroundTint="@color/mainBlue"
-        android:textSize="20sp"
+        android:textSize="18sp"
         android:textAlignment="center"
         android:background="@drawable/blue_button"
         app:layout_constraintEnd_toEndOf="parent"

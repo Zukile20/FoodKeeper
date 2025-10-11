@@ -227,9 +227,9 @@
             android:layout_width="150dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
-            android:gravity="center_horizontal"
             android:text="Cancel"
             android:textAllCaps="false"
+            android:textSize="18sp"
             android:background="@drawable/rounded_button"
             android:textColor="@color/white"
             app:backgroundTint="@color/grey"
@@ -242,11 +242,11 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
             android:background="@drawable/rounded_button"
-            android:gravity="center_horizontal"
             android:text="Save"
             android:textAlignment="center"
             android:textAllCaps="false"
             android:textColor="@color/white"
+            android:textSize="18sp"
             app:backgroundTint="@color/mainBlue" />
     </LinearLayout>
 
