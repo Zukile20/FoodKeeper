@@ -15,7 +15,6 @@ public class CustomSpinnerAdapter extends ArrayAdapter<String> {
 
     @Override
     public boolean isEnabled(int position) {
-        // Disable the first item (position 0)
         return position != 0;
     }
 
@@ -25,7 +24,6 @@ public class CustomSpinnerAdapter extends ArrayAdapter<String> {
         TextView textView = (TextView) view;
 
         if (position == 0) {
-            // Make the first item appear disabled
             textView.setTextColor(Color.GRAY);
         } else {
             textView.setTextColor(Color.BLACK);

@@ -2,6 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    style="18sp"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/blue">
@@ -20,7 +21,7 @@
 
     <ImageView
         android:id="@+id/imageView6"
-        android:layout_width="match_parent"
+        android:layout_width="417dp"
         android:layout_height="669dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -44,35 +45,41 @@
         app:shapeAppearanceOverlay="@style/CircleImageView"
         />
 
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="47dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:padding="16dp"
+            android:layout_height="match_parent"
+            android:layout_marginTop="10dp"
             android:gravity="center_vertical"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent">
+            android:orientation="horizontal">
 
             <Button
                 android:id="@+id/backBtn"
                 android:layout_width="45dp"
                 android:layout_height="45dp"
-                android:background="@drawable/back_white_arrow" />
+                android:background="@drawable/back_white_arrow"
+                android:contentDescription="back button" />
 
             <TextView
                 android:id="@+id/titleHeader"
-                android:layout_width="0dp"
+                android:layout_width="303dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
+                android:gravity="center"
                 android:text="Recipe"
-                android:textColor="#FFFFFF"
-                android:textSize="20sp"
-                android:textStyle="bold"
-                android:gravity="center" />
+                android:textColor="#FFFFFFFF"
+                android:textSize="25dp"
+                android:textStyle="bold" />
             <RelativeLayout
-                android:layout_width="45dp"
-                android:layout_height="45dp">
+                android:layout_width="37dp"
+                android:layout_height="37dp"
+                tools:layout_editor_absoluteX="0dp"
+                tools:layout_editor_absoluteY="109dp">
 
                 <ImageView
                     android:id="@+id/favButton"
@@ -86,10 +93,12 @@
             </RelativeLayout>
         </LinearLayout>
 
+    </androidx.appcompat.widget.Toolbar>
+
     <ImageView
         android:id="@+id/btn_play"
-        android:layout_width="45dp"
-        android:layout_height="45dp"
+        android:layout_width="43dp"
+        android:layout_height="43dp"
         android:layout_marginTop="40dp"
         android:layout_marginEnd="28dp"
         android:src="@drawable/play"

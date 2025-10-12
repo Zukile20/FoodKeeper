@@ -44,7 +44,7 @@ public class ItemsViewActivity extends AppCompatActivity {
     private FoodItemAdapter foodItemAdapter;
     private List<FoodItem> allFoodItems;
     private FloatingActionButton fabAddItem;
-    private TextView categoryTab, soonToExpireTab, allTab, empty;
+    private TextView soonToExpireTab, allTab, empty;
     private Database db;
     private BottomNavigationView bottomNav;
     private Spinner spinnerCategory;
@@ -59,15 +59,6 @@ public class ItemsViewActivity extends AppCompatActivity {
 
         db = new Database(this);
         session= new SessionManager(this);
-
-        SessionManager userSession = new SessionManager(this);
-
-        //if (!userSession.isLoggedIn()) {
-          //  startActivity(new Intent(this, LoginActivity.class));
-            //finish();
-           // return;
-        //}
-
         recyclerView = findViewById(R.id.recyclerView);
         fabAddItem = findViewById(R.id.fabAddItem);
         allTab = findViewById(R.id.allTab);
@@ -238,7 +229,7 @@ public class ItemsViewActivity extends AppCompatActivity {
         Toast.makeText(this, selectedItem.getName() + " clicked", Toast.LENGTH_SHORT).show();
     }
     private void loadSoonToExpireItems() {
-        List<FoodItem> userItems = db.getUserFoodItems(session.getUserEmail());
+        List<FoodItem> userItems = db.getFoodItemsInConnectedFridge(session.getUserEmail());
         List<FoodItem> soonToExpireItems = new ArrayList<>();
 
         Calendar calendar = Calendar.getInstance();
