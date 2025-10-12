@@ -138,11 +138,9 @@ public class MainShoppingListActivity extends AppCompatActivity {
     }
     private void updateEmptyState() {
         if (itemName == null || itemName.isEmpty()) {
-            // Show empty state, hide RecyclerView
             emptyStateLayout.setVisibility(View.VISIBLE);
             recyclerView.setVisibility(View.GONE);
         } else {
-            // Show RecyclerView, hide empty state
             emptyStateLayout.setVisibility(View.GONE);
             recyclerView.setVisibility(View.VISIBLE);
         }

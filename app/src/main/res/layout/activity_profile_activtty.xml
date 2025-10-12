@@ -12,6 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
+        android:layout_marginTop="20dp"
         android:padding="16dp"
         android:gravity="center_vertical"
         app:layout_constraintTop_toTopOf="parent"
@@ -20,8 +21,8 @@
 
         <Button
             android:id="@+id/backBtn"
-            android:layout_width="47dp"
-            android:layout_height="47dp"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
             android:background="@drawable/back_white_arrow"
             android:contentDescription="Back button" />
 

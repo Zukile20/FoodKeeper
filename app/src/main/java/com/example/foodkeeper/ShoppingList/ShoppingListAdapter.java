@@ -21,7 +21,6 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapte
     private Context context;
     private ArrayList itemName,itemQty;
     private ArrayList<Integer> itemBought;// NEW
-
     private ArrayList<String> itemId;
     private Database myDB;
 
@@ -93,7 +92,7 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapte
            super(itemView);
            item_Name= itemView.findViewById(R.id.item_name);
            item_Qty=itemView.findViewById(R.id.item_qty);
-            checkboxBought = itemView.findViewById(R.id.item_checkbox);
+           checkboxBought = itemView.findViewById(R.id.item_checkbox);
         }
 
     }

@@ -46,7 +46,7 @@ public class ProfileActivity extends AppCompatActivity {
 
     private ShapeableImageView profileImage;
     private Button backBtn;
-    private ImageButton loadPicture;
+    private Button loadPicture;
     private TextView titleHeader;
     private EditText etName, etSurname, etEmail, etPhone;
     private Button btnSave, btnEdit, btnCancel, btnChangePassword;

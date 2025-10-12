@@ -75,25 +75,7 @@ public class DeleteDialog extends DialogFragment {
         dialogContainer.setOnClickListener(v -> {
         });
     }
-    private void animateEntrance(View dialogContainer) {
-        getView().setAlpha(0f);
-        getView().animate()
-                .alpha(1f)
-                .setDuration(200)
-                .start();
 
-        dialogContainer.setAlpha(0f);
-        dialogContainer.setScaleX(0.8f);
-        dialogContainer.setScaleY(0.8f);
-
-        dialogContainer.animate()
-                .alpha(1f)
-                .scaleX(1f)
-                .scaleY(1f)
-                .setDuration(300)
-                .setInterpolator(new DecelerateInterpolator())
-                .start();
-    }
     private void dismissWithAnimation() {
         View dialogContainer = getView().findViewById(R.id.dialog_container);
 
