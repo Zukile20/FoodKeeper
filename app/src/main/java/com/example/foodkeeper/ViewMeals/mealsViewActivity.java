@@ -128,6 +128,7 @@ public class mealsViewActivity extends AppCompatActivity  {
                             filteredMeals.remove(position);
                             mealAdapter.notifyItemRemoved(position);
                             mealAdapter.notifyItemRangeChanged(position, filteredMeals.size());
+                            updateEmptyState();// if the meals now are empty
                             Toast.makeText(mealsViewActivity.this, "Meal deleted", Toast.LENGTH_SHORT).show();
                         }
 

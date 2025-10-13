@@ -143,7 +143,7 @@ public class LandingPageActivity extends AppCompatActivity {
 
     private void setupMealAdapter()
     {
-        MealPlan plan = database.getMealPlanForDay(LocalDate.now());
+        MealPlan plan = database.getMealPlanForDay(LocalDate.now(),database.getConnectedFridgeForUser(sess.getUserEmail()).getId());
         List<Meal> meals = new ArrayList<>();
 
         //load the meals in the meal plan

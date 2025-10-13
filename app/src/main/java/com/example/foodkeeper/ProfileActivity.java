@@ -46,12 +46,11 @@ public class ProfileActivity extends AppCompatActivity {
 
     private ShapeableImageView profileImage;
     private Button backBtn;
-    private Button loadPicture;
+    private ImageButton loadPicture;
     private TextView titleHeader;
     private EditText etName, etSurname, etEmail, etPhone;
     private Button btnSave, btnEdit, btnCancel, btnChangePassword;
 
-    // Password fields with toggle functionality
     private LinearLayout currentPasswordLayout, newPasswordLayout, confirmPasswordLayout;
     private EditText etCurrentPassword, etNewPassword, etConfirmPassword;
     private ImageButton btnToggleCurrentPassword, btnToggleNewPassword, btnToggleConfirmPassword;
@@ -112,7 +111,6 @@ public class ProfileActivity extends AppCompatActivity {
         btnCancel = findViewById(R.id.btnCancel);
         btnChangePassword = findViewById(R.id.btnChangePassword);
 
-        // Password fields and layouts
         currentPasswordLayout = findViewById(R.id.currentPasswordLayout);
         newPasswordLayout = findViewById(R.id.newPasswordLayout);
         confirmPasswordLayout = findViewById(R.id.confirmPasswordLayout);
@@ -120,10 +118,8 @@ public class ProfileActivity extends AppCompatActivity {
         etNewPassword = findViewById(R.id.etNewPassword);
         etConfirmPassword = findViewById(R.id.etConfirmPassword);
 
-        // Create password toggle buttons programmatically
         createPasswordToggleButtons();
 
-        // Initially set fields to read-only
         setFieldsEditable(false);
     }
 
@@ -132,19 +128,15 @@ public class ProfileActivity extends AppCompatActivity {
         btnToggleCurrentPassword = new ImageButton(this);
         btnToggleCurrentPassword.setBackground(null);
         btnToggleCurrentPassword.setPadding(8, 8, 8, 8);
-        btnToggleCurrentPassword.setOnClickListener(v -> togglePasswordVisibility(etCurrentPassword, 1));
 
         btnToggleNewPassword = new ImageButton(this);
         btnToggleNewPassword.setBackground(null);
         btnToggleNewPassword.setPadding(8, 8, 8, 8);
-        btnToggleNewPassword.setOnClickListener(v -> togglePasswordVisibility(etNewPassword, 2));
 
         btnToggleConfirmPassword = new ImageButton(this);
         btnToggleConfirmPassword.setBackground(null);
         btnToggleConfirmPassword.setPadding(8, 8, 8, 8);
-        btnToggleConfirmPassword.setOnClickListener(v -> togglePasswordVisibility(etConfirmPassword, 3));
 
-        // Add toggle buttons to password layouts
         addToggleButtonToLayout(currentPasswordLayout, btnToggleCurrentPassword);
         addToggleButtonToLayout(newPasswordLayout, btnToggleNewPassword);
         addToggleButtonToLayout(confirmPasswordLayout, btnToggleConfirmPassword);
@@ -213,42 +205,6 @@ public class ProfileActivity extends AppCompatActivity {
             }
             return false;
         }
-    }
-    private void togglePasswordVisibility(EditText editText, int passwordType) {
-        boolean isVisible = false;
-
-        switch (passwordType) {
-            case 1: // Current password
-                isCurrentPasswordVisible = !isCurrentPasswordVisible;
-                isVisible = isCurrentPasswordVisible;
-                btnToggleCurrentPassword.setImageResource(
-                        isVisible ? android.R.drawable.ic_secure : android.R.drawable.ic_menu_view
-                );
-                break;
-            case 2: // New password
-                isNewPasswordVisible = !isNewPasswordVisible;
-                isVisible = isNewPasswordVisible;
-                btnToggleNewPassword.setImageResource(
-                        isVisible ? android.R.drawable.ic_secure : android.R.drawable.ic_menu_view
-                );
-                break;
-            case 3: // Confirm password
-                isConfirmPasswordVisible = !isConfirmPasswordVisible;
-                isVisible = isConfirmPasswordVisible;
-                btnToggleConfirmPassword.setImageResource(
-                        isVisible ? android.R.drawable.ic_secure : android.R.drawable.ic_menu_view
-                );
-                break;
-        }
-
-        // Toggle input type
-        if (isVisible) {
-            editText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
-        } else {
-            editText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-        }
-
-        editText.setSelection(editText.getText().length());
     }
 
     private void setupDatabase() {

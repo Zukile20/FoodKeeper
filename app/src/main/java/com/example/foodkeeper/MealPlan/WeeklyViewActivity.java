@@ -41,11 +41,13 @@ import com.example.foodkeeper.Meal.Meal;
 import com.example.foodkeeper.Meal.UpdateMealActivity;
 import com.example.foodkeeper.Meal.ViewMealActivity;
 import com.example.foodkeeper.R;
+import com.example.foodkeeper.SessionManager;
 import com.example.foodkeeper.ViewMeals.mealsViewActivity;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.time.LocalDate;
 import java.util.ArrayList;
 
@@ -61,6 +63,7 @@ public class WeeklyViewActivity extends AppCompatActivity implements CalendarAda
 
     Context context ;
     private Database db;
+    private SessionManager sess;
     ActivityResultLauncher<Intent> launcher;
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -83,6 +86,7 @@ public class WeeklyViewActivity extends AppCompatActivity implements CalendarAda
 
     private void initWidgets() {
         db = Database.getInstance(this);
+        sess= new SessionManager(this);
 
         backBtn = findViewById(R.id.back_button);
         calendarRecyclerView = findViewById(R.id.calendarRecyclerView);
@@ -121,15 +125,20 @@ public class WeeklyViewActivity extends AppCompatActivity implements CalendarAda
                     if (result.getResultCode() == RESULT_OK && result.getData() != null) {
                         Intent data = result.getData();
                         long mealID = data.getLongExtra("selectedMeal",0);
+                        long fridgeId = db.getConnectedFridgeForUser(sess.getUserEmail()).getId();
                         Meal meal =db.getMealWithFoodItems(mealID);
                         String type = data.getStringExtra("mealType");
-                        db.addMealToPlan(meal.getMealID(), CalendarUtils.selectedDate, type);
+                        db.addMealToPlan(meal.getMealID(), CalendarUtils.selectedDate, type,fridgeId);
 
                         meal.setLastUsed(selectedDate);
                         db.updateMeal(meal);
 
-                        MealPlan mealPlan = db.getMealPlanForDay(CalendarUtils.selectedDate);
+                        MealPlan mealPlan = db.getMealPlanForDay(CalendarUtils.selectedDate,fridgeId);
                         if (mealPlan != null) {
+                            if((mealPlan.getBreakFast()==null && mealPlan.getLunch()==null && mealPlan.getDinner()==null && mealPlan.getSnack()==null ))// meal plan with no meals must not be stored in the database1
+                            {
+                                db.deleteMealPlan(selectedDate);//check if the meal does contain at least one meal ,otherwise delete it
+                            }
                             if (mealPlan.getBreakFast() != null) {
                                 //Obtain the breakfast meal from the database
                                 Meal breakfastMeal = db.getMealWithFoodItems(mealPlan.getBreakFast());
@@ -190,6 +199,8 @@ public class WeeklyViewActivity extends AppCompatActivity implements CalendarAda
 
         Intent intent = new Intent(this, MonthlyViewActivity.class);
         startActivity(intent);
+        overridePendingTransition(R.anim.fade_in, 0);
+
     }
 
 
@@ -250,7 +261,7 @@ public class WeeklyViewActivity extends AppCompatActivity implements CalendarAda
 
                         Toast.makeText(context,"Meal plan deleted successfully", Toast.LENGTH_SHORT).show();
                     }
-                   populatedState.setVisibility(INVISIBLE);
+                    populatedState.setVisibility(INVISIBLE);
                     addButton.setVisibility(VISIBLE);
                 }
                 @Override
@@ -332,9 +343,19 @@ public class WeeklyViewActivity extends AppCompatActivity implements CalendarAda
             {
                 PopupMenu popup = new PopupMenu(this, optButton); // anchorView is the view where popup will appear
                 popup.getMenuInflater().inflate(R.menu.meal_menu, popup.getMenu());
+                try {
+                    Field mFieldPopup = popup.getClass().getDeclaredField("mPopup");
+                    mFieldPopup.setAccessible(true);
+                    Object mPopup = mFieldPopup.get(popup);
+                    mPopup.getClass()
+                            .getDeclaredMethod("setForceShowIcon", boolean.class)
+                            .invoke(mPopup, true);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
                 popup.setOnMenuItemClickListener(item -> {
                     int id = item.getItemId();
-                    MealPlan plan = db.getMealPlanForDay(selectedDate);
+                    MealPlan plan = db.getMealPlanForDay(selectedDate,db.getConnectedFridgeForUser(sess.getUserEmail()).getId());
                     if (id == R.id.delete) {
                         int containerId = container.getId();
                        if(containerId==R.id.breakFastDisplay)
@@ -393,8 +414,8 @@ public class WeeklyViewActivity extends AppCompatActivity implements CalendarAda
     protected void onResume()
     {
         super.onResume();
-        db.deleteExpiredMealPlans();
         try {
+            db.deleteExpiredMealPlans();
             setupEventsForDay();
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -404,13 +425,18 @@ public class WeeklyViewActivity extends AppCompatActivity implements CalendarAda
     {
         //gets the meal plan for a selected day
         RestoreLayouts();
-        MealPlan mealPlan = db.getMealPlanForDay(CalendarUtils.selectedDate);
+        long fridgeID = db.getConnectedFridgeForUser(sess.getUserEmail()).getId();
+        MealPlan mealPlan = db.getMealPlanForDay(CalendarUtils.selectedDate,fridgeID);
         if(mealPlan!=null)
         {
             addButton.setVisibility(GONE);//The add button is set to be invisible since a meal plan already exist for this day
             populatedState.setVisibility(VISIBLE);
 
-
+            if((mealPlan.getBreakFast()==null && mealPlan.getLunch()==null && mealPlan.getDinner()==null && mealPlan.getSnack()==null ))// meal plan with no meals must not be stored in the database1
+            {
+                db.deleteMealPlan(selectedDate);//check if the meal does contain at least one meal ,otherwise delete it
+                return;
+            }
             if(mealPlan.getBreakFast()!=null)
             {
                 //Obtain the breakfast meal from the database
