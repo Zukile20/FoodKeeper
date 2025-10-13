@@ -13,6 +13,7 @@
         android:layout_width="0dp"
         android:layout_height="72dp"
         android:background="@color/mainBlue"
+        android:layout_marginTop="20dp"
         android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -206,7 +207,7 @@
                     android:paddingStart="32dp"
                     android:paddingEnd="32dp"
                     android:textAllCaps="false"
-                    android:text="Add Meal Plan"
+                    android:text="Add meal plan"
                     android:textColor="@color/white"
                     android:textSize="18sp" />
 

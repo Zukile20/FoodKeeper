@@ -1641,7 +1641,7 @@ public class Database extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
         cv.put(SHOPPING_COLUMN_BOUGHT, 0); // Unmark as bought
-        db.update(SHOPPING_COLUMN_BOUGHT, cv, SHOPPING_COLUMN_ID + "=?", new String[]{String.valueOf(id)});
+        db.update(SHOPPING_TABLE_NAME, cv, SHOPPING_COLUMN_ID + " = ?", new String[]{String.valueOf(id)});
     }
     public User loadUserByEmail(String email) {
         if (email == null || email.trim().isEmpty()) {
