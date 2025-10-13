@@ -239,7 +239,6 @@ public class SearchActivity extends AppCompatActivity {
             hideEmptyState();
             allFoodItems = userItems;
             foodItemAdapter.updateData(new ArrayList<>(allFoodItems));
-            checkAndNotifyExpiringItems(userItems);
         }
     }
     private void showItemDetails(FoodItem selectedItem) {
@@ -282,31 +281,6 @@ public class SearchActivity extends AppCompatActivity {
             showEmptyState("No items expiring within the next 3 days");
         } else {
             hideEmptyState();
-        }
-    }
-    private void checkAndNotifyExpiringItems(List<FoodItem> items) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.HOUR_OF_DAY, 0);
-        calendar.set(Calendar.MINUTE, 0);
-        calendar.set(Calendar.SECOND, 0);
-        calendar.set(Calendar.MILLISECOND, 0);
-        Date today = calendar.getTime();
-
-        calendar.add(Calendar.DAY_OF_YEAR, 3);
-        Date thresholdDate = calendar.getTime();
-
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
-
-        for (FoodItem item : items) {
-            try {
-                Date expiryDate = dateFormat.parse(item.getExpiryDate().trim());
-
-                if (expiryDate != null && !expiryDate.before(today) && !expiryDate.after(thresholdDate)) {
-                    NotificationHelper.showExpiringItemNotification(this, item);
-                }
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
         }
     }
     @Override
