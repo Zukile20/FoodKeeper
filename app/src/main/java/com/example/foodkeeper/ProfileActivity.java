@@ -1,5 +1,7 @@
 package com.example.foodkeeper;
 
+import static com.example.foodkeeper.RegisterActivity.isValidPassword;
+
 import android.Manifest;
 import android.app.AlertDialog;
 import android.content.ContentValues;
@@ -427,36 +429,25 @@ public class ProfileActivity extends AppCompatActivity {
 
     private boolean validatePasswordChange() {
         String currentPassword = etCurrentPassword.getText().toString().trim();
-        String newPassword = etNewPassword.getText().toString().trim();
-        String confirmPassword = etConfirmPassword.getText().toString().trim();
+        String password = etNewPassword.getText().toString().trim();
+        String confirm = etConfirmPassword.getText().toString().trim();
 
-        if (currentPassword.isEmpty()) {
-            etCurrentPassword.setError("Current password is required");
-            etCurrentPassword.requestFocus();
-            return false;
-        }
-
-        if (newPassword.isEmpty()) {
-            etNewPassword.setError("New password is required");
-            etNewPassword.requestFocus();
-            return false;
-        }
-
-        if (newPassword.length() < 6) {
-            etNewPassword.setError("Password must be at least 6 characters");
-            etNewPassword.requestFocus();
-            return false;
-        }
-
-        if (!newPassword.equals(confirmPassword)) {
-            etConfirmPassword.setError("Passwords do not match");
+        if(!password.equals(confirm)) {
+            Toast.makeText(getApplicationContext(), "Passwords do not match", Toast.LENGTH_SHORT).show();
             etConfirmPassword.requestFocus();
             return false;
         }
 
-        if (currentPassword.equals(newPassword)) {
-            etNewPassword.setError("New password must be different from current password");
-            etNewPassword.requestFocus();
+        if(!isValidPassword(password)) {
+            etCurrentPassword.setError(
+                    "Password must be at least 8 characters with letter, digit and special symbol"
+            );
+            return false;
+        }
+
+        if (currentPassword.isEmpty()) {
+            etCurrentPassword.setError("Current password is required");
+            etCurrentPassword.requestFocus();
             return false;
         }
 
