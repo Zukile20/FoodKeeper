@@ -29,7 +29,7 @@ import java.util.Objects;
 public class Database extends SQLiteOpenHelper {
     private Context context;
     private static final String DATABASE_NAME = "FoodKeeper.db";
-    private static final int DATABASE_VERSION = 32;
+    private static final int DATABASE_VERSION = 36;
     private static Database instance;
     private static final String TABLE_USERS = "users";
     private static final String TABLE_FOOD_ITEMS = "food_items";
@@ -293,7 +293,7 @@ public class Database extends SQLiteOpenHelper {
         }
 
         int result = db.update(TABLE_FRIDGES, values,
-                KEY_ID + "=? AND " + KEY_USER_EMAIL + "=?",
+                KEY_FRIDGE_ID+ "=? AND " + KEY_USER_EMAIL + "=?",
                 new String[]{String.valueOf(fridge.getId()), userEmail});
         db.close();
         return result > 0;
@@ -465,6 +465,78 @@ public class Database extends SQLiteOpenHelper {
         return result;
     }
 
+
+
+
+
+    private void createTables(SQLiteDatabase db) {
+        fridgeUserItemTables(db);
+        createCategoryTable(db);
+        createMealPlanMealTables(db);
+        createRecipeTables(db);
+        createShoppingListTable(db);
+    }
+
+    public static synchronized Database getInstance(Context context) {
+        if (instance == null) {
+            instance = new Database(context.getApplicationContext());
+        }
+        return instance;
+    }
+
+    public long createMeal(Meal meal, long fridgeID) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        try {
+            ContentValues values = new ContentValues();
+            values.put("mealName", meal.getMealName());
+            values.put("fridgeID", fridgeID);  // Make sure this matches your schema
+            if(meal.getUri() != null) {
+                values.put("mealImage", meal.getUri());
+            }
+            return db.insert("Meal", null, values);
+        } finally {
+            db.close();
+        }
+    }
+
+
+    private Long getNullableLong(Cursor cursor, String columnName) {
+        int columnIndex = cursor.getColumnIndex(columnName);
+        if (columnIndex == -1) {
+            throw new IllegalArgumentException("Column not found: " + columnName);
+        }
+        return cursor.isNull(columnIndex) ? null : cursor.getLong(columnIndex);
+    }
+
+    public List<FoodItem> getFoodItemsForMeal(long mealId) {
+        List<FoodItem> foodItems = new ArrayList<>();
+
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        String query = "SELECT f.* FROM " + TABLE_FOOD_ITEMS + " f " +
+                "INNER JOIN MealFoodItem mfi ON f." + KEY_ID + " = mfi.foodItemID " +
+                "WHERE mfi.mealID = ?";
+
+        Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(mealId)});
+
+        if (cursor.moveToFirst()) {
+            do {
+                int foodItemID = cursor.getInt(cursor.getColumnIndexOrThrow(KEY_ID));
+                String name = cursor.getString(cursor.getColumnIndexOrThrow(KEY_ITEM_NAME));
+                byte[] imageUri = cursor.getBlob(cursor.getColumnIndexOrThrow(KEY_FOOD_IMAGE));
+                int qty = cursor.getInt(cursor.getColumnIndexOrThrow(KEY_QUANTITY));
+                String expiryDateStr = cursor.getString(cursor.getColumnIndexOrThrow(KEY_EXPIRY_DATE));
+                String categoryID = cursor.getString(cursor.getColumnIndexOrThrow(KEY_CATEGORY));
+                int isInShoppingList = cursor.getInt(cursor.getColumnIndexOrThrow(KEY_IS_IN_SHOPPING_LIST));
+
+                FoodItem foodItem = new FoodItem(foodItemID, name, categoryID, expiryDateStr, qty, imageUri, isInShoppingList);
+                foodItems.add(foodItem);
+            } while (cursor.moveToNext());
+        }
+
+        cursor.close();
+        return foodItems;
+    }
     public boolean updateFoodItem(FoodItem item, String userEmail) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
@@ -534,12 +606,12 @@ public class Database extends SQLiteOpenHelper {
         if (cursor.moveToFirst()) {
             do {
                 FoodItem item = new FoodItem();
-                item.setId(cursor.getInt(0));
-                item.setName(cursor.getString(1));
-                item.setCategory(cursor.getString(2));
-                item.setExpiryDate(cursor.getString(3));
-                item.setQuantity(cursor.getInt(4));
-                item.setImage(cursor.getBlob(5));
+                item.setId(cursor.getInt(cursor.getColumnIndexOrThrow(KEY_ID)));
+                item.setName(cursor.getString(cursor.getColumnIndexOrThrow(KEY_ITEM_NAME)));
+                item.setCategory(cursor.getString(cursor.getColumnIndexOrThrow(KEY_CATEGORY)));
+                item.setExpiryDate(cursor.getString(cursor.getColumnIndexOrThrow(KEY_EXPIRY_DATE)));
+                item.setQuantity(cursor.getInt(cursor.getColumnIndexOrThrow(KEY_QUANTITY)));
+                item.setImage(cursor.getBlob(cursor.getColumnIndexOrThrow(KEY_FOOD_IMAGE)));
 
                 foodItems.add(item);
             } while (cursor.moveToNext());
@@ -562,12 +634,12 @@ public class Database extends SQLiteOpenHelper {
         if (cursor.moveToFirst()) {
             do {
                 FoodItem item = new FoodItem();
-                item.setId(cursor.getInt(0));
-                item.setName(cursor.getString(1));
-                item.setCategory(cursor.getString(2));
-                item.setExpiryDate(cursor.getString(3));
-                item.setQuantity(cursor.getInt(4));
-                item.setImage(cursor.getBlob(5));
+                item.setId(cursor.getInt(cursor.getColumnIndexOrThrow(KEY_ID)));
+                item.setName(cursor.getString(cursor.getColumnIndexOrThrow(KEY_ITEM_NAME)));
+                item.setCategory(cursor.getString(cursor.getColumnIndexOrThrow(KEY_CATEGORY)));
+                item.setExpiryDate(cursor.getString(cursor.getColumnIndexOrThrow(KEY_EXPIRY_DATE)));
+                item.setQuantity(cursor.getInt(cursor.getColumnIndexOrThrow(KEY_QUANTITY)));
+                item.setImage(cursor.getBlob(cursor.getColumnIndexOrThrow(KEY_FOOD_IMAGE)));
 
                 foodItems.add(item);
             } while (cursor.moveToNext());
@@ -587,35 +659,6 @@ public class Database extends SQLiteOpenHelper {
         db.close();
         return result > 0;
     }
-    private void createTables(SQLiteDatabase db) {
-        fridgeUserItemTables(db);
-        createCategoryTable(db);
-        createMealPlanMealTables(db);
-        createRecipeTables(db);
-        createShoppingListTable(db);
-    }
-
-    public static synchronized Database getInstance(Context context) {
-        if (instance == null) {
-            instance = new Database(context.getApplicationContext());
-        }
-        return instance;
-    }
-
-    public long createMeal(Meal meal, long fridgeID) {
-        SQLiteDatabase db = this.getWritableDatabase();
-        try {
-            ContentValues values = new ContentValues();
-            values.put("mealName", meal.getMealName());
-            values.put("fridgeID", fridgeID);  // Make sure this matches your schema
-            if(meal.getUri() != null) {
-                values.put("mealImage", meal.getUri());
-            }
-            return db.insert("Meal", null, values);
-        } finally {
-            db.close();
-        }
-    }
 
     public List<Meal> getMealsInConnectedFridge(String userEmail) {
         List<Meal> meals = new ArrayList<>();
@@ -624,23 +667,22 @@ public class Database extends SQLiteOpenHelper {
         try {
             String query = "SELECT m.* FROM Meal m " +
                     "INNER JOIN " + TABLE_FRIDGES + " f ON m.fridgeID = f." + KEY_FRIDGE_ID + " " +
-                    "WHERE f." + KEY_IS_LOGGED_IN + " = 1 AND f."+KEY_USER_EMAIL+"=?";
+                    "WHERE f." + KEY_IS_LOGGED_IN + " = 1 AND f." + KEY_USER_EMAIL + "=?";
 
             cursor = db.rawQuery(query, new String[]{userEmail});
 
             if (cursor.moveToFirst()) {
                 do {
-                    long id =cursor.getLong(cursor.getColumnIndexOrThrow("mealID"));
+                    long id = cursor.getLong(cursor.getColumnIndexOrThrow("mealID"));
                     String name = cursor.getString(cursor.getColumnIndexOrThrow("mealName"));
-
                     String imageUri = cursor.getString(cursor.getColumnIndexOrThrow("mealImage"));
-
                     String lastUsed = cursor.getString(cursor.getColumnIndexOrThrow("lastUsed"));
-
                     long fridgeID = cursor.getLong(cursor.getColumnIndexOrThrow("fridgeID"));
-                    Meal meal = new Meal(id,name,imageUri,fridgeID);
-                    if(lastUsed!=null)
-                    {   meal.setLastUsed(LocalDate.parse(lastUsed));}
+
+                    Meal meal = new Meal(id, name, imageUri, fridgeID);
+                    if (lastUsed != null) {
+                        meal.setLastUsed(LocalDate.parse(lastUsed));
+                    }
                     meals.add(meal);
                 } while (cursor.moveToNext());
             }
@@ -652,102 +694,6 @@ public class Database extends SQLiteOpenHelper {
             }
         }
     }
-
-    public MealPlan getMealPlanForDay(LocalDate planDay) {
-        SQLiteDatabase db = this.getReadableDatabase();
-        String query = "SELECT * FROM MealPlan WHERE planDay = ?";
-
-        try (Cursor cursor = db.rawQuery(query, new String[]{planDay.toString()})) {
-            if (cursor.moveToFirst()) {
-                Long breakfastID = getNullableLong(cursor, "breakfastMealID");
-                Long lunchID = getNullableLong(cursor, "lunchMealID");
-                Long dinnerID = getNullableLong(cursor, "dinnerMealID");
-                Long snackID = getNullableLong(cursor, "snackMealID");
-
-                MealPlan plan = new MealPlan(planDay);
-                plan.setBreakFast(breakfastID);
-                plan.setLunch(lunchID);
-                plan.setDinner(dinnerID);
-                plan.setSnack(snackID);
-
-                return plan;
-            }
-        } catch (SQLException e) {
-            Log.e("MealPlanDB", "Error fetching meal plan for date: " + planDay, e);
-            throw new RuntimeException("Failed to fetch meal plan", e);
-        }
-
-        return null;
-    }
-
-    private Long getNullableLong(Cursor cursor, String columnName) {
-        int columnIndex = cursor.getColumnIndex(columnName);
-        if (columnIndex == -1) {
-            throw new IllegalArgumentException("Column not found: " + columnName);
-        }
-        return cursor.isNull(columnIndex) ? null : cursor.getLong(columnIndex);
-    }
-
-    public void addMealToPlan(long mealID, LocalDate planDay, String type) {
-        SQLiteDatabase db = this.getWritableDatabase();
-        ContentValues values = new ContentValues();
-        String planDayStr = planDay.toString();
-
-        switch (Objects.requireNonNull(type)) {
-            case "Breakfast":
-                values.put("breakfastMealID", mealID);
-                break;
-            case "Lunch":
-                values.put("lunchMealID", mealID);
-                break;
-            case "Dinner":
-                values.put("dinnerMealID", mealID);
-                break;
-            case "Snack":
-                values.put("snackMealID", mealID);
-                break;
-            default:
-                throw new IllegalArgumentException("Invalid meal type: " + type);
-        }
-
-        int rowsAffected = db.update("MealPlan", values, "planDay = ?", new String[]{planDayStr});
-
-        if (rowsAffected == 0) {
-            values.put("planDay", planDayStr);
-            db.insert("MealPlan", null, values);
-        }
-    }
-
-    public List<FoodItem> getFoodItemsForMeal(long mealId) {
-        List<FoodItem> foodItems = new ArrayList<>();
-
-        SQLiteDatabase db = this.getReadableDatabase();
-
-        String query = "SELECT f.* FROM " + TABLE_FOOD_ITEMS + " f " +
-                "INNER JOIN MealFoodItem mfi ON f." + KEY_ID + " = mfi.foodItemID " +
-                "WHERE mfi.mealID = ?";
-
-        Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(mealId)});
-
-        if (cursor.moveToFirst()) {
-            do {
-                int foodItemID = cursor.getInt(cursor.getColumnIndexOrThrow(KEY_ID));
-                String name = cursor.getString(cursor.getColumnIndexOrThrow(KEY_ITEM_NAME));
-                byte[] imageUri = cursor.getBlob(cursor.getColumnIndexOrThrow(KEY_FOOD_IMAGE));
-                int qty = cursor.getInt(cursor.getColumnIndexOrThrow(KEY_QUANTITY));
-                String expiryDateStr = cursor.getString(cursor.getColumnIndexOrThrow(KEY_EXPIRY_DATE));
-                String categoryID = cursor.getString(cursor.getColumnIndexOrThrow(KEY_CATEGORY));
-                int isInShoppingList = cursor.getInt(cursor.getColumnIndexOrThrow(KEY_IS_IN_SHOPPING_LIST));
-
-                FoodItem foodItem = new FoodItem(foodItemID, name, categoryID, expiryDateStr, qty, imageUri, isInShoppingList);
-                foodItems.add(foodItem);
-            } while (cursor.moveToNext());
-        }
-
-        cursor.close();
-        return foodItems;
-    }
-
     // MEAL PLAN METHODS
     public void deleteMealplan(LocalDate date) {
         SQLiteDatabase db = this.getWritableDatabase();
@@ -867,48 +813,6 @@ public class Database extends SQLiteOpenHelper {
         return meal;
     }
 
-    public boolean updateMealPlan(MealPlan mealPlan) {
-        if (mealPlan == null) {
-            Log.e("Database", "MealPlan cannot be null");
-            return false;
-        }
-        SQLiteDatabase db = this.getWritableDatabase();
-
-        try {
-            Cursor cursor = db.rawQuery("SELECT COUNT(*) FROM MealPlan WHERE planDay = ?",
-                    new String[]{mealPlan.getPlanDay().toString()});
-
-            boolean exists = false;
-            if (cursor.moveToFirst()) {
-                exists = cursor.getInt(0) > 0;
-            }
-            cursor.close();
-
-            ContentValues values = new ContentValues();
-            values.put("planDay", mealPlan.getPlanDay().toString());
-            values.put("breakfastMealID", mealPlan.getBreakFast());
-            values.put("lunchMealID", mealPlan.getLunch());
-            values.put("dinnerMealID", mealPlan.getDinner());
-            values.put("snackMealID", mealPlan.getSnack());
-
-            long result;
-            if (exists) {
-                result = db.update("MealPlan", values, "planDay = ?", new String[]{mealPlan.getPlanDay().toString()});
-            } else {
-                result = db.insert("MealPlan", null, values);
-            }
-
-            return result > 0;
-
-        } catch (Exception e) {
-            Log.e("Database", "Error updating meal plan: " + e.getMessage());
-            e.printStackTrace();
-            return false;
-        } finally {
-            db.close();
-        }
-    }
-
     public void deleteMeal(Meal meal) throws Exception {
         SQLiteDatabase db = this.getReadableDatabase();
         long mealID = meal.getMealID();
@@ -933,7 +837,6 @@ public class Database extends SQLiteOpenHelper {
     public void deleteMealPlansForMeal(int mealID) {
         SQLiteDatabase db = this.getWritableDatabase();
 
-        // Set all references to this meal to NULL in the MealPlan table
         ContentValues values = new ContentValues();
         values.putNull("breakfastMealID");
         db.update("MealPlan", values, "breakfastMealID = ?", new String[]{String.valueOf(mealID)});
@@ -951,6 +854,114 @@ public class Database extends SQLiteOpenHelper {
         db.update("MealPlan", values, "snackMealID = ?", new String[]{String.valueOf(mealID)});
 
         db.close();
+    }
+    public MealPlan getMealPlanForDay(LocalDate planDay, long fridgeID) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT * FROM MealPlan WHERE planDay = ? AND fridgeID = ?";
+
+        try (Cursor cursor = db.rawQuery(query, new String[]{planDay.toString(), String.valueOf(fridgeID)})) {
+            if (cursor.moveToFirst()) {
+                Long breakfastID = getNullableLong(cursor, "breakfastMealID");
+                Long lunchID = getNullableLong(cursor, "lunchMealID");
+                Long dinnerID = getNullableLong(cursor, "dinnerMealID");
+                Long snackID = getNullableLong(cursor, "snackMealID");
+
+                MealPlan plan = new MealPlan(planDay, fridgeID);
+                plan.setBreakFast(breakfastID);
+                plan.setLunch(lunchID);
+                plan.setDinner(dinnerID);
+                plan.setSnack(snackID);
+
+                return plan;
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to fetch meal plan", e);
+        }
+
+        return null;
+    }
+    public void addMealToPlan(long mealID, LocalDate planDay, String type, long fridgeID) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        String planDayStr = planDay.toString();
+
+        switch (Objects.requireNonNull(type)) {
+            case "Breakfast":
+                values.put("breakfastMealID", mealID);
+                break;
+            case "Lunch":
+                values.put("lunchMealID", mealID);
+                break;
+            case "Dinner":
+                values.put("dinnerMealID", mealID);
+                break;
+            case "Snack":
+                values.put("snackMealID", mealID);
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid meal type: " + type);
+        }
+
+        int rowsAffected = db.update("MealPlan", values,
+                "planDay = ? AND fridgeID = ?",
+                new String[]{planDayStr, String.valueOf(fridgeID)});
+
+        if (rowsAffected == 0) {
+            values.put("planDay", planDayStr);
+            values.put("fridgeID", fridgeID);
+            db.insert("MealPlan", null, values);
+        }
+    }
+
+    public boolean updateMealPlan(MealPlan mealPlan) {
+        if (mealPlan == null) {
+            Log.e("Database", "MealPlan cannot be null");
+            return false;
+        }
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        try {
+            Cursor cursor = db.rawQuery("SELECT COUNT(*) FROM MealPlan WHERE planDay = ? AND fridgeID = ?",
+                    new String[]{mealPlan.getPlanDay().toString(), String.valueOf(mealPlan.getFridgeID())});
+
+            boolean exists = false;
+            if (cursor.moveToFirst()) {
+                exists = cursor.getInt(0) > 0;
+            }
+            cursor.close();
+
+            ContentValues values = new ContentValues();
+            values.put("planDay", mealPlan.getPlanDay().toString());
+            values.put("fridgeID", mealPlan.getFridgeID());
+            values.put("breakfastMealID", mealPlan.getBreakFast());
+            values.put("lunchMealID", mealPlan.getLunch());
+            values.put("dinnerMealID", mealPlan.getDinner());
+            values.put("snackMealID", mealPlan.getSnack());
+
+            long result;
+            if (exists) {
+                result = db.update("MealPlan", values,
+                        "planDay = ? AND fridgeID = ?",
+                        new String[]{mealPlan.getPlanDay().toString(), String.valueOf(mealPlan.getFridgeID())});
+            } else {
+                result = db.insert("MealPlan", null, values);
+            }
+
+            return result > 0;
+
+        } catch (Exception e) {
+            Log.e("Database", "Error updating meal plan: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        } finally {
+            db.close();
+        }
+    }
+
+    public void deleteMealplan(LocalDate date, long fridgeID) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        String sql = "DELETE FROM MealPlan WHERE planDay = ? AND fridgeID = ?";
+        db.execSQL(sql, new Object[]{date.toString(), fridgeID});
     }
     private void createMealPlanMealTables(SQLiteDatabase db) {
         String createMealTable = "CREATE TABLE Meal (" +
@@ -973,10 +984,13 @@ public class Database extends SQLiteOpenHelper {
 
         String createMealPlanTable = "CREATE TABLE MealPlan (" +
                 "planDay TEXT NOT NULL," +
+                "fridgeID INTEGER NOT NULL," +
                 "breakfastMealID INTEGER," +
                 "lunchMealID INTEGER," +
                 "dinnerMealID INTEGER," +
                 "snackMealID INTEGER," +
+                "PRIMARY KEY (planDay, fridgeID)," +
+                "FOREIGN KEY (fridgeID) REFERENCES " + TABLE_FRIDGES + "(" + KEY_FRIDGE_ID + ") ON DELETE CASCADE," +
                 "FOREIGN KEY (breakfastMealID) REFERENCES Meal(mealID)," +
                 "FOREIGN KEY (lunchMealID) REFERENCES Meal(mealID)," +
                 "FOREIGN KEY (dinnerMealID) REFERENCES Meal(mealID)," +
