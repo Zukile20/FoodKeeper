@@ -26,6 +26,7 @@ import com.bumptech.glide.Glide;
 import com.example.foodkeeper.Database;
 import com.example.foodkeeper.Meal.Meal;
 import com.example.foodkeeper.R;
+import com.example.foodkeeper.SessionManager;
 import com.example.foodkeeper.ViewMeals.mealsViewActivity;
 
 import java.io.File;
@@ -52,11 +53,13 @@ public class MealPlanActivity extends AppCompatActivity {
 
     }
     Database db ;
+    SessionManager sess;
     Button cancelBtn,saveBtn,breakfastBtn,lunchBtn,dinnerBtn,snackBtn;
     TextView dayText;
     ActivityResultLauncher<Intent> launcher ;
     private void initializeViews() {
         db = Database.getInstance(this);
+        sess = new SessionManager(this);
         dayText = findViewById(R.id.selected_day_text);
         cancelBtn = findViewById(R.id.cancelBtn);
         saveBtn = findViewById(R.id.saveBtn);
@@ -128,6 +131,7 @@ public class MealPlanActivity extends AppCompatActivity {
                             Intent data = result.getData();
                             String mealType = data.getStringExtra("mealType");
                             long mealID = data.getLongExtra("selectedMeal", 0);
+                            long fridgeId = db.getConnectedFridgeForUser(sess.getUserEmail()).getId();
 
                             Meal meal = db.getMealWithFoodItems(mealID);
                             meal.setLastUsed(selectedDate);
@@ -137,7 +141,7 @@ public class MealPlanActivity extends AppCompatActivity {
                                 case "Breakfast" :
                                 {
                                     try {
-                                        db.addMealToPlan(meal.getMealID(),CalendarUtils.selectedDate,mealType);
+                                        db.addMealToPlan(meal.getMealID(),CalendarUtils.selectedDate,mealType,fridgeId);
                                         showMealLayout(breakfastContainer,meal,breakFastLayout);
                                     } catch (IOException e) {
                                         throw new RuntimeException(e);
@@ -146,7 +150,7 @@ public class MealPlanActivity extends AppCompatActivity {
                                 }
                                 case "Lunch" :
                                 {
-                                    db.addMealToPlan(meal.getMealID(), CalendarUtils.selectedDate, mealType);
+                                    db.addMealToPlan(meal.getMealID(), CalendarUtils.selectedDate, mealType,fridgeId);
                                     try {
                                         showMealLayout(lunchContainer, meal,lunchLayout);
 
@@ -156,7 +160,7 @@ public class MealPlanActivity extends AppCompatActivity {
                                     break;
                                 }
                                 case "Dinner" : {
-                                    db.addMealToPlan(meal.getMealID(), CalendarUtils.selectedDate, mealType);
+                                    db.addMealToPlan(meal.getMealID(), CalendarUtils.selectedDate, mealType,fridgeId);
                                     try {
                                         showMealLayout(dinnerContainer, meal,dinnerLayout);
 
@@ -166,7 +170,7 @@ public class MealPlanActivity extends AppCompatActivity {
                                     break;
                                 }
                                 case "Snack" : {
-                                    db.addMealToPlan(meal.getMealID(), CalendarUtils.selectedDate, mealType);
+                                    db.addMealToPlan(meal.getMealID(), CalendarUtils.selectedDate, mealType,fridgeId);
                                     try {
                                         showMealLayout(snackContainer, meal,snackLayout);
                                     } catch (IOException e) {

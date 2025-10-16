@@ -5,10 +5,17 @@ import java.time.LocalDate;
 public class MealPlan {
 
 
-    private LocalDate planDay;//PRIMARY KEY
+    public long getFridgeID() {
+        return fridgeID;
+    }
 
-    public MealPlan(LocalDate planDay) {
+    //composite primary key
+    private LocalDate planDay;
+    private long fridgeID;
+
+    public MealPlan(LocalDate planDay,long fridgeID) {
         this.planDay = planDay;
+        this.fridgeID =fridgeID;
     }
 
     //Store a pointer to the meal i.e ID

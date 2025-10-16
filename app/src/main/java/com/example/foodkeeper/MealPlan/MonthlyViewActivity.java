@@ -83,6 +83,8 @@ public class MonthlyViewActivity extends AppCompatActivity implements CalendarAd
     {
         startActivity(new Intent(this, WeeklyViewActivity.class));
         finish();
+        overridePendingTransition(R.anim.fade_out, 0);
+
     }
 
     public void closeMothlyView(View view) {
