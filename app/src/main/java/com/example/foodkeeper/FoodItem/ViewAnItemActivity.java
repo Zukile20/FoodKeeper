@@ -106,8 +106,9 @@ public class ViewAnItemActivity extends AppCompatActivity implements DeleteDialo
     }
 
     private void displayItemDetails(FoodItem currentItem) {
+        String categoryName = getCategoryName(currentItem.getCategory());
         itemName.setText(currentItem.getName());
-        itemCategory.setText(currentItem.getCategory());
+        itemCategory.setText(categoryName != null ? categoryName : "Other");
         itemExpiry.setText(currentItem.getExpiryDate());
         itemQuantity.setText(String.valueOf(currentItem.getQuantity()));
 
@@ -127,6 +128,20 @@ public class ViewAnItemActivity extends AppCompatActivity implements DeleteDialo
             case 1:
                 itemExpiry.setTextColor(ContextCompat.getColor(this, R.color.green));
                 break;
+        }
+    }
+
+    private String getCategoryName(String categoryId) {
+        try {
+            if (categoryId == null || categoryId.isEmpty()) {
+                return "Other";
+            }
+
+            int id = Integer.parseInt(categoryId);
+            return db.getCategoryNameById(id);
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+            return "Other";
         }
     }
 

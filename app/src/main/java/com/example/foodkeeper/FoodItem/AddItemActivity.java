@@ -47,6 +47,7 @@ public class AddItemActivity extends AppCompatActivity {
     Bitmap selectedImage;
     Button btnMinus, btnPlus, btnSavePopup, btnCancelPopup, btnSave, backBtn;
     SessionManager session;
+    private List<com.example.foodkeeper.Category> categories;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +56,7 @@ public class AddItemActivity extends AppCompatActivity {
 
         db = new Database(this);
         session = new SessionManager(this);
+        categories = db.getAllCategories();
         edName = findViewById(R.id.nameEditText);
         edCategory = findViewById(R.id.categoryEditText);
         edExpiryDate = findViewById(R.id.expiryDateEditText);
@@ -116,7 +118,9 @@ public class AddItemActivity extends AppCompatActivity {
                 imageBytes = stream.toByteArray();
             }
 
-            long added = db.addFoodItem(new FoodItem(name, category, expiryDate, quantity, imageBytes),session.getUserEmail());
+            int categoryId = findCategoryIdByName(category);
+
+            long added = db.addFoodItem(new FoodItem(name, String.valueOf(categoryId), expiryDate, quantity, imageBytes),session.getUserEmail());
             if(added > 0) {
                 Toast.makeText(this, "Food item added successfully", Toast.LENGTH_SHORT).show();
                 startActivity(new Intent(this, ItemsViewActivity.class));
@@ -128,6 +132,26 @@ public class AddItemActivity extends AppCompatActivity {
         backBtn.setOnClickListener(v -> {
             startActivity(new Intent(this, ItemsViewActivity.class));
         });
+    }
+
+    private int findCategoryIdByName(String categoryName) {
+        if (categories == null || categoryName == null) {
+            return 15;
+        }
+
+        for (com.example.foodkeeper.Category category : categories) {
+            if (category.getName().equals(categoryName)) {
+                return category.getId();
+            }
+        }
+
+        for (com.example.foodkeeper.Category category : categories) {
+            if ("Other".equals(category.getName())) {
+                return category.getId();
+            }
+        }
+
+        return 15;
     }
 
     private void checkPermissionsAndOpenImageDialog() {
@@ -224,6 +248,29 @@ public class AddItemActivity extends AppCompatActivity {
         btnSavePopup = popupView.findViewById(R.id.savePopup);
         btnCancelPopup = popupView.findViewById(R.id.cancelPopup);
         radioBtns = popupView.findViewById(R.id.radioGroup);
+
+        radioBtns.removeAllViews();
+
+        if (categories == null || categories.isEmpty()) {
+            Toast.makeText(this, "No categories available", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        for (com.example.foodkeeper.Category category : categories) {
+            RadioButton radioButton = new RadioButton(this);
+            radioButton.setText(category.getName());
+            radioButton.setTextSize(15);
+            radioButton.setTextColor(getResources().getColor(android.R.color.black));
+            radioButton.setPadding(0, 16, 0, 16);
+
+            RadioGroup.LayoutParams params = new RadioGroup.LayoutParams(
+                    RadioGroup.LayoutParams.MATCH_PARENT,
+                    RadioGroup.LayoutParams.WRAP_CONTENT
+            );
+            params.setMargins(0, 0, 0, 16);
+
+            radioBtns.addView(radioButton, params);
+        }
 
         AlertDialog dialog = builder.create();
 

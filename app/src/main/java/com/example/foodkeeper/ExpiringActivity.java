@@ -147,6 +147,8 @@ public class ExpiringActivity extends AppCompatActivity {
         List<FoodItem> userItems = db.getUserFoodItems(session.getUserEmail());
         List<FoodItem> soonToExpireItems = new ArrayList<>();
 
+        allFoodItems = userItems;
+
         Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.HOUR_OF_DAY, 0);
         calendar.set(Calendar.MINUTE, 0);

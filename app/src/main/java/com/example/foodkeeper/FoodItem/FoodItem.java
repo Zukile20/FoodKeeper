@@ -8,11 +8,12 @@ public class FoodItem implements Serializable {
     private int id;
     private String name;
     private String category;
+    private String categoryName;
     private String expiryDate;
     private int quantity;
     private byte[] image;
-    private int isInShopList;// either 0 or 1 (1 if the item is in the shopping list already)
-    private boolean checked; // only for ui purposes
+    private int isInShopList;
+    private boolean checked;
 
     public FoodItem(String name, String category, String expiryDate, int quantity, byte[] image) {
         this.name = name;
@@ -71,6 +72,14 @@ public class FoodItem implements Serializable {
     }
     public void setImage(byte[] image) {
         this.image = image;
+    }
+
+    public String getCategoryName() {
+        return categoryName;
+    }
+
+    public void setCategoryName(String categoryName) {
+        this.categoryName = categoryName;
     }
 
     public int getIsInShopList() {

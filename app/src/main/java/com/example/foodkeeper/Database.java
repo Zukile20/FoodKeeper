@@ -29,12 +29,13 @@ import java.util.Objects;
 public class Database extends SQLiteOpenHelper {
     private Context context;
     private static final String DATABASE_NAME = "FoodKeeper.db";
-    private static final int DATABASE_VERSION = 25;
+    private static final int DATABASE_VERSION = 32;
     private static Database instance;
     private static final String TABLE_USERS = "users";
     private static final String TABLE_FOOD_ITEMS = "food_items";
     private static final String TABLE_FRIDGES = "fridges";
-    private static final String KEY_ID = "id";
+    private static final String TABLE_CATEGORIES = "categories";
+    private static final String KEY_ID = "item_id";
     private static final String KEY_NAME = "name";
     private static final String KEY_SURNAME = "surname";
     public static final String KEY_EMAIL = "email";
@@ -58,6 +59,9 @@ public class Database extends SQLiteOpenHelper {
     private static final String KEY_IS_LOGGED_IN = "is_logged_in";
     private static final String KEY_FRIDGE_IMAGE = "fridge_image";
     public static final String KEY_USER_EMAIL = "user_email";
+
+    private static final String KEY_CATEGORY_ID = "category_id";
+    private static final String KEY_CATEGORY_NAME = "category_name";
 
     SessionManager userSession;
 
@@ -83,7 +87,7 @@ public class Database extends SQLiteOpenHelper {
         db.execSQL(CREATE_USERS_TABLE);
 
         String CREATE_FRIDGES_TABLE = "CREATE TABLE " + TABLE_FRIDGES + "("
-                + KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+                + KEY_FRIDGE_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
                 + KEY_BRAND + " TEXT,"
                 + KEY_MODEL + " TEXT,"
                 + KEY_DESCRIPTION + " TEXT,"
@@ -97,14 +101,81 @@ public class Database extends SQLiteOpenHelper {
         String CREATE_FOOD_ITEMS_TABLE = "CREATE TABLE " + TABLE_FOOD_ITEMS + "("
                 + KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
                 + KEY_ITEM_NAME + " TEXT,"
-                + KEY_CATEGORY + " TEXT,"
+                + KEY_CATEGORY + " INTEGER,"
                 + KEY_EXPIRY_DATE + " TEXT,"
                 + KEY_QUANTITY + " INTEGER,"
                 + KEY_FOOD_IMAGE + " BLOB,"
                 + KEY_IS_IN_SHOPPING_LIST + " INTEGER,"
                 + KEY_FRIDGE_ID + " INTEGER NOT NULL,"
-                + "FOREIGN KEY(" + KEY_FRIDGE_ID + ") REFERENCES " + TABLE_FRIDGES + "(" + KEY_ID + ") ON DELETE CASCADE)";
+                + "FOREIGN KEY(" + KEY_CATEGORY + ") REFERENCES " + TABLE_CATEGORIES + "(" + KEY_CATEGORY_ID + ") ON DELETE SET NULL,"
+                + "FOREIGN KEY(" + KEY_FRIDGE_ID + ") REFERENCES " + TABLE_FRIDGES + "(" + KEY_FRIDGE_ID + ") ON DELETE CASCADE)";
         db.execSQL(CREATE_FOOD_ITEMS_TABLE);
+    }
+
+    private void createCategoryTable(SQLiteDatabase db) {
+        String CREATE_CATEGORIES_TABLE = "CREATE TABLE " + TABLE_CATEGORIES + "("
+                + KEY_CATEGORY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+                + KEY_CATEGORY_NAME + " TEXT NOT NULL UNIQUE"
+                + ")";
+        db.execSQL(CREATE_CATEGORIES_TABLE);
+
+        populateCategories(db);
+    }
+
+    private void populateCategories(SQLiteDatabase db) {
+        String[][] categories = {
+                {"1", "Fruits"},
+                {"2", "Vegetables"},
+                {"3", "Dairy & Eggs"},
+                {"4", "Meat & Poultry"},
+                {"5", "Seafood"},
+                {"6", "Grains & Bread"},
+                {"7", "Beverages"},
+                {"8", "Snacks"},
+                {"9", "Frozen Foods"},
+                {"10", "Canned Goods"},
+                {"11", "Condiments & Spices"},
+                {"12", "Bakery"},
+                {"13", "Deli"},
+                {"14", "Leftovers"},
+                {"15", "Other"}
+        };
+
+        for (String[] category : categories) {
+            ContentValues values = new ContentValues();
+            values.put(KEY_CATEGORY_ID, Integer.parseInt(category[0]));
+            values.put(KEY_CATEGORY_NAME, category[1]);
+
+            db.insertWithOnConflict(TABLE_CATEGORIES, null, values, SQLiteDatabase.CONFLICT_IGNORE);
+        }
+    }
+
+    @SuppressLint("Range")
+    public List<Category> getAllCategories() {
+        List<Category> categories = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = null;
+
+        try {
+            cursor = db.query(TABLE_CATEGORIES,
+                    new String[]{KEY_CATEGORY_ID, KEY_CATEGORY_NAME},
+                    null, null, null, null, KEY_CATEGORY_NAME + " ASC");
+
+            if (cursor.moveToFirst()) {
+                do {
+                    Category category = new Category();
+                    category.setId(cursor.getInt(cursor.getColumnIndex(KEY_CATEGORY_ID)));
+                    category.setName(cursor.getString(cursor.getColumnIndex(KEY_CATEGORY_NAME)));
+                    categories.add(category);
+                } while (cursor.moveToNext());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (cursor != null) cursor.close();
+            db.close();
+        }
+        return categories;
     }
 
     @Override
@@ -112,6 +183,7 @@ public class Database extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_FOOD_ITEMS);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_FRIDGES);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_USERS);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_CATEGORIES);
         db.execSQL("DROP TABLE IF EXISTS MealPlan");
         db.execSQL("DROP TABLE IF EXISTS MealFoodItem");
         db.execSQL("DROP TABLE IF EXISTS Meal");
@@ -122,6 +194,36 @@ public class Database extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + SHOPPING_TABLE_NAME);
 
         onCreate(db);
+    }
+
+    @SuppressLint("Range")
+    public Category getCategoryById(int categoryId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Category category = null;
+        Cursor cursor = null;
+
+        try {
+            cursor = db.query(TABLE_CATEGORIES,
+                    new String[]{KEY_CATEGORY_ID, KEY_CATEGORY_NAME},
+                    KEY_CATEGORY_ID + " = ?",
+                    new String[]{String.valueOf(categoryId)},
+                    null, null, null);
+
+            if (cursor.moveToFirst()) {
+                category = new Category();
+                category.setId(cursor.getInt(cursor.getColumnIndex(KEY_CATEGORY_ID)));
+                category.setName(cursor.getString(cursor.getColumnIndex(KEY_CATEGORY_NAME)));
+            }
+        } finally {
+            if (cursor != null) cursor.close();
+            db.close();
+        }
+        return category;
+    }
+
+    public String getCategoryNameById(int categoryId) {
+        Category category = getCategoryById(categoryId);
+        return category != null ? category.getName() : "Other";
     }
 
     public void register(String name, String surname, String email, String phone, String password, byte[] profileImage) {
@@ -205,12 +307,12 @@ public class Database extends SQLiteOpenHelper {
         Cursor cursor = db.query(TABLE_FRIDGES,
                 null,
                 KEY_USER_EMAIL + "=?", new String[]{userEmail},
-                null, null, KEY_ID + " ASC");
+                null, null, KEY_FRIDGE_ID + " ASC");
 
         if (cursor.moveToFirst()) {
             do {
                 Fridge fridge = new Fridge();
-                fridge.setId(cursor.getInt(cursor.getColumnIndex(KEY_ID)));
+                fridge.setId(cursor.getInt(cursor.getColumnIndex(KEY_FRIDGE_ID)));
                 fridge.setBrand(cursor.getString(cursor.getColumnIndex(KEY_BRAND)));
                 fridge.setModel(cursor.getString(cursor.getColumnIndex(KEY_MODEL)));
                 fridge.setDescription(cursor.getString(cursor.getColumnIndex(KEY_DESCRIPTION)));
@@ -238,7 +340,7 @@ public class Database extends SQLiteOpenHelper {
             ContentValues loggedInValues = new ContentValues();
             loggedInValues.put(KEY_IS_LOGGED_IN, 1);
             int rowsAffected = db.update(TABLE_FRIDGES, loggedInValues,
-                    KEY_ID + "=? AND " + KEY_USER_EMAIL + "=?",
+                    KEY_FRIDGE_ID + "=? AND " + KEY_USER_EMAIL + "=?",
                     new String[]{String.valueOf(fridgeId), userEmail});
 
             db.setTransactionSuccessful();
@@ -259,7 +361,7 @@ public class Database extends SQLiteOpenHelper {
         Fridge fridge = null;
         if (cursor.moveToFirst()) {
             fridge = new Fridge();
-            fridge.setId(cursor.getInt(cursor.getColumnIndex(KEY_ID)));
+            fridge.setId(cursor.getInt(cursor.getColumnIndex(KEY_FRIDGE_ID)));
             fridge.setBrand(cursor.getString(cursor.getColumnIndex(KEY_BRAND)));
             fridge.setModel(cursor.getString(cursor.getColumnIndex(KEY_MODEL)));
             fridge.setDescription(cursor.getString(cursor.getColumnIndex(KEY_DESCRIPTION)));
@@ -279,13 +381,13 @@ public class Database extends SQLiteOpenHelper {
 
         Cursor cursor = db.query(TABLE_FRIDGES,
                 null,
-                KEY_ID + "=? AND " + KEY_USER_EMAIL + "=?",
+                KEY_FRIDGE_ID + "=? AND " + KEY_USER_EMAIL + "=?",
                 new String[]{String.valueOf(fridgeId), userEmail},
                 null, null, null);
 
         if (cursor.moveToFirst()) {
             fridge = new Fridge();
-            fridge.setId(cursor.getInt(cursor.getColumnIndex(KEY_ID)));
+            fridge.setId(cursor.getInt(cursor.getColumnIndex(KEY_FRIDGE_ID)));
             fridge.setBrand(cursor.getString(cursor.getColumnIndex(KEY_BRAND)));
             fridge.setModel(cursor.getString(cursor.getColumnIndex(KEY_MODEL)));
             fridge.setDescription(cursor.getString(cursor.getColumnIndex(KEY_DESCRIPTION)));
@@ -299,9 +401,8 @@ public class Database extends SQLiteOpenHelper {
 
     public boolean deleteFridge(int fridgeId, String userEmail) {
         SQLiteDatabase db = this.getWritableDatabase();
-        // Only delete fridges belonging to this user (cascade will delete food items)
         int result = db.delete(TABLE_FRIDGES,
-                KEY_ID + "=? AND " + KEY_USER_EMAIL + "=?",
+                KEY_FRIDGE_ID + "=? AND " + KEY_USER_EMAIL + "=?",
                 new String[]{String.valueOf(fridgeId), userEmail});
         db.close();
         return result > 0;
@@ -333,10 +434,20 @@ public class Database extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(KEY_ITEM_NAME, item.getName());
-        values.put(KEY_CATEGORY, item.getCategory());
         values.put(KEY_EXPIRY_DATE, item.getExpiryDate());
         values.put(KEY_QUANTITY, item.getQuantity());
         values.put(KEY_FRIDGE_ID, fridgeId);
+
+        if (item.getCategory() != null) {
+            try {
+                int categoryId = Integer.parseInt(item.getCategory());
+                values.put(KEY_CATEGORY, categoryId);
+            } catch (NumberFormatException e) {
+                values.put(KEY_CATEGORY, 15);
+            }
+        } else {
+            values.put(KEY_CATEGORY, 15);
+        }
 
         if (item.getImage() != null) {
             values.put(KEY_FOOD_IMAGE, item.getImage());
@@ -366,9 +477,8 @@ public class Database extends SQLiteOpenHelper {
             values.put(KEY_FOOD_IMAGE, item.getImage());
         }
 
-        // Only update items in fridges belonging to this user
         String whereClause = KEY_ID + "=? AND " + KEY_FRIDGE_ID + " IN " +
-                "(SELECT " + KEY_ID + " FROM " + TABLE_FRIDGES + " WHERE " + KEY_USER_EMAIL + "=?)";
+                "(SELECT " + KEY_FRIDGE_ID + " FROM " + TABLE_FRIDGES + " WHERE " + KEY_USER_EMAIL + "=?)";
 
         int result = db.update(TABLE_FOOD_ITEMS, values, whereClause,
                 new String[]{String.valueOf(item.getId()), userEmail});
@@ -380,9 +490,9 @@ public class Database extends SQLiteOpenHelper {
         List<FoodItem> foodItems = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
 
-        // Get all food items from all fridges belonging to the user
-        String query = "SELECT fi.* FROM " + TABLE_FOOD_ITEMS + " fi " +
-                "INNER JOIN " + TABLE_FRIDGES + " f ON fi." + KEY_FRIDGE_ID + " = f." + KEY_ID + " " +
+        String query = "SELECT fi.*, c." + KEY_CATEGORY_NAME + " FROM " + TABLE_FOOD_ITEMS + " fi " +
+                "INNER JOIN " + TABLE_FRIDGES + " f ON fi." + KEY_FRIDGE_ID + " = f." + KEY_FRIDGE_ID + " " +
+                "LEFT JOIN " + TABLE_CATEGORIES + " c ON fi." + KEY_CATEGORY + " = c." + KEY_CATEGORY_ID + " " +
                 "WHERE f." + KEY_USER_EMAIL + " = ? " +
                 "ORDER BY fi." + KEY_EXPIRY_DATE + " ASC";
 
@@ -391,12 +501,16 @@ public class Database extends SQLiteOpenHelper {
         if (cursor.moveToFirst()) {
             do {
                 FoodItem item = new FoodItem();
-                item.setId(cursor.getInt(0));
-                item.setName(cursor.getString(1));
-                item.setCategory(cursor.getString(2));
-                item.setExpiryDate(cursor.getString(3));
-                item.setQuantity(cursor.getInt(4));
-                item.setImage(cursor.getBlob(5));
+                item.setId(cursor.getInt(cursor.getColumnIndexOrThrow(KEY_ID)));
+                item.setName(cursor.getString(cursor.getColumnIndexOrThrow(KEY_ITEM_NAME)));
+                item.setCategory(cursor.getString(cursor.getColumnIndexOrThrow(KEY_CATEGORY)));
+
+                String categoryName = cursor.getString(cursor.getColumnIndexOrThrow(KEY_CATEGORY_NAME));
+                item.setCategoryName(categoryName != null ? categoryName : "Other");
+
+                item.setExpiryDate(cursor.getString(cursor.getColumnIndexOrThrow(KEY_EXPIRY_DATE)));
+                item.setQuantity(cursor.getInt(cursor.getColumnIndexOrThrow(KEY_QUANTITY)));
+                item.setImage(cursor.getBlob(cursor.getColumnIndexOrThrow(KEY_FOOD_IMAGE)));
 
                 foodItems.add(item);
             } while (cursor.moveToNext());
@@ -409,9 +523,9 @@ public class Database extends SQLiteOpenHelper {
         List<FoodItem> foodItems = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
 
-        // Get food items from the currently connected fridge for the user
-        String query = "SELECT fi.* FROM " + TABLE_FOOD_ITEMS + " fi " +
-                "INNER JOIN " + TABLE_FRIDGES + " f ON fi." + KEY_FRIDGE_ID + " = f." + KEY_ID + " " +
+        String query = "SELECT fi.*, c." + KEY_CATEGORY_NAME + " FROM " + TABLE_FOOD_ITEMS + " fi " +
+                "INNER JOIN " + TABLE_FRIDGES + " f ON fi." + KEY_FRIDGE_ID + " = f." + KEY_FRIDGE_ID + " " +
+                "LEFT JOIN " + TABLE_CATEGORIES + " c ON fi." + KEY_CATEGORY + " = c." + KEY_CATEGORY_ID + " " +
                 "WHERE f." + KEY_USER_EMAIL + " = ? AND f." + KEY_IS_LOGGED_IN + " = 1 " +
                 "ORDER BY fi." + KEY_EXPIRY_DATE + " ASC";
 
@@ -438,10 +552,9 @@ public class Database extends SQLiteOpenHelper {
         List<FoodItem> foodItems = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
 
-        // Get food items from specific fridge (only if user owns the fridge)
         String query = "SELECT fi.* FROM " + TABLE_FOOD_ITEMS + " fi " +
-                "INNER JOIN " + TABLE_FRIDGES + " f ON fi." + KEY_FRIDGE_ID + " = f." + KEY_ID + " " +
-                "WHERE f." + KEY_ID + " = ? AND f." + KEY_USER_EMAIL + " = ? " +
+                "INNER JOIN " + TABLE_FRIDGES + " f ON fi." + KEY_FRIDGE_ID + " = f." + KEY_FRIDGE_ID + " " +
+                "WHERE f." + KEY_FRIDGE_ID + " = ? AND f." + KEY_USER_EMAIL + " = ? " +
                 "ORDER BY fi." + KEY_EXPIRY_DATE + " ASC";
 
         Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(fridgeId), userEmail});
@@ -467,97 +580,16 @@ public class Database extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
 
         String whereClause = KEY_ID + "=? AND " + KEY_FRIDGE_ID + " IN " +
-                "(SELECT " + KEY_ID + " FROM " + TABLE_FRIDGES + " WHERE " + KEY_USER_EMAIL + "=?)";
+                "(SELECT " + KEY_FRIDGE_ID + " FROM " + TABLE_FRIDGES + " WHERE " + KEY_USER_EMAIL + "=?)";
 
         int result = db.delete(TABLE_FOOD_ITEMS, whereClause,
                 new String[]{String.valueOf(id), userEmail});
         db.close();
         return result > 0;
     }
-
-    // BACKWARD COMPATIBILITY METHODS - Deprecated but functional
-//    @Deprecated
-//    public long addFoodItem(FoodItem item) {
-//        if (userSession != null && userSession.isLoggedIn()) {
-//            return addFoodItem(item, userSession.getUserEmail());
-//        }
-//        return -1;
-//    }
-//
-//    @Deprecated
-//    public List<FoodItem> getUserFoodItems() {
-//        if (userSession != null && userSession.isLoggedIn()) {
-//            return getFoodItemsInConnectedFridge(userSession.getUserEmail());
-//        }
-//        return new ArrayList<>();
-//    }
-//
-//    @Deprecated
-//    public boolean updateFoodItem(FoodItem item) {
-//        if (userSession != null && userSession.isLoggedIn()) {
-//            return updateFoodItem(item, userSession.getUserEmail());
-//        }
-//        return false;
-//    }
-//
-//    @Deprecated
-//    public boolean deleteFoodItem(int id) {
-//        if (userSession != null && userSession.isLoggedIn()) {
-//            return deleteFoodItem(id, userSession.getUserEmail());
-//        }
-//        return false;
-//    }
-//
-//    @Deprecated
-//    public long addFridge(Fridge fridge) {
-//        if (userSession != null && userSession.isLoggedIn()) {
-//            return addFridge(fridge, userSession.getUserEmail());
-//        }
-//        return -1;
-//    }
-//
-//    @Deprecated
-//    public List<Fridge> getAllFridges() {
-//        if (userSession != null && userSession.isLoggedIn()) {
-//            return getUserFridges(userSession.getUserEmail());
-//        }
-//        return new ArrayList<>();
-//    }
-//
-//    @Deprecated
-//    public boolean logIntoFridge(int fridgeId) {
-//        if (userSession != null && userSession.isLoggedIn()) {
-//            return logIntoFridge(fridgeId, userSession.getUserEmail());
-//        }
-//        return false;
-//    }
-//
-//    @Deprecated
-//    public Fridge getConnectedFridge() {
-//        if (userSession != null && userSession.isLoggedIn()) {
-//            return getConnectedFridgeForUser(userSession.getUserEmail());
-//        }
-//        return null;
-//    }
-//
-//    @Deprecated
-//    public boolean deleteFridge(int fridgeId) {
-//        if (userSession != null && userSession.isLoggedIn()) {
-//            return deleteFridge(fridgeId, userSession.getUserEmail());
-//        }
-//        return false;
-//    }
-//
-//    @Deprecated
-//    public int getFridgeCount() {
-//        if (userSession != null && userSession.isLoggedIn()) {
-//            return getFridgeCountForUser(userSession.getUserEmail());
-//        }
-//        return 0;
-//    }
-
     private void createTables(SQLiteDatabase db) {
         fridgeUserItemTables(db);
+        createCategoryTable(db);
         createMealPlanMealTables(db);
         createRecipeTables(db);
         createShoppingListTable(db);
@@ -591,7 +623,7 @@ public class Database extends SQLiteOpenHelper {
         Cursor cursor = null;
         try {
             String query = "SELECT m.* FROM Meal m " +
-                    "INNER JOIN " + TABLE_FRIDGES + " f ON m.fridgeID = f." + KEY_ID + " " +
+                    "INNER JOIN " + TABLE_FRIDGES + " f ON m.fridgeID = f." + KEY_FRIDGE_ID + " " +
                     "WHERE f." + KEY_IS_LOGGED_IN + " = 1 AND f."+KEY_USER_EMAIL+"=?";
 
             cursor = db.rawQuery(query, new String[]{userEmail});
@@ -927,7 +959,7 @@ public class Database extends SQLiteOpenHelper {
                 "mealImage TEXT," +
                 "lastUsed TEXT," +
                 "fridgeID INTEGER NOT NULL," +
-                "FOREIGN KEY(fridgeID) REFERENCES " + TABLE_FRIDGES + "(" + KEY_ID + ") ON DELETE CASCADE)";
+                "FOREIGN KEY(fridgeID) REFERENCES " + TABLE_FRIDGES + "(" + KEY_FRIDGE_ID + ") ON DELETE CASCADE)";
         db.execSQL(createMealTable);
 
         String createMealFoodItemTable = "CREATE TABLE MealFoodItem (" +
@@ -953,9 +985,8 @@ public class Database extends SQLiteOpenHelper {
         db.execSQL(createMealPlanTable);
     }
 
-    // RECIPE METHODS
     public static final String TABLE_RECIPES = "recipes";
-    public static final String COLUMN_ID = "id";
+    public static final String COLUMN_ID = "recipe_id";
     public static final String COLUMN_TITLE = "Recipe_Name";
     public static final String COLUMN_IMAGE = "Recipe_image";
     public static final String COLUMN_LIKES = "Recipe_likes";
@@ -1011,17 +1042,10 @@ public class Database extends SQLiteOpenHelper {
     public void onOpen(SQLiteDatabase db) {
         super.onOpen(db);
         if (!db.isReadOnly()) {
-            // Enable foreign key constraints
             db.execSQL("PRAGMA foreign_keys=ON");
         }
     }
 
-    // ========================================
-    // RECIPE OPERATIONS
-    // ========================================
-
-    // Insert or update a recipe
-    // Replace the existing insertRecipe method in RecipeDatabaseHelper.java
     public long insertRecipe(int id, String Recipe_Name, String Recipe_image, int Recipe_likes, int Cooking_time, int Recipe_servings, int fav) {
         SQLiteDatabase db = this.getWritableDatabase();
 

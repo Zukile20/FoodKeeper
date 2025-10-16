@@ -67,6 +67,7 @@ public class EditItemActivity extends AppCompatActivity {
     private RadioGroup categoryRadioGroup;
     private String selectedCategory = "";
     SessionManager session;
+    private List<com.example.foodkeeper.Category> categories;
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -78,6 +79,8 @@ public class EditItemActivity extends AppCompatActivity {
         db = new Database(this);
         session = new SessionManager(this);
         currentItem = (FoodItem) getIntent().getSerializableExtra("foodItem");
+
+        categories = db.getAllCategories();
 
         edName = findViewById(R.id.nameEditText);
         edCategory = findViewById(R.id.categoryEditText);
@@ -113,9 +116,11 @@ public class EditItemActivity extends AppCompatActivity {
 
         if (currentItem != null) {
             edName.setText(currentItem.getName());
-            edCategory.setText(currentItem.getCategory());
             edExpiryDate.setText(currentItem.getExpiryDate());
             tvQuantity.setText(String.valueOf(currentItem.getQuantity()));
+
+            String categoryName = db.getCategoryNameById(Integer.parseInt(currentItem.getCategory()));
+            edCategory.setText(categoryName);
 
             if (currentItem.getImage() != null) {
                 selectedImage = BitmapFactory.decodeByteArray(
@@ -128,6 +133,15 @@ public class EditItemActivity extends AppCompatActivity {
 
         btnCancel.setOnClickListener(v -> finish());
         btnSave.setOnClickListener(v -> saveItem());
+    }
+
+    private int findCategoryIdByName(String categoryName) {
+        for (com.example.foodkeeper.Category category : categories) {
+            if (category.getName().equals(categoryName)) {
+                return category.getId();
+            }
+        }
+        return 15;
     }
 
     private void checkPermissionsAndOpenImageDialog() {
@@ -298,11 +312,28 @@ public class EditItemActivity extends AppCompatActivity {
         Button cancelButton = popupView.findViewById(R.id.cancelPopup);
         Button saveButton = popupView.findViewById(R.id.savePopup);
 
-        if (!currentItem.getCategory().isEmpty()) {
-            int radioId = getRadioButtonIdForCategory(currentItem.getCategory());
-            if (radioId != -1) {
-                categoryRadioGroup.check(radioId);
+        categoryRadioGroup.removeAllViews();
+
+        String currentCategoryName = db.getCategoryNameById(Integer.parseInt(currentItem.getCategory()));
+
+        for (com.example.foodkeeper.Category category : categories) {
+            RadioButton radioButton = new RadioButton(this);
+            radioButton.setText(category.getName());
+            radioButton.setTextSize(15);
+            radioButton.setTextColor(getResources().getColor(android.R.color.black));
+            radioButton.setPadding(0, 16, 0, 16);
+
+            if (category.getName().equals(currentCategoryName)) {
+                radioButton.setChecked(true);
             }
+
+            RadioGroup.LayoutParams params = new RadioGroup.LayoutParams(
+                    RadioGroup.LayoutParams.MATCH_PARENT,
+                    RadioGroup.LayoutParams.WRAP_CONTENT
+            );
+            params.setMargins(0, 0, 0, 16);
+
+            categoryRadioGroup.addView(radioButton, params);
         }
 
         AlertDialog dialog = builder.create();
@@ -320,20 +351,6 @@ public class EditItemActivity extends AppCompatActivity {
         });
 
         dialog.show();
-    }
-
-    private int getRadioButtonIdForCategory(String category) {
-        switch (category) {
-            case "Fats & Oils": return R.id.radioButton;
-            case "Fruit": return R.id.radioButton2;
-            case "Vegetable": return R.id.radioButton3;
-            case "Dairy": return R.id.radioButton4;
-            case "Beverage": return R.id.radioButton5;
-            case "Meat": return R.id.radioButton6;
-            case "Sweet": return R.id.radioButton7;
-            case "Junk": return R.id.radioButton8;
-            default: return -1;
-        }
     }
 
     private void saveItem() {
@@ -354,8 +371,10 @@ public class EditItemActivity extends AppCompatActivity {
             imageBytes = stream.toByteArray();
         }
 
+        int categoryId = findCategoryIdByName(category);
+
         currentItem.setName(name);
-        currentItem.setCategory(category);
+        currentItem.setCategory(String.valueOf(categoryId));
         currentItem.setExpiryDate(expiryDate);
         currentItem.setQuantity(quantity);
         currentItem.setImage(imageBytes);
