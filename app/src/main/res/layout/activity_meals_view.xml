@@ -73,7 +73,6 @@
             android:layout_marginStart="8dp"
             android:minWidth="60dp" />
 
-
     </LinearLayout>
 
     <View
@@ -81,14 +80,27 @@
         android:layout_height="1dp"
         android:background="@color/grey" />
 
+    <!-- Breakfast Title Section -->
+    <TextView
+        android:id="@+id/selectTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/linearLayout4"
+        android:text="Select breakfast"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:textColor="@color/black"
+        android:padding="16dp"
+        android:visibility="visible" />
+
     <!-- Meals List -->
 
     <!-- Empty State (Initially Hidden) -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/mealsRecyclerView"
         android:layout_width="match_parent"
-        android:layout_height="770dp"
-        android:layout_below="@+id/linearLayout4"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/selectTitle"
         android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"
         android:layout_marginTop="0dp"

@@ -1,8 +1,12 @@
 package com.example.foodkeeper.ViewMeals;
 
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
+
 import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.health.connect.datatypes.MealType;
 import android.os.Bundle;
 import android.view.MotionEvent;
 import android.view.View;
@@ -11,6 +15,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -51,6 +56,7 @@ public class mealsViewActivity extends AppCompatActivity  {
     private MealAdapter mealAdapter;
     private List<Meal> allMeals;
     private List<Meal> filteredMeals;
+    private TextView selectTitle;
 
     //constants
     private static final int REQUEST_CREATE_MEAL = 1001;
@@ -69,12 +75,12 @@ public class mealsViewActivity extends AppCompatActivity  {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_meals_view);
+        getMealType();
         initViews();
         setUpSpinner();
         setupRecyclerView();
         setOnClickListeners();
         setupSwipeToDelete();
-        getMealType();
         loadMeals();
     }
     public void getMealType()
@@ -176,7 +182,6 @@ public class mealsViewActivity extends AppCompatActivity  {
 
             @Override
             public void onItemClick(Meal meal, int position) {
-                ACTIVITY_MODE = getIntent().getIntExtra("ACTIVITY_MODE",0);
                 if(ACTIVITY_MODE==SELECTION_MODE)
                 {
                     Intent resIntent= new Intent();
@@ -229,6 +234,7 @@ public class mealsViewActivity extends AppCompatActivity  {
     {
         db =   Database.getInstance(this);
         sess=new SessionManager(this);
+        ACTIVITY_MODE = getIntent().getIntExtra("ACTIVITY_MODE",0);
 
         backButton = findViewById(R.id.backButton);
         sortSpinner = findViewById(R.id.sortSpinner);
@@ -236,6 +242,18 @@ public class mealsViewActivity extends AppCompatActivity  {
         emptyStateLayout = findViewById(R.id.emptyStateLayout);
         loadingLayout = findViewById(R.id.loadingLayout);
         createMealButton = findViewById(R.id.createMealButton);
+        selectTitle = findViewById(R.id.selectTitle);
+
+        if(ACTIVITY_MODE==SELECTION_MODE)
+        {
+            selectTitle.setText("Select "+ mealType);
+            selectTitle.setVisibility(VISIBLE);
+        }
+        else
+        {
+            selectTitle.setVisibility(GONE);
+
+        }
 
     }
 
@@ -338,23 +356,23 @@ public class mealsViewActivity extends AppCompatActivity  {
         itemTouchHelper.attachToRecyclerView(mealsRecyclerView);
     }
     private void showLoadingState() {
-        loadingLayout.setVisibility(View.VISIBLE);
-        mealsRecyclerView.setVisibility(View.GONE);
-        emptyStateLayout.setVisibility(View.GONE);
+        loadingLayout.setVisibility(VISIBLE);
+        mealsRecyclerView.setVisibility(GONE);
+        emptyStateLayout.setVisibility(GONE);
     }
 
     private void hideLoadingState() {
-        loadingLayout.setVisibility(View.GONE);
+        loadingLayout.setVisibility(GONE);
     //    mealsRecyclerView.setVisibility(View.VISIBLE);
     }
 
     private void updateEmptyState() {
         if (filteredMeals.isEmpty()) {
-            emptyStateLayout.setVisibility(View.VISIBLE);
-            mealsRecyclerView.setVisibility(View.GONE);
+            emptyStateLayout.setVisibility(VISIBLE);
+            mealsRecyclerView.setVisibility(GONE);
         } else {
-            emptyStateLayout.setVisibility(View.GONE);
-            mealsRecyclerView.setVisibility(View.VISIBLE);
+            emptyStateLayout.setVisibility(GONE);
+            mealsRecyclerView.setVisibility(VISIBLE);
         }
     }
 
