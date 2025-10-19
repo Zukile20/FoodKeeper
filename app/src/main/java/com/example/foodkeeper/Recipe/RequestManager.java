@@ -50,7 +50,6 @@ public class RequestManager {
                 .build();
     }
 
-    // Helper method to get user email
     private String getUserEmail() {
         String email = sessionManager.getUserEmail();
         if (email == null || email.isEmpty()) {
@@ -59,14 +58,11 @@ public class RequestManager {
         return email;
     }
 
-    // NEW METHOD: Check if user needs to fetch recipes on first login
     public void getRandomRecipesForUser(RandomRecipeResponseListener listener, List<String> tags, String userEmail) {
         try {
-            // Check if this user has already fetched recipes
             if (fetchStateManager.hasFetchedRecipes(userEmail)) {
                 Log.d(TAG, "User " + userEmail + " has already fetched recipes. Loading from database.");
 
-                // Load from database
                 List<Recipe> cachedRecipes = dbHelper.getAllRecipes(userEmail);
                 if (!cachedRecipes.isEmpty()) {
                     RandomRecipeApiResponse cachedResponse = new RandomRecipeApiResponse();
@@ -78,7 +74,6 @@ public class RequestManager {
 
             Log.d(TAG, "First time login for user " + userEmail + ". Fetching recipes from API.");
 
-            // First time for this user - fetch from API
             fetchRandomRecipesFromAPIForUser(listener, tags, userEmail);
 
         } catch (Exception e) {
@@ -102,7 +97,6 @@ public class RequestManager {
 
                 RandomRecipeApiResponse data = response.body();
                 if (data != null && data.recipes != null) {
-                    // Store all recipes in database
                     for (Recipe recipe : data.recipes) {
                         try {
                             dbHelper.insertRecipe(
@@ -120,7 +114,6 @@ public class RequestManager {
                         }
                     }
 
-                    // Mark that this user has fetched recipes
                     fetchStateManager.setRecipesFetched(userEmail, true);
                     Log.d(TAG, "Successfully fetched and cached recipes for user " + userEmail);
 
@@ -138,7 +131,6 @@ public class RequestManager {
         });
     }
 
-    // ORIGINAL METHOD: DATABASE-FIRST for general use (with user email)
     public void getRandomRecipes(RandomRecipeResponseListener listener, List<String> tags) {
         String userEmail = getUserEmail();
         if (userEmail == null || userEmail.isEmpty()) {
@@ -147,11 +139,9 @@ public class RequestManager {
         }
 
         try {
-            // First check if we have recipes in database for this user
             List<Recipe> cachedRecipes = dbHelper.getAllRecipes(userEmail);
 
             if (!cachedRecipes.isEmpty()) {
-                // We have recipes, return from database
                 RandomRecipeApiResponse cachedResponse = new RandomRecipeApiResponse();
                 cachedResponse.recipes = (java.util.ArrayList<Recipe>) cachedRecipes;
                 listener.didFetch(cachedResponse, "Loaded from database");
@@ -161,7 +151,6 @@ public class RequestManager {
             Log.e(TAG, "Error loading cached recipes: " + e.getMessage());
         }
 
-        // Not enough recipes in database, fetch from API
         fetchRandomRecipesFromAPI(listener, tags);
     }
 
@@ -186,7 +175,6 @@ public class RequestManager {
 
                 RandomRecipeApiResponse data = response.body();
                 if (data != null && data.recipes != null) {
-                    // Store all recipes in database with userEmail
                     for (Recipe recipe : data.recipes) {
                         try {
                             dbHelper.insertRecipe(
@@ -238,7 +226,6 @@ public class RequestManager {
         }
     }
 
-    // DATABASE-FIRST: Recipe details with complete caching (including instructions)
     public void getRecipeDetails(RecipeDetailsListener listener, int id) {
         String userEmail = getUserEmail();
         if (userEmail == null || userEmail.isEmpty()) {

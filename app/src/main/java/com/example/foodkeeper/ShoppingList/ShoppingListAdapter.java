@@ -23,7 +23,7 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapte
     private ArrayList<Integer> itemBought;
     private ArrayList<String> itemId;
     private Database myDB;
-    private String userEmail; // Add userEmail field
+    private String userEmail;
 
     public ShoppingListAdapter(Context context, ArrayList<String> itemName, ArrayList<String> itemQty,
                                ArrayList<Integer> itemBought, ArrayList<String> itemId, String userEmail) {
@@ -32,7 +32,7 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapte
         this.itemQty = itemQty;
         this.itemBought = itemBought;
         this.itemId = itemId;
-        this.userEmail = userEmail; // Store userEmail
+        this.userEmail = userEmail;
         this.myDB = new Database(context);
     }
 
@@ -49,7 +49,7 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapte
         holder.item_Name.setText(itemName.get(position).toString());
         holder.item_Qty.setText(itemQty.get(position).toString());
 
-        holder.checkboxBought.setOnCheckedChangeListener(null); // reset listener first
+        holder.checkboxBought.setOnCheckedChangeListener(null);
 
         boolean isChecked = itemBought.get(position) == 1;
         holder.checkboxBought.setChecked(isChecked);
@@ -63,12 +63,10 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapte
         holder.checkboxBought.setOnCheckedChangeListener((buttonView, isChecked1) -> {
             itemBought.set(position, isChecked1 ? 1 : 0);
             if (isChecked1) {
-                // Pass userEmail to UpdateItemShoppingList
                 myDB.UpdateItemShoppingList(Integer.parseInt(itemId.get(position)), userEmail);
                 holder.item_Name.setPaintFlags(holder.item_Name.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
                 Toast.makeText(context, "Don't forget to add items to your fridge!", Toast.LENGTH_LONG).show();
             } else {
-                // Pass userEmail to UpdateItemBackShoppingList
                 myDB.UpdateItemBackShoppingList(Integer.parseInt(itemId.get(position)), userEmail);
                 holder.item_Name.setPaintFlags(holder.item_Name.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
             }

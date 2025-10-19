@@ -29,7 +29,7 @@ import java.util.Objects;
 public class Database extends SQLiteOpenHelper {
     private Context context;
     private static final String DATABASE_NAME = "FoodKeeper.db";
-    private static final int DATABASE_VERSION = 36;
+    private static final int DATABASE_VERSION = 37;
     private static Database instance;
     private static final String TABLE_USERS = "users";
     private static final String TABLE_FOOD_ITEMS = "food_items";

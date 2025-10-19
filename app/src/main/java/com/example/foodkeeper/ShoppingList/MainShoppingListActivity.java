@@ -25,13 +25,11 @@ import java.util.ArrayList;
 
 public class MainShoppingListActivity extends AppCompatActivity {
 
-    //main Activity
     RecyclerView recyclerView;
     FloatingActionButton add_button;
     private Button back_btn;
     private LinearLayout emptyStateLayout;
 
-    //dialog
     EditText Name;
     EditText QTY;
     Button add;
@@ -40,7 +38,6 @@ public class MainShoppingListActivity extends AppCompatActivity {
     ArrayList<Integer> itemBought;
     ShoppingListAdapter customAdapter;
 
-    // Session management
     private SessionManager sessionManager;
     private String userEmail;
 
@@ -50,7 +47,6 @@ public class MainShoppingListActivity extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_shoppinglist);
 
-        // Initialize session manager and get user email
         sessionManager = new SessionManager(this);
         userEmail = sessionManager.getUserEmail();
 
@@ -68,7 +64,6 @@ public class MainShoppingListActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(MainShoppingListActivity.this));
         deleteItem();
 
-        // Check empty state after setup
         updateEmptyState();
     }
 
@@ -127,7 +122,6 @@ public class MainShoppingListActivity extends AppCompatActivity {
 
                 Database myDB = new Database(MainShoppingListActivity.this);
 
-                // Pass userEmail to AddItem
                 long results = myDB.AddItem(item_name, item_qty, userEmail);
                 itemId.add(String.valueOf(results));
                 itemName.add(item_name);
@@ -135,7 +129,6 @@ public class MainShoppingListActivity extends AppCompatActivity {
                 itemBought.add(0);
                 customAdapter.updateList(itemName, itemQty, itemBought);
 
-                // Update empty state after adding item
                 updateEmptyState();
 
                 dialog.dismiss();
@@ -150,7 +143,6 @@ public class MainShoppingListActivity extends AppCompatActivity {
         itemQty = new ArrayList<>();
         itemBought = new ArrayList<>();
 
-        // Pass userEmail to readAllData
         Cursor cursor = myDB.readAllData(userEmail);
         while(cursor.moveToNext()){
             itemId.add(cursor.getString(0));
@@ -188,30 +180,24 @@ public class MainShoppingListActivity extends AppCompatActivity {
                 deleteDialog.setOnDeleteConfirmListener(new DeleteDialog.OnDeleteConfirmListener() {
                     @Override
                     public void onDeleteConfirmed() {
-                        // Delete from database with userEmail
                         myDB.deleteItemById(Integer.parseInt(idToDelete), userEmail);
 
-                        // Remove from local lists
                         itemId.remove(position);
                         itemName.remove(position);
                         itemQty.remove(position);
                         itemBought.remove(position);
 
-                        // Update adapter
                         customAdapter.notifyItemRemoved(position);
 
-                        // Update empty state after deletion
                         updateEmptyState();
                     }
 
                     @Override
                     public void onDeleteCancelled() {
-                        // Restore swiped item visually
                         customAdapter.notifyItemChanged(position);
                     }
                 });
 
-                // Show the dialog fragment
                 deleteDialog.show(getSupportFragmentManager(), "DeleteDialog");
             }
         });

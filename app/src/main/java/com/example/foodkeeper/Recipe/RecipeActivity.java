@@ -35,18 +35,15 @@ public class RecipeActivity extends AppCompatActivity {
     List<String> tags = new ArrayList<>();
     SearchView searchView;
 
-    // Filter buttons
     TextView btnAllRecipes, btnFavoritesOnly;
     LinearLayout layoutEmptyFavorites;
 
-    // Filter state
     private boolean showingFavoritesOnly = false;
 
     Database dbHelper;
     ActivityResultLauncher<Intent> launcher;
     private Button back_btn;
 
-    // Session management
     private SessionManager sessionManager;
     private String userEmail;
 
@@ -60,7 +57,6 @@ public class RecipeActivity extends AppCompatActivity {
 
         dbHelper = new Database(this);
 
-        // Initialize session manager and get user email
         sessionManager = new SessionManager(this);
         userEmail = sessionManager.getUserEmail();
 
@@ -72,12 +68,10 @@ public class RecipeActivity extends AppCompatActivity {
 
         manager = new RequestManager(this);
 
-        // Initialize UI elements
         initializeViews();
         setupSearchView();
         setupFilterButtons();
 
-        // Load recipes at startup
         loadRecipesFromDatabase();
 
         launcher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
@@ -117,7 +111,6 @@ public class RecipeActivity extends AppCompatActivity {
             @Override
             public boolean onQueryTextChange(String newText) {
                 if (newText.isEmpty()) {
-                    // Reset to current filter when search is cleared
                     if (showingFavoritesOnly) {
                         showFavoriteRecipes();
                     } else {
@@ -130,64 +123,54 @@ public class RecipeActivity extends AppCompatActivity {
     }
 
     private void setupFilterButtons() {
-        // Set initial button states
         updateButtonStates();
 
         btnAllRecipes.setOnClickListener(v -> {
             showingFavoritesOnly = false;
             updateButtonStates();
             showAllRecipes();
-            searchView.setQuery("", false); // Clear search
+            searchView.setQuery("", false);
         });
 
         btnFavoritesOnly.setOnClickListener(v -> {
             showingFavoritesOnly = true;
             updateButtonStates();
             showFavoriteRecipes();
-            searchView.setQuery("", false); // Clear search
+            searchView.setQuery("", false);
         });
     }
 
     private void updateButtonStates() {
         if (showingFavoritesOnly) {
-            // Favorites button is active
             btnFavoritesOnly.setBackgroundTintList(getResources().getColorStateList(R.color.blue));
             btnFavoritesOnly.setTextColor(getResources().getColor(android.R.color.darker_gray));
 
-            // All recipes button is inactive
             btnAllRecipes.setBackgroundTintList(getResources().getColorStateList(R.color.light_pink));
             btnAllRecipes.setTextColor(getResources().getColor(R.color.black));
         } else {
-            // All recipes button is active
             btnAllRecipes.setBackgroundTintList(getResources().getColorStateList(R.color.blue));
             btnAllRecipes.setTextColor(getResources().getColor(android.R.color.darker_gray));
 
-            // Favorites button is inactive
             btnFavoritesOnly.setBackgroundTintList(getResources().getColorStateList(R.color.light_pink));
             btnFavoritesOnly.setTextColor(getResources().getColor(R.color.black));
         }
     }
 
     private void showAllRecipes() {
-        // Pass userEmail
         List<Recipe> allRecipes = dbHelper.getAllRecipes(userEmail);
         loadRecipesIntoRecyclerView(allRecipes);
 
-        // Hide empty state
         layoutEmptyFavorites.setVisibility(android.view.View.GONE);
         recyclerView.setVisibility(android.view.View.VISIBLE);
     }
 
     private void showFavoriteRecipes() {
-        // Pass userEmail
         List<Recipe> favoriteRecipes = dbHelper.getFavoriteRecipes(userEmail);
 
         if (favoriteRecipes.isEmpty()) {
-            // Show empty favorites state
             recyclerView.setVisibility(android.view.View.GONE);
             layoutEmptyFavorites.setVisibility(android.view.View.VISIBLE);
         } else {
-            // Show favorite recipes
             layoutEmptyFavorites.setVisibility(android.view.View.GONE);
             recyclerView.setVisibility(android.view.View.VISIBLE);
             loadRecipesIntoRecyclerView(favoriteRecipes);
@@ -195,14 +178,11 @@ public class RecipeActivity extends AppCompatActivity {
     }
 
     private void loadRecipesFromDatabase() {
-        // Pass userEmail
         List<Recipe> recipes = dbHelper.getAllRecipes(userEmail);
         if (recipes.isEmpty()) {
-            // If DB empty, fetch from API
             dialog.show();
             manager.getRandomRecipes(randomRecipeResponseListener, tags);
         } else {
-            // Load recipes based on current filter
             if (showingFavoritesOnly) {
                 showFavoriteRecipes();
             } else {
@@ -214,7 +194,6 @@ public class RecipeActivity extends AppCompatActivity {
     private void searchRecipes(String query) {
         dialog.show();
 
-        // Search based on current filter - pass userEmail
         List<Recipe> localResults;
         if (showingFavoritesOnly) {
             localResults = dbHelper.searchFavoriteRecipes(query, userEmail);
@@ -223,24 +202,20 @@ public class RecipeActivity extends AppCompatActivity {
         }
 
         if (!localResults.isEmpty()) {
-            // Found locally → show instantly
             loadRecipesIntoRecyclerView(localResults);
             layoutEmptyFavorites.setVisibility(android.view.View.GONE);
             recyclerView.setVisibility(android.view.View.VISIBLE);
             dialog.dismiss();
         } else {
-            // Not found locally → fetch from API (only if showing all recipes)
             if (!showingFavoritesOnly) {
                 tags.clear();
                 tags.add(query);
 
-                // Use searchRecipesFromAPI instead of getRandomRecipes to force API call
                 manager.searchRecipesFromAPI(new RandomRecipeResponseListener() {
                     @Override
                     public void didFetch(RandomRecipeApiResponse response, String message) {
                         dialog.dismiss();
 
-                        // Save new recipes into DB - pass userEmail
                         for (Recipe recipe : response.recipes) {
                             dbHelper.insertRecipe(
                                     recipe.id,
@@ -254,10 +229,8 @@ public class RecipeActivity extends AppCompatActivity {
                             );
                         }
 
-                        // Reload results from DB for consistency - pass userEmail
                         List<Recipe> updatedResults = dbHelper.searchRecipes(query, userEmail);
                         if (updatedResults.isEmpty()) {
-                            // Show empty state message for search
                             recyclerView.setVisibility(android.view.View.GONE);
                             layoutEmptyFavorites.setVisibility(android.view.View.GONE);
                             Toast.makeText(RecipeActivity.this, "No recipes found for: " + query, Toast.LENGTH_SHORT).show();
@@ -277,7 +250,6 @@ public class RecipeActivity extends AppCompatActivity {
                     }
                 }, tags);
             } else {
-                // No favorites found matching search
                 dialog.dismiss();
                 recyclerView.setVisibility(android.view.View.GONE);
                 layoutEmptyFavorites.setVisibility(android.view.View.VISIBLE);
@@ -298,7 +270,6 @@ public class RecipeActivity extends AppCompatActivity {
         public void didFetch(RandomRecipeApiResponse response, String message) {
             dialog.dismiss();
 
-            // Save results into DB - pass userEmail
             for (Recipe recipe : response.recipes) {
                 dbHelper.insertRecipe(
                         recipe.id,
@@ -312,7 +283,6 @@ public class RecipeActivity extends AppCompatActivity {
                 );
             }
 
-            // Reload from DB based on current filter
             loadRecipesFromDatabase();
         }
 

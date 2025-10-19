@@ -50,29 +50,23 @@ public class RecipeDetailsActivity extends AppCompatActivity implements TTSHelpe
     InstructionsAdapter instructionsAdapter;
     SimilarRecipeAdapter similarRecipeAdapter;
 
-    // Database Helper
     private Database dbHelper;
     private boolean isFavorite = false;
 
-    // TTS Components
     private TTSHelper ttsHelper;
     private ImageView btnPlayPause;
 
-    // TTS State
     private boolean isPlaying = false;
     private boolean isPaused = false;
     private boolean isTTSReady = false;
 
-    // Data holders
     private RecipeDetailsResponse currentRecipe;
     private List<InstructionsResponse> currentInstructions;
 
-    // TTS Resume functionality
     private List<String> textSegments;
     private int currentSegmentIndex = 0;
     private boolean isReadingComplete = false;
 
-    // Session management
     private SessionManager sessionManager;
     private String userEmail;
 
@@ -81,7 +75,6 @@ public class RecipeDetailsActivity extends AppCompatActivity implements TTSHelpe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recipe_details);
 
-        // Initialize session manager and get user email
         sessionManager = new SessionManager(this);
         userEmail = sessionManager.getUserEmail();
 
@@ -95,7 +88,6 @@ public class RecipeDetailsActivity extends AppCompatActivity implements TTSHelpe
         initializeTTS();
         setupTTSButtons();
 
-        // Initialize database helper
         dbHelper = new Database(this);
 
         id = Integer.parseInt(getIntent().getStringExtra("id"));
@@ -121,7 +113,6 @@ public class RecipeDetailsActivity extends AppCompatActivity implements TTSHelpe
 
         btnPlayPause = findViewById(R.id.btn_play);
 
-        // Initially disable button until TTS is ready
         btnPlayPause.setEnabled(false);
         btnPlayPause.setAlpha(0.5f);
     }
@@ -157,7 +148,6 @@ public class RecipeDetailsActivity extends AppCompatActivity implements TTSHelpe
             return;
         }
 
-        // Build text segments for pause/resume functionality
         buildTextSegments();
 
         if (textSegments != null && !textSegments.isEmpty()) {
@@ -196,12 +186,10 @@ public class RecipeDetailsActivity extends AppCompatActivity implements TTSHelpe
     private void buildTextSegments() {
         textSegments = new ArrayList<>();
 
-        // Add recipe name
         if (currentRecipe != null && currentRecipe.title != null) {
             textSegments.add("Recipe: " + currentRecipe.title + ". Let's start cooking!");
         }
 
-        // Add ingredients section
         if (currentRecipe != null && currentRecipe.extendedIngredients != null && !currentRecipe.extendedIngredients.isEmpty()) {
             textSegments.add("First, let's gather our ingredients.");
 
@@ -214,7 +202,6 @@ public class RecipeDetailsActivity extends AppCompatActivity implements TTSHelpe
             textSegments.add("Now, let's start with the cooking instructions.");
         }
 
-        // Add instructions
         if (currentInstructions != null && !currentInstructions.isEmpty()) {
             int stepNumber = 1;
             for (InstructionsResponse instruction : currentInstructions) {
@@ -244,10 +231,8 @@ public class RecipeDetailsActivity extends AppCompatActivity implements TTSHelpe
     private void moveToNextSegment() {
         currentSegmentIndex++;
         if (currentSegmentIndex < textSegments.size()) {
-            // Continue with next segment
             speakCurrentSegment();
         } else {
-            // All segments completed
             onAllSegmentsComplete();
         }
     }
@@ -256,7 +241,7 @@ public class RecipeDetailsActivity extends AppCompatActivity implements TTSHelpe
         isPlaying = false;
         isPaused = false;
         isReadingComplete = true;
-        currentSegmentIndex = 0; // Reset for next time
+        currentSegmentIndex = 0;
         updatePlayButtonToPlay();
         Toast.makeText(this, "Recipe reading completed!", Toast.LENGTH_SHORT).show();
     }
@@ -269,20 +254,16 @@ public class RecipeDetailsActivity extends AppCompatActivity implements TTSHelpe
         btnPlayPause.setImageResource(R.drawable.pause);
     }
 
-    // Favorite functionality methods
     private void toggleFavorite() {
         isFavorite = !isFavorite;
 
-        // Update the button appearance immediately
         updateFavoriteButton();
 
-        // Save to database - pass userEmail
         boolean success = dbHelper.toggleFavorite(currentRecipe.id, isFavorite, userEmail);
 
         if (success) {
             showFavoriteToast();
         } else {
-            // Revert the change if database update failed
             isFavorite = !isFavorite;
             updateFavoriteButton();
             Toast.makeText(this, "Failed to update favorite status", Toast.LENGTH_SHORT).show();
@@ -298,7 +279,6 @@ public class RecipeDetailsActivity extends AppCompatActivity implements TTSHelpe
     }
 
     private boolean loadFavoriteState(int recipeId) {
-        // Check if recipe exists in favorites table - pass userEmail
         List<Recipe> favoriteRecipes = dbHelper.getFavoriteRecipes(userEmail);
         for (Recipe recipe : favoriteRecipes) {
             if (recipe.id == recipeId) {
@@ -314,7 +294,6 @@ public class RecipeDetailsActivity extends AppCompatActivity implements TTSHelpe
     }
 
     private void saveRecipeToDatabase(RecipeDetailsResponse response) {
-        // Save the recipe to database - pass userEmail
         long result = dbHelper.insertRecipe(
                 response.id,
                 response.title,
@@ -326,7 +305,6 @@ public class RecipeDetailsActivity extends AppCompatActivity implements TTSHelpe
                 userEmail
         );
 
-        // Save ingredients if not already cached
         if (!dbHelper.hasIngredientsForRecipe(response.id) && response.extendedIngredients != null) {
             for (ExtendedIngredient ingredient : response.extendedIngredients) {
                 if (ingredient.name != null && !ingredient.name.isEmpty()) {
@@ -353,7 +331,6 @@ public class RecipeDetailsActivity extends AppCompatActivity implements TTSHelpe
         }
     }
 
-    // TTSHelper.TTSListener implementation
     @Override
     public void onTTSReady() {
         runOnUiThread(() -> {
@@ -385,23 +362,19 @@ public class RecipeDetailsActivity extends AppCompatActivity implements TTSHelpe
     public void onSpeechComplete() {
         runOnUiThread(() -> {
             if (!isPaused) {
-                // Only move to next segment if not paused by user
                 moveToNextSegment();
             }
         });
     }
 
-    // Original listeners
     private final RecipeDetailsListener recipeDetailsListener = new RecipeDetailsListener() {
         @Override
         public void didFetch(RecipeDetailsResponse response, String message) {
             dialog.dismiss();
-            currentRecipe = response; // Store the recipe data
+            currentRecipe = response;
 
-            // Save recipe to database if not already cached
             saveRecipeToDatabase(response);
 
-            // Load favorite state from database
             isFavorite = loadFavoriteState(response.id);
             updateFavoriteButton();
 
@@ -455,9 +428,8 @@ public class RecipeDetailsActivity extends AppCompatActivity implements TTSHelpe
     private final InstructionsListener instructionsListener = new InstructionsListener() {
         @Override
         public void didFetch(List<InstructionsResponse> response, String message) {
-            currentInstructions = response; // Store the instructions data
+            currentInstructions = response;
 
-            // Save instructions to database if not already cached
             if (!dbHelper.hasInstructionsForRecipe(id) && response != null) {
                 saveInstructionsToDatabase(id, response);
             }
@@ -488,7 +460,6 @@ public class RecipeDetailsActivity extends AppCompatActivity implements TTSHelpe
     @Override
     protected void onPause() {
         super.onPause();
-        // Optionally pause TTS when activity is paused
         if (isPlaying) {
             pauseRecipeReading();
         }
