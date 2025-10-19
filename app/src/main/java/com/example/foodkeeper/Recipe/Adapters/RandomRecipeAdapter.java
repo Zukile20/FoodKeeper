@@ -12,11 +12,11 @@ import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
-
 import com.example.foodkeeper.Database;
 import com.example.foodkeeper.R;
 import com.example.foodkeeper.Recipe.Listeners.RecipeClickListerner;
 import com.example.foodkeeper.Recipe.Models.Recipe;
+import com.example.foodkeeper.SessionManager;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -26,15 +26,21 @@ public class RandomRecipeAdapter extends RecyclerView.Adapter<RandomRecipeViewHo
     Context contex;
     List<Recipe> list;
     RecipeClickListerner listerner;
-    Database db; // Move database helper to class level
-    Boolean infavourite=true;
+    Database db;
+    Boolean infavourite = true;
+    private String userEmail; // Add userEmail field
+
     public RandomRecipeAdapter(Context contex, List<Recipe> list, RecipeClickListerner listerner) {
         this.contex = contex;
         this.list = list;
         this.listerner = listerner;
         this.db = new Database(contex);
+
+        // Get user email from SessionManager
+        SessionManager sessionManager = new SessionManager(contex);
+        this.userEmail = sessionManager.getUserEmail();
+
         checkState();
-        // Initialize once
     }
 
     @NonNull
@@ -67,11 +73,17 @@ public class RandomRecipeAdapter extends RecyclerView.Adapter<RandomRecipeViewHo
         updateFavoriteButton(holder, recipe);
 
         holder.favButton.setOnClickListener(v -> {
+            // Check if user is logged in
+            if (userEmail == null || userEmail.isEmpty()) {
+                Toast.makeText(contex, "Please log in to favorite recipes", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
             // Toggle favorite status
             boolean newFavoriteStatus = recipe.fav != 1;
 
-            // Update database
-            boolean success = db.toggleFavorite(recipe.id, newFavoriteStatus);
+            // Update database - pass userEmail
+            boolean success = db.toggleFavorite(recipe.id, newFavoriteStatus, userEmail);
 
             if (success) {
                 // Update the recipe object
@@ -79,31 +91,35 @@ public class RandomRecipeAdapter extends RecyclerView.Adapter<RandomRecipeViewHo
 
                 // Update the UI
                 updateFavoriteButton(holder, recipe);
-                String message =  newFavoriteStatus? "Added to favorites!" : "Removed from favorites!";
+                String message = newFavoriteStatus ? "Added to favorites!" : "Removed from favorites!";
                 Toast.makeText(contex, message, Toast.LENGTH_SHORT).show();
-                if(infavourite)
-                {
+
+                if (infavourite) {
                     updateRecipes();
                 }
+            } else {
+                Toast.makeText(contex, "Failed to update favorite status", Toast.LENGTH_SHORT).show();
             }
         });
     }
+
     public void checkState() {
-        for(Recipe recipe : list) {
+        for (Recipe recipe : list) {
             if (recipe.fav != 1) {
                 infavourite = false;
                 break;
             }
         }
     }
+
     public void updateRecipes() {
         List<Recipe> newList = new ArrayList<>();
-        for(Recipe recipe : list) {
+        for (Recipe recipe : list) {
             if (recipe.fav == 1) {
-               newList.add(recipe);
+                newList.add(recipe);
             }
         }
-        list= newList;
+        list = newList;
         notifyDataSetChanged();
     }
 

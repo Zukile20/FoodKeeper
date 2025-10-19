@@ -1,6 +1,5 @@
 package com.example.foodkeeper.Recipe;
 
-
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
@@ -30,6 +29,7 @@ import com.example.foodkeeper.Recipe.Models.RecipeDetailsResponse;
 import com.example.foodkeeper.Recipe.Models.SimilarRecipeResponse;
 import com.example.foodkeeper.Recipe.Models.Step;
 import com.example.foodkeeper.Recipe.Models.TTSHelper;
+import com.example.foodkeeper.SessionManager;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -72,10 +72,24 @@ public class RecipeDetailsActivity extends AppCompatActivity implements TTSHelpe
     private int currentSegmentIndex = 0;
     private boolean isReadingComplete = false;
 
+    // Session management
+    private SessionManager sessionManager;
+    private String userEmail;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recipe_details);
+
+        // Initialize session manager and get user email
+        sessionManager = new SessionManager(this);
+        userEmail = sessionManager.getUserEmail();
+
+        if (userEmail == null || userEmail.isEmpty()) {
+            Toast.makeText(this, "User not logged in", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+        }
 
         findViews();
         initializeTTS();
@@ -88,7 +102,7 @@ public class RecipeDetailsActivity extends AppCompatActivity implements TTSHelpe
         manager = new RequestManager(this);
         manager.getRecipeDetails(recipeDetailsListener, id);
         manager.getInstructions(instructionsListener, id);
-        manager.getSimilarRecipes(similarRecipesListerner,id);
+        manager.getSimilarRecipes(similarRecipesListerner, id);
         dialog = new ProgressDialog(this);
         dialog.setTitle("Loading Details...");
         dialog.show();
@@ -101,7 +115,7 @@ public class RecipeDetailsActivity extends AppCompatActivity implements TTSHelpe
         recycler_meal_similar = findViewById(R.id.recycler_meal_similar);
         recycler_meal_instructions = findViewById(R.id.recycler_meal_instructions);
         favButton = findViewById(R.id.favButton);
-        findViewById(R.id.backBtn).setOnClickListener(event ->{
+        findViewById(R.id.backBtn).setOnClickListener(event -> {
             finish();
         });
 
@@ -154,7 +168,7 @@ public class RecipeDetailsActivity extends AppCompatActivity implements TTSHelpe
             updatePlayButtonToPause();
             speakCurrentSegment();
             Toast.makeText(this, "Reading complete recipe...", Toast.LENGTH_SHORT).show();
-        } else {
+        }else {
             Toast.makeText(this, "No recipe content to read", Toast.LENGTH_SHORT).show();
         }
     }
@@ -230,7 +244,7 @@ public class RecipeDetailsActivity extends AppCompatActivity implements TTSHelpe
     private void moveToNextSegment() {
         currentSegmentIndex++;
         if (currentSegmentIndex < textSegments.size()) {
-            // Continue with nexft segment
+            // Continue with next segment
             speakCurrentSegment();
         } else {
             // All segments completed
@@ -262,8 +276,8 @@ public class RecipeDetailsActivity extends AppCompatActivity implements TTSHelpe
         // Update the button appearance immediately
         updateFavoriteButton();
 
-        // Save to database
-        boolean success = dbHelper.toggleFavorite(currentRecipe.id, isFavorite);
+        // Save to database - pass userEmail
+        boolean success = dbHelper.toggleFavorite(currentRecipe.id, isFavorite, userEmail);
 
         if (success) {
             showFavoriteToast();
@@ -284,8 +298,8 @@ public class RecipeDetailsActivity extends AppCompatActivity implements TTSHelpe
     }
 
     private boolean loadFavoriteState(int recipeId) {
-        // Check if recipe exists in favorites table
-        List<Recipe> favoriteRecipes = dbHelper.getFavoriteRecipes();
+        // Check if recipe exists in favorites table - pass userEmail
+        List<Recipe> favoriteRecipes = dbHelper.getFavoriteRecipes(userEmail);
         for (Recipe recipe : favoriteRecipes) {
             if (recipe.id == recipeId) {
                 return true;
@@ -300,7 +314,7 @@ public class RecipeDetailsActivity extends AppCompatActivity implements TTSHelpe
     }
 
     private void saveRecipeToDatabase(RecipeDetailsResponse response) {
-        // Save the recipe to database
+        // Save the recipe to database - pass userEmail
         long result = dbHelper.insertRecipe(
                 response.id,
                 response.title,
@@ -308,7 +322,8 @@ public class RecipeDetailsActivity extends AppCompatActivity implements TTSHelpe
                 response.aggregateLikes,
                 response.readyInMinutes,
                 response.servings,
-                response.fav
+                response.fav,
+                userEmail
         );
 
         // Save ingredients if not already cached

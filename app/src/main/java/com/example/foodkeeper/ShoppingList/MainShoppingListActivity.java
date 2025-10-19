@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.foodkeeper.Database;
 import com.example.foodkeeper.R;
+import com.example.foodkeeper.SessionManager;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
@@ -28,7 +29,8 @@ public class MainShoppingListActivity extends AppCompatActivity {
     RecyclerView recyclerView;
     FloatingActionButton add_button;
     private Button back_btn;
-    private LinearLayout emptyStateLayout;  // Add this for empty state
+    private LinearLayout emptyStateLayout;
+
     //dialog
     EditText Name;
     EditText QTY;
@@ -38,16 +40,30 @@ public class MainShoppingListActivity extends AppCompatActivity {
     ArrayList<Integer> itemBought;
     ShoppingListAdapter customAdapter;
 
+    // Session management
+    private SessionManager sessionManager;
+    private String userEmail;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_shoppinglist);
 
+        // Initialize session manager and get user email
+        sessionManager = new SessionManager(this);
+        userEmail = sessionManager.getUserEmail();
+
+        if (userEmail == null || userEmail.isEmpty()) {
+            Toast.makeText(this, "User not logged in", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+        }
+
         iniViews();
         setupListeners();
         storedDataInArrays();
-        customAdapter= new ShoppingListAdapter(MainShoppingListActivity.this,itemName,itemQty,itemBought,itemId);
+        customAdapter = new ShoppingListAdapter(MainShoppingListActivity.this, itemName, itemQty, itemBought, itemId, userEmail);
         recyclerView.setAdapter(customAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(MainShoppingListActivity.this));
         deleteItem();
@@ -55,32 +71,35 @@ public class MainShoppingListActivity extends AppCompatActivity {
         // Check empty state after setup
         updateEmptyState();
     }
-    private void iniViews(){
-        recyclerView= findViewById(R.id.recylerView);
-        add_button=findViewById(R.id.add_button);
-        back_btn=findViewById(R.id.back_btn);
-        emptyStateLayout = findViewById(R.id.empty_state_layout);  // Initialize empty state view
-    }
-    private void setupListeners(){
 
-        add_button.setOnClickListener(new View.OnClickListener() {   //clicking add button
+    private void iniViews(){
+        recyclerView = findViewById(R.id.recylerView);
+        add_button = findViewById(R.id.add_button);
+        back_btn = findViewById(R.id.back_btn);
+        emptyStateLayout = findViewById(R.id.empty_state_layout);
+    }
+
+    private void setupListeners(){
+        add_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 showAddItemDialog();
             }
         });
+
         back_btn.setOnClickListener(v -> {
             finish();
         });
     }
+
     private void showAddItemDialog() {
-        AlertDialog.Builder mBuilder= new AlertDialog.Builder(MainShoppingListActivity.this);
-        View mView= getLayoutInflater().inflate(R.layout.add_dialog,null);
-        Name= mView.findViewById(R.id.ItemName);
+        AlertDialog.Builder mBuilder = new AlertDialog.Builder(MainShoppingListActivity.this);
+        View mView = getLayoutInflater().inflate(R.layout.add_dialog, null);
+        Name = mView.findViewById(R.id.ItemName);
         QTY = mView.findViewById(R.id.ItemQty);
         add = mView.findViewById(R.id.Add);
 
-        mBuilder.setView(mView);// dialog to pop up
+        mBuilder.setView(mView);
         AlertDialog dialog = mBuilder.create();
         dialog.show();
 
@@ -94,24 +113,27 @@ public class MainShoppingListActivity extends AppCompatActivity {
                     Toast.makeText(MainShoppingListActivity.this, "Please enter both name and quantity", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                if(item_name.length()>50)
-                {
+
+                if(item_name.length() > 50) {
                     Toast.makeText(MainShoppingListActivity.this, "The name is too long", Toast.LENGTH_SHORT).show();
                     return;
                 }
+
                 int item_qty = Integer.parseInt(QTY.getText().toString().trim());
                 if (item_qty == 0) {
                     Toast.makeText(MainShoppingListActivity.this, "Quantity must be at least 1", Toast.LENGTH_SHORT).show();
                     return;
                 }
+
                 Database myDB = new Database(MainShoppingListActivity.this);
 
-                long results = myDB.AddItem(item_name, item_qty);
+                // Pass userEmail to AddItem
+                long results = myDB.AddItem(item_name, item_qty, userEmail);
                 itemId.add(String.valueOf(results));
                 itemName.add(item_name);
                 itemQty.add(String.valueOf(item_qty));
                 itemBought.add(0);
-                customAdapter.updateList(itemName, itemQty,itemBought);
+                customAdapter.updateList(itemName, itemQty, itemBought);
 
                 // Update empty state after adding item
                 updateEmptyState();
@@ -120,22 +142,24 @@ public class MainShoppingListActivity extends AppCompatActivity {
             }
         });
     }
+
     private void storedDataInArrays(){
-        myDB= new Database(MainShoppingListActivity.this);
-        itemId= new ArrayList<>();
-        itemName= new ArrayList<>();
-        itemQty= new ArrayList<>();
+        myDB = new Database(MainShoppingListActivity.this);
+        itemId = new ArrayList<>();
+        itemName = new ArrayList<>();
+        itemQty = new ArrayList<>();
         itemBought = new ArrayList<>();
 
-        Cursor cursor = myDB.readAllData();
-            while(cursor.moveToNext()){
-                itemId.add(cursor.getString(0));
-                itemName.add(cursor.getString(1));
-                itemQty.add(cursor.getString(2));
-                itemBought.add(cursor.getInt(3));
-            }
-
+        // Pass userEmail to readAllData
+        Cursor cursor = myDB.readAllData(userEmail);
+        while(cursor.moveToNext()){
+            itemId.add(cursor.getString(0));
+            itemName.add(cursor.getString(1));
+            itemQty.add(cursor.getString(2));
+            itemBought.add(cursor.getInt(3));
+        }
     }
+
     private void updateEmptyState() {
         if (itemName == null || itemName.isEmpty()) {
             emptyStateLayout.setVisibility(View.VISIBLE);
@@ -145,6 +169,7 @@ public class MainShoppingListActivity extends AppCompatActivity {
             recyclerView.setVisibility(View.VISIBLE);
         }
     }
+
     private void deleteItem() {
         ItemTouchHelper helper = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
             @Override
@@ -163,14 +188,14 @@ public class MainShoppingListActivity extends AppCompatActivity {
                 deleteDialog.setOnDeleteConfirmListener(new DeleteDialog.OnDeleteConfirmListener() {
                     @Override
                     public void onDeleteConfirmed() {
-                        // Delete from database
-                        myDB.deleteItemById(Integer.parseInt(idToDelete));
+                        // Delete from database with userEmail
+                        myDB.deleteItemById(Integer.parseInt(idToDelete), userEmail);
 
                         // Remove from local lists
                         itemId.remove(position);
                         itemName.remove(position);
                         itemQty.remove(position);
-                        itemBought.remove(position);  // Don't forget to remove from itemBought too!
+                        itemBought.remove(position);
 
                         // Update adapter
                         customAdapter.notifyItemRemoved(position);

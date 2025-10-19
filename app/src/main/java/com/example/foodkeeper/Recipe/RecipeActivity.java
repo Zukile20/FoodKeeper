@@ -15,7 +15,6 @@ import androidx.appcompat.widget.SearchView;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-
 import com.example.foodkeeper.Database;
 import com.example.foodkeeper.R;
 import com.example.foodkeeper.Recipe.Adapters.RandomRecipeAdapter;
@@ -23,6 +22,7 @@ import com.example.foodkeeper.Recipe.Listeners.RandomRecipeResponseListener;
 import com.example.foodkeeper.Recipe.Listeners.RecipeClickListerner;
 import com.example.foodkeeper.Recipe.Models.RandomRecipeApiResponse;
 import com.example.foodkeeper.Recipe.Models.Recipe;
+import com.example.foodkeeper.SessionManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,6 +46,10 @@ public class RecipeActivity extends AppCompatActivity {
     ActivityResultLauncher<Intent> launcher;
     private Button back_btn;
 
+    // Session management
+    private SessionManager sessionManager;
+    private String userEmail;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,6 +59,17 @@ public class RecipeActivity extends AppCompatActivity {
         dialog.setTitle("Loading...");
 
         dbHelper = new Database(this);
+
+        // Initialize session manager and get user email
+        sessionManager = new SessionManager(this);
+        userEmail = sessionManager.getUserEmail();
+
+        if (userEmail == null || userEmail.isEmpty()) {
+            Toast.makeText(this, "User not logged in", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+        }
+
         manager = new RequestManager(this);
 
         // Initialize UI elements
@@ -85,7 +100,7 @@ public class RecipeActivity extends AppCompatActivity {
         btnFavoritesOnly = findViewById(R.id.btn_favorites_only);
         layoutEmptyFavorites = findViewById(R.id.layout_empty_favorites);
         recyclerView = findViewById(R.id.recycler_random);
-        back_btn=findViewById(R.id.backr_btn);
+        back_btn = findViewById(R.id.backr_btn);
     }
 
     private void setupSearchView() {
@@ -130,7 +145,6 @@ public class RecipeActivity extends AppCompatActivity {
             updateButtonStates();
             showFavoriteRecipes();
             searchView.setQuery("", false); // Clear search
-
         });
     }
 
@@ -155,7 +169,8 @@ public class RecipeActivity extends AppCompatActivity {
     }
 
     private void showAllRecipes() {
-        List<Recipe> allRecipes = dbHelper.getAllRecipes();
+        // Pass userEmail
+        List<Recipe> allRecipes = dbHelper.getAllRecipes(userEmail);
         loadRecipesIntoRecyclerView(allRecipes);
 
         // Hide empty state
@@ -164,7 +179,8 @@ public class RecipeActivity extends AppCompatActivity {
     }
 
     private void showFavoriteRecipes() {
-        List<Recipe> favoriteRecipes = dbHelper.getFavoriteRecipes();
+        // Pass userEmail
+        List<Recipe> favoriteRecipes = dbHelper.getFavoriteRecipes(userEmail);
 
         if (favoriteRecipes.isEmpty()) {
             // Show empty favorites state
@@ -179,7 +195,8 @@ public class RecipeActivity extends AppCompatActivity {
     }
 
     private void loadRecipesFromDatabase() {
-        List<Recipe> recipes = dbHelper.getAllRecipes();
+        // Pass userEmail
+        List<Recipe> recipes = dbHelper.getAllRecipes(userEmail);
         if (recipes.isEmpty()) {
             // If DB empty, fetch from API
             dialog.show();
@@ -197,12 +214,12 @@ public class RecipeActivity extends AppCompatActivity {
     private void searchRecipes(String query) {
         dialog.show();
 
-        // Search based on current filter
+        // Search based on current filter - pass userEmail
         List<Recipe> localResults;
         if (showingFavoritesOnly) {
-            localResults = dbHelper.searchFavoriteRecipes(query);
+            localResults = dbHelper.searchFavoriteRecipes(query, userEmail);
         } else {
-            localResults = dbHelper.searchRecipes(query);
+            localResults = dbHelper.searchRecipes(query, userEmail);
         }
 
         if (!localResults.isEmpty()) {
@@ -223,7 +240,7 @@ public class RecipeActivity extends AppCompatActivity {
                     public void didFetch(RandomRecipeApiResponse response, String message) {
                         dialog.dismiss();
 
-                        // Save new recipes into DB
+                        // Save new recipes into DB - pass userEmail
                         for (Recipe recipe : response.recipes) {
                             dbHelper.insertRecipe(
                                     recipe.id,
@@ -232,12 +249,13 @@ public class RecipeActivity extends AppCompatActivity {
                                     recipe.aggregateLikes,
                                     recipe.readyInMinutes,
                                     recipe.servings,
-                                    recipe.fav
+                                    recipe.fav,
+                                    userEmail
                             );
                         }
 
-                        // Reload results from DB for consistency
-                        List<Recipe> updatedResults = dbHelper.searchRecipes(query);
+                        // Reload results from DB for consistency - pass userEmail
+                        List<Recipe> updatedResults = dbHelper.searchRecipes(query, userEmail);
                         if (updatedResults.isEmpty()) {
                             // Show empty state message for search
                             recyclerView.setVisibility(android.view.View.GONE);
@@ -280,7 +298,7 @@ public class RecipeActivity extends AppCompatActivity {
         public void didFetch(RandomRecipeApiResponse response, String message) {
             dialog.dismiss();
 
-            // Save results into DB
+            // Save results into DB - pass userEmail
             for (Recipe recipe : response.recipes) {
                 dbHelper.insertRecipe(
                         recipe.id,
@@ -289,7 +307,8 @@ public class RecipeActivity extends AppCompatActivity {
                         recipe.aggregateLikes,
                         recipe.readyInMinutes,
                         recipe.servings,
-                        recipe.fav
+                        recipe.fav,
+                        userEmail
                 );
             }
 

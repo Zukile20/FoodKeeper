@@ -16,6 +16,7 @@ import com.example.foodkeeper.Recipe.Models.Recipe;
 import com.example.foodkeeper.Recipe.Models.RecipeDetailsResponse;
 import com.example.foodkeeper.Recipe.Models.SimilarRecipeResponse;
 import com.example.foodkeeper.Recipe.Models.Step;
+import com.example.foodkeeper.SessionManager;
 
 import java.util.List;
 
@@ -35,16 +36,27 @@ public class RequestManager {
     FetchStateManager fetchStateManager;
     Retrofit retrofit;
     private static final String TAG = "RequestManager";
+    private SessionManager sessionManager;
 
     public RequestManager(Context context) {
         this.context = context;
         this.dbHelper = new Database(context);
         this.fetchStateManager = new FetchStateManager(context);
+        this.sessionManager = new SessionManager(context);
 
         retrofit = new Retrofit.Builder()
                 .baseUrl("https://api.spoonacular.com/")
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
+    }
+
+    // Helper method to get user email
+    private String getUserEmail() {
+        String email = sessionManager.getUserEmail();
+        if (email == null || email.isEmpty()) {
+            Log.e(TAG, "User email is null or empty!");
+        }
+        return email;
     }
 
     // NEW METHOD: Check if user needs to fetch recipes on first login
@@ -55,7 +67,7 @@ public class RequestManager {
                 Log.d(TAG, "User " + userEmail + " has already fetched recipes. Loading from database.");
 
                 // Load from database
-                List<Recipe> cachedRecipes = dbHelper.getAllRecipes();
+                List<Recipe> cachedRecipes = dbHelper.getAllRecipes(userEmail);
                 if (!cachedRecipes.isEmpty()) {
                     RandomRecipeApiResponse cachedResponse = new RandomRecipeApiResponse();
                     cachedResponse.recipes = (java.util.ArrayList<Recipe>) cachedRecipes;
@@ -100,7 +112,8 @@ public class RequestManager {
                                     recipe.aggregateLikes,
                                     recipe.readyInMinutes,
                                     recipe.servings,
-                                    recipe.fav
+                                    recipe.fav,
+                                    userEmail
                             );
                         } catch (Exception e) {
                             Log.e(TAG, "Error caching recipe: " + e.getMessage());
@@ -125,11 +138,17 @@ public class RequestManager {
         });
     }
 
-    // ORIGINAL METHOD: DATABASE-FIRST for general use (non-user-specific)
+    // ORIGINAL METHOD: DATABASE-FIRST for general use (with user email)
     public void getRandomRecipes(RandomRecipeResponseListener listener, List<String> tags) {
+        String userEmail = getUserEmail();
+        if (userEmail == null || userEmail.isEmpty()) {
+            listener.didError("User not logged in");
+            return;
+        }
+
         try {
-            // First check if we have recipes in database
-            List<Recipe> cachedRecipes = dbHelper.getAllRecipes();
+            // First check if we have recipes in database for this user
+            List<Recipe> cachedRecipes = dbHelper.getAllRecipes(userEmail);
 
             if (!cachedRecipes.isEmpty()) {
                 // We have recipes, return from database
@@ -147,6 +166,12 @@ public class RequestManager {
     }
 
     private void fetchRandomRecipesFromAPI(RandomRecipeResponseListener listener, List<String> tags) {
+        String userEmail = getUserEmail();
+        if (userEmail == null || userEmail.isEmpty()) {
+            listener.didError("User not logged in");
+            return;
+        }
+
         CallRandomRecipes callRandomRecipes = retrofit.create(CallRandomRecipes.class);
         Call<RandomRecipeApiResponse> call = callRandomRecipes.callRandomRecipe(
                 context.getString(R.string.api_key), "100", tags
@@ -161,7 +186,7 @@ public class RequestManager {
 
                 RandomRecipeApiResponse data = response.body();
                 if (data != null && data.recipes != null) {
-                    // Store all recipes in database
+                    // Store all recipes in database with userEmail
                     for (Recipe recipe : data.recipes) {
                         try {
                             dbHelper.insertRecipe(
@@ -171,7 +196,8 @@ public class RequestManager {
                                     recipe.aggregateLikes,
                                     recipe.readyInMinutes,
                                     recipe.servings,
-                                    recipe.fav
+                                    recipe.fav,
+                                    userEmail
                             );
                         } catch (Exception e) {
                             Log.e(TAG, "Error caching recipe: " + e.getMessage());
@@ -191,8 +217,14 @@ public class RequestManager {
     }
 
     private void loadFromDatabaseFallback(RandomRecipeResponseListener listener) {
+        String userEmail = getUserEmail();
+        if (userEmail == null || userEmail.isEmpty()) {
+            listener.didError("User not logged in");
+            return;
+        }
+
         try {
-            List<Recipe> cachedRecipes = dbHelper.getAllRecipes();
+            List<Recipe> cachedRecipes = dbHelper.getAllRecipes(userEmail);
             if (!cachedRecipes.isEmpty()) {
                 RandomRecipeApiResponse cachedResponse = new RandomRecipeApiResponse();
                 cachedResponse.recipes = (java.util.ArrayList<Recipe>) cachedRecipes;
@@ -208,10 +240,16 @@ public class RequestManager {
 
     // DATABASE-FIRST: Recipe details with complete caching (including instructions)
     public void getRecipeDetails(RecipeDetailsListener listener, int id) {
+        String userEmail = getUserEmail();
+        if (userEmail == null || userEmail.isEmpty()) {
+            listener.didError("User not logged in");
+            return;
+        }
+
         try {
             Log.d(TAG, "Getting recipe details for ID: " + id);
 
-            RecipeDetailsResponse cachedDetails = dbHelper.getCachedRecipeDetails(id);
+            RecipeDetailsResponse cachedDetails = dbHelper.getCachedRecipeDetails(id, userEmail);
 
             if (cachedDetails != null) {
                 Log.d(TAG, "Found cached recipe: " + cachedDetails.title);
@@ -237,6 +275,12 @@ public class RequestManager {
     }
 
     private void fetchRecipeDetailsFromAPI(RecipeDetailsListener listener, int id) {
+        String userEmail = getUserEmail();
+        if (userEmail == null || userEmail.isEmpty()) {
+            listener.didError("User not logged in");
+            return;
+        }
+
         Log.d(TAG, "Fetching recipe details from API for ID: " + id);
 
         CallRecipeDetails callRecipeDetails = retrofit.create(CallRecipeDetails.class);
@@ -250,7 +294,7 @@ public class RequestManager {
                 if (!response.isSuccessful()) {
                     Log.e(TAG, "API error: " + response.code() + " " + response.message());
                     try {
-                        RecipeDetailsResponse cachedDetails = dbHelper.getCachedRecipeDetails(id);
+                        RecipeDetailsResponse cachedDetails = dbHelper.getCachedRecipeDetails(id, userEmail);
                         if (cachedDetails != null && cachedDetails.title != null) {
                             listener.didFetch(cachedDetails, "Loaded from database (API failed)");
                         } else {
@@ -267,7 +311,7 @@ public class RequestManager {
                     Log.d(TAG, "Received recipe from API: " + details.title);
 
                     try {
-                        cacheCompleteRecipeDetails(details);
+                        cacheCompleteRecipeDetails(details, userEmail);
                         Log.d(TAG, "Successfully cached recipe details");
                         fetchAndCacheInstructions(id);
                     } catch (Exception e) {
@@ -284,7 +328,7 @@ public class RequestManager {
             public void onFailure(Call<RecipeDetailsResponse> call, Throwable t) {
                 Log.e(TAG, "Network error: " + t.getMessage());
                 try {
-                    RecipeDetailsResponse cachedDetails = dbHelper.getCachedRecipeDetails(id);
+                    RecipeDetailsResponse cachedDetails = dbHelper.getCachedRecipeDetails(id, userEmail);
                     if (cachedDetails != null && cachedDetails.title != null) {
                         listener.didFetch(cachedDetails, "Loaded from database (Network failed)");
                     } else {
@@ -431,9 +475,7 @@ public class RequestManager {
                 listener.didError(t.getMessage());
             }
         });
-    }
-
-    private void cacheCompleteRecipeDetails(RecipeDetailsResponse details) {
+    }private void cacheCompleteRecipeDetails(RecipeDetailsResponse details, String userEmail) {
         try {
             if (details == null || details.title == null) {
                 Log.w(TAG, "Cannot cache null or incomplete recipe details");
@@ -449,7 +491,8 @@ public class RequestManager {
                     details.aggregateLikes,
                     details.readyInMinutes,
                     details.servings,
-                    details.fav
+                    details.fav,
+                    userEmail
             );
 
             if (details.extendedIngredients != null && !details.extendedIngredients.isEmpty()) {

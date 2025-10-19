@@ -113,7 +113,7 @@ public class LandingPageActivity extends AppCompatActivity {
     }
     private void setupRecipesRecyclerView() {
         // Get random recipes from database (e.g., 5 random recipes)
-        List<Recipe> recipes = database.getRandomRecipes(5);
+        List<Recipe> recipes = database.getRandomRecipes(5,sess.getUserEmail());
 
         // Create click listener
         RecipeClickListerner listener = new RecipeClickListerner() {
@@ -225,7 +225,7 @@ public class LandingPageActivity extends AppCompatActivity {
 
     private void refreshRecipes() {
         // Get new random recipes
-        List<Recipe> newRecipes = database.getRandomRecipes(5);
+        List<Recipe> newRecipes = database.getRandomRecipes(5,sess.getUserEmail());
         if (recipeAdapter != null) {
             recipeAdapter.updateRecipes(newRecipes);
         }

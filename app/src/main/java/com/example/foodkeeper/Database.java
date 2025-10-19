@@ -483,7 +483,6 @@ public class Database extends SQLiteOpenHelper {
         }
         return instance;
     }
-
     public long createMeal(Meal meal, long fridgeID) {
         SQLiteDatabase db = this.getWritableDatabase();
         try {
@@ -498,8 +497,6 @@ public class Database extends SQLiteOpenHelper {
             db.close();
         }
     }
-
-
     private Long getNullableLong(Cursor cursor, String columnName) {
         int columnIndex = cursor.getColumnIndex(columnName);
         if (columnIndex == -1) {
@@ -507,7 +504,6 @@ public class Database extends SQLiteOpenHelper {
         }
         return cursor.isNull(columnIndex) ? null : cursor.getLong(columnIndex);
     }
-
     public List<FoodItem> getFoodItemsForMeal(long mealId) {
         List<FoodItem> foodItems = new ArrayList<>();
 
@@ -557,7 +553,6 @@ public class Database extends SQLiteOpenHelper {
         db.close();
         return result > 0;
     }
-
     public List<FoodItem> getUserFoodItems(String userEmail) {
         List<FoodItem> foodItems = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
@@ -590,7 +585,6 @@ public class Database extends SQLiteOpenHelper {
         cursor.close();
         return foodItems;
     }
-
     public List<FoodItem> getFoodItemsInConnectedFridge(String userEmail) {
         List<FoodItem> foodItems = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
@@ -619,7 +613,6 @@ public class Database extends SQLiteOpenHelper {
         cursor.close();
         return foodItems;
     }
-
     public List<FoodItem> getFoodItemsByFridge(int fridgeId, String userEmail) {
         List<FoodItem> foodItems = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
@@ -647,7 +640,6 @@ public class Database extends SQLiteOpenHelper {
         cursor.close();
         return foodItems;
     }
-
     public boolean deleteFoodItem(int id, String userEmail) {
         SQLiteDatabase db = this.getWritableDatabase();
 
@@ -1030,7 +1022,9 @@ public class Database extends SQLiteOpenHelper {
                 COLUMN_LIKES + " INTEGER, " +
                 COLUMN_TIME + " INTEGER, " +
                 COLUMN_SERVINGS + " INTEGER, " +
-                COLUMN_FAVORITE + " INTEGER DEFAULT 0)");
+                COLUMN_FAVORITE + " INTEGER DEFAULT 0, " +
+                KEY_USER_EMAIL + " TEXT, " +
+                "FOREIGN KEY(" + KEY_USER_EMAIL + ") REFERENCES " + TABLE_USERS + "(" + KEY_EMAIL + ") ON DELETE CASCADE);");
 
         db.execSQL("CREATE TABLE " + TABLE_INGREDIENTS + " (" +
                 COLUMN_INGREDIENT_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
@@ -1060,21 +1054,21 @@ public class Database extends SQLiteOpenHelper {
         }
     }
 
-    public long insertRecipe(int id, String Recipe_Name, String Recipe_image, int Recipe_likes, int Cooking_time, int Recipe_servings, int fav) {
+    public long insertRecipe(int id, String Recipe_Name, String Recipe_image, int Recipe_likes, int Cooking_time, int Recipe_servings, int fav, String userEmail) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         try {
-            // First check if recipe already exists and get its current favorite status
-            Cursor cursor = db.rawQuery("SELECT " + COLUMN_FAVORITE + " FROM " + TABLE_RECIPES + " WHERE " + COLUMN_ID + " = ?",
-                    new String[]{String.valueOf(id)});
+            // Check if recipe already exists for this user
+            Cursor cursor = db.rawQuery("SELECT " + COLUMN_FAVORITE + " FROM " + TABLE_RECIPES +
+                            " WHERE " + COLUMN_ID + " = ? AND " + KEY_USER_EMAIL + " = ?",
+                    new String[]{String.valueOf(id), userEmail});
 
-            int existingFavoriteStatus = 0; // Default to 0 if recipe doesn't exist
+            int existingFavoriteStatus = 0;
             if (cursor.moveToFirst()) {
                 existingFavoriteStatus = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_FAVORITE));
             }
             cursor.close();
 
-            // Prepare values for insertion/update
             ContentValues values = new ContentValues();
             values.put(COLUMN_ID, id);
             values.put(COLUMN_TITLE, Recipe_Name);
@@ -1082,9 +1076,8 @@ public class Database extends SQLiteOpenHelper {
             values.put(COLUMN_LIKES, Recipe_likes);
             values.put(COLUMN_TIME, Cooking_time);
             values.put(COLUMN_SERVINGS, Recipe_servings);
-
-            // IMPORTANT: Preserve existing favorite status, don't override with API data
             values.put(COLUMN_FAVORITE, existingFavoriteStatus);
+            values.put(KEY_USER_EMAIL, userEmail);
 
             long result = db.insertWithOnConflict(TABLE_RECIPES, null, values, SQLiteDatabase.CONFLICT_REPLACE);
             return result;
@@ -1093,15 +1086,14 @@ public class Database extends SQLiteOpenHelper {
             db.close();
         }
     }
-
-    // Get all recipes
-    public List<Recipe> getAllRecipes() {
+    public List<Recipe> getAllRecipes(String userEmail) {
         List<Recipe> recipes = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = null;
 
         try {
-            cursor = db.rawQuery("SELECT * FROM " + TABLE_RECIPES, null);
+            cursor = db.rawQuery("SELECT * FROM " + TABLE_RECIPES + " WHERE " + KEY_USER_EMAIL + " = ?",
+                    new String[]{userEmail});
 
             if (cursor.moveToFirst()) {
                 do {
@@ -1113,8 +1105,7 @@ public class Database extends SQLiteOpenHelper {
                     int servings = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_SERVINGS));
                     int favorite = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_FAVORITE));
 
-                    Recipe recipe = new Recipe(id, title, image, likes, time, servings,favorite);
-                    // If your Recipe model has a favorite field, set it here
+                    Recipe recipe = new Recipe(id, title, image, likes, time, servings, favorite);
                     recipes.add(recipe);
                 } while (cursor.moveToNext());
             }
@@ -1126,17 +1117,15 @@ public class Database extends SQLiteOpenHelper {
         }
         return recipes;
     }
-
-    // Search recipes by title
-    public List<Recipe> searchRecipes(String query) {
+    public List<Recipe> searchRecipes(String query, String userEmail) {
         List<Recipe> recipes = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = null;
 
         try {
             cursor = db.rawQuery(
-                    "SELECT * FROM " + TABLE_RECIPES + " WHERE " + COLUMN_TITLE + " LIKE ?",
-                    new String[]{"%" + query + "%"}
+                    "SELECT * FROM " + TABLE_RECIPES + " WHERE " + COLUMN_TITLE + " LIKE ? AND " + KEY_USER_EMAIL + " = ?",
+                    new String[]{"%" + query + "%", userEmail}
             );
 
             if (cursor.moveToFirst()) {
@@ -1149,7 +1138,7 @@ public class Database extends SQLiteOpenHelper {
                     int servings = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_SERVINGS));
                     int favorite = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_FAVORITE));
 
-                    recipes.add(new Recipe(id, title, image, likes, time, servings,favorite));
+                    recipes.add(new Recipe(id, title, image, likes, time, servings, favorite));
                 } while (cursor.moveToNext());
             }
         } finally {
@@ -1160,8 +1149,7 @@ public class Database extends SQLiteOpenHelper {
         }
         return recipes;
     }
-
-    public List<Recipe> searchFavoriteRecipes(String searchQuery) {
+    public List<Recipe> searchFavoriteRecipes(String searchQuery, String userEmail) {
         List<Recipe> favoriteRecipes = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = null;
@@ -1169,14 +1157,13 @@ public class Database extends SQLiteOpenHelper {
         try {
             String query = "SELECT * FROM " + TABLE_RECIPES +
                     " WHERE " + COLUMN_FAVORITE + " = 1 AND " +
-                    COLUMN_TITLE + " LIKE ?";
-            String[] selectionArgs = {"%" + searchQuery + "%"};
+                    COLUMN_TITLE + " LIKE ? AND " + KEY_USER_EMAIL + " = ?";
+            String[] selectionArgs = {"%" + searchQuery + "%", userEmail};
 
             cursor = db.rawQuery(query, selectionArgs);
 
             if (cursor.moveToFirst()) {
                 do {
-                    // Declare variables to store cursor data
                     int id = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_ID));
                     String title = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_TITLE));
                     String image = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_IMAGE));
@@ -1185,7 +1172,6 @@ public class Database extends SQLiteOpenHelper {
                     int servings = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_SERVINGS));
                     int fav = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_FAVORITE));
 
-                    // Add recipe to list using constructor
                     favoriteRecipes.add(new Recipe(id, title, image, aggregateLikes, readyInMinutes, servings, fav));
                 } while (cursor.moveToNext());
             }
@@ -1198,17 +1184,16 @@ public class Database extends SQLiteOpenHelper {
 
         return favoriteRecipes;
     }
-
-    // Toggle favorite status for a recipe
-    public boolean toggleFavorite(int recipeId, boolean isFavorite) {
+    public boolean toggleFavorite(int recipeId, boolean isFavorite, String userEmail) {
         SQLiteDatabase db = null;
         try {
             db = this.getWritableDatabase();
             ContentValues values = new ContentValues();
             values.put(COLUMN_FAVORITE, isFavorite ? 1 : 0);
 
-            int rowsAffected = db.update(TABLE_RECIPES, values, COLUMN_ID + " = ?",
-                    new String[]{String.valueOf(recipeId)});
+            int rowsAffected = db.update(TABLE_RECIPES, values,
+                    COLUMN_ID + " = ? AND " + KEY_USER_EMAIL + " = ?",
+                    new String[]{String.valueOf(recipeId), userEmail});
 
             return rowsAffected > 0;
         } finally {
@@ -1217,17 +1202,15 @@ public class Database extends SQLiteOpenHelper {
             }
         }
     }
-
-    // Get favorite recipes
-    public List<Recipe> getFavoriteRecipes() {
+    public List<Recipe> getFavoriteRecipes(String userEmail) {
         List<Recipe> recipes = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = null;
 
         try {
             cursor = db.rawQuery(
-                    "SELECT * FROM " + TABLE_RECIPES + " WHERE " + COLUMN_FAVORITE + " = 1",
-                    null
+                    "SELECT * FROM " + TABLE_RECIPES + " WHERE " + COLUMN_FAVORITE + " = 1 AND " + KEY_USER_EMAIL + " = ?",
+                    new String[]{userEmail}
             );
 
             if (cursor.moveToFirst()) {
@@ -1240,8 +1223,7 @@ public class Database extends SQLiteOpenHelper {
                     int servings = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_SERVINGS));
                     int favorite = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_FAVORITE));
 
-
-                    recipes.add(new Recipe(id, title, image, likes, time, servings,favorite));
+                    recipes.add(new Recipe(id, title, image, likes, time, servings, favorite));
                 } while (cursor.moveToNext());
             }
         } finally {
@@ -1252,12 +1234,6 @@ public class Database extends SQLiteOpenHelper {
         }
         return recipes;
     }
-
-    // ========================================
-    // INGREDIENT OPERATIONS
-    // ========================================
-
-    // Insert ingredient (returns ID, or existing ID if already exists)
     public long insertIngredient(String name) {
         SQLiteDatabase db = null;
         Cursor cursor = null;
@@ -1291,8 +1267,6 @@ public class Database extends SQLiteOpenHelper {
         }
         return result;
     }
-
-    // Get ingredient ID by name
     public long getIngredientIdByName(String name) {
         SQLiteDatabase db = this.getReadableDatabase();
         long id = -1;
@@ -1316,13 +1290,6 @@ public class Database extends SQLiteOpenHelper {
         }
         return id;
     }
-
-
-    // ========================================
-    // RECIPE-INGREDIENT RELATIONSHIP
-    // ========================================
-
-    // Link recipe to ingredient
     public long insertRecipeIngredient(int recipeId, long ingredientId) {
         SQLiteDatabase db = null;
         long result = -1;
@@ -1340,12 +1307,6 @@ public class Database extends SQLiteOpenHelper {
         }
         return result;
     }
-
-    // ========================================
-    // INSTRUCTION OPERATIONS
-    // ========================================
-
-    // Insert instruction
     public long insertInstruction(int recipeId, int stepNumber, String step) {
         SQLiteDatabase db = null;
         long result = -1;
@@ -1364,10 +1325,6 @@ public class Database extends SQLiteOpenHelper {
         }
         return result;
     }
-
-    // Get instructions for a recipe
-
-    // Get cached instructions (formatted for API response)
     public List<InstructionsResponse> getCachedInstructions(int recipeId) {
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = null;
@@ -1403,8 +1360,6 @@ public class Database extends SQLiteOpenHelper {
         }
         return result;
     }
-
-    // Delete old instructions for a recipe
     public int deleteInstructionsForRecipe(int recipeId) {
         SQLiteDatabase db = null;
         int rowsDeleted = 0;
@@ -1419,23 +1374,16 @@ public class Database extends SQLiteOpenHelper {
         }
         return rowsDeleted;
     }
-
-    // ========================================
-    // ADVANCED OPERATIONS - FIXED VERSION
-    // ========================================
-
-    // Get cached recipe details (with ingredients) - formatted for API response
-    public RecipeDetailsResponse getCachedRecipeDetails(int recipeId) {
+    public RecipeDetailsResponse getCachedRecipeDetails(int recipeId, String userEmail) {
         SQLiteDatabase db = this.getReadableDatabase();
         RecipeDetailsResponse details = null;
         Cursor recipeCursor = null;
         Cursor ingredientsCursor = null;
 
         try {
-            // Get recipe basic info
             recipeCursor = db.rawQuery(
-                    "SELECT * FROM " + TABLE_RECIPES + " WHERE " + COLUMN_ID + " = ?",
-                    new String[]{String.valueOf(recipeId)}
+                    "SELECT * FROM " + TABLE_RECIPES + " WHERE " + COLUMN_ID + " = ? AND " + KEY_USER_EMAIL + " = ?",
+                    new String[]{String.valueOf(recipeId), userEmail}
             );
 
             if (!recipeCursor.moveToFirst()) {
@@ -1446,17 +1394,13 @@ public class Database extends SQLiteOpenHelper {
             details.id = recipeCursor.getInt(recipeCursor.getColumnIndexOrThrow(COLUMN_ID));
             details.title = recipeCursor.getString(recipeCursor.getColumnIndexOrThrow(COLUMN_TITLE));
             details.image = recipeCursor.getString(recipeCursor.getColumnIndexOrThrow(COLUMN_IMAGE));
-
-            // Add the missing fields
             details.aggregateLikes = recipeCursor.getInt(recipeCursor.getColumnIndexOrThrow(COLUMN_LIKES));
             details.readyInMinutes = recipeCursor.getInt(recipeCursor.getColumnIndexOrThrow(COLUMN_TIME));
             details.servings = recipeCursor.getInt(recipeCursor.getColumnIndexOrThrow(COLUMN_SERVINGS));
-            details.fav=recipeCursor.getInt(recipeCursor.getColumnIndexOrThrow(COLUMN_FAVORITE));
+            details.fav = recipeCursor.getInt(recipeCursor.getColumnIndexOrThrow(COLUMN_FAVORITE));
 
-            // Initialize the extended ingredients list
             details.extendedIngredients = new ArrayList<>();
 
-            // Get ingredients for this recipe
             ingredientsCursor = db.rawQuery(
                     "SELECT i." + COLUMN_INGREDIENT_ID + ", i." + COLUMN_INGREDIENT_NAME + " " +
                             "FROM " + TABLE_INGREDIENTS + " i " +
@@ -1470,9 +1414,8 @@ public class Database extends SQLiteOpenHelper {
                 ingredient.id = ingredientsCursor.getInt(0);
                 ingredient.name = ingredientsCursor.getString(1);
 
-                // Initialize all fields to prevent null pointer exceptions
                 if (ingredient.meta == null) {
-                    ingredient.meta = new ArrayList<>(); // Empty list for cached data
+                    ingredient.meta = new ArrayList<>();
                 }
 
                 details.extendedIngredients.add(ingredient);
@@ -1488,12 +1431,6 @@ public class Database extends SQLiteOpenHelper {
         }
         return details;
     }
-
-    // ========================================
-    // NEW DATA CHECKING METHODS
-    // ========================================
-
-    // Check if a recipe already has ingredients cached
     public boolean hasIngredientsForRecipe(int recipeId) {
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = null;
@@ -1515,8 +1452,6 @@ public class Database extends SQLiteOpenHelper {
         }
         return hasIngredients;
     }
-
-    // Check if a recipe already has instructions cached
     public boolean hasInstructionsForRecipe(int recipeId) {
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = null;
@@ -1538,8 +1473,6 @@ public class Database extends SQLiteOpenHelper {
         }
         return hasInstructions;
     }
-
-    // Helper method to delete ingredients for a recipe (to avoid duplicates when re-caching)
     public int deleteIngredientsForRecipe(int recipeId) {
         SQLiteDatabase db = null;
         int rowsDeleted = 0;
@@ -1554,8 +1487,6 @@ public class Database extends SQLiteOpenHelper {
         }
         return rowsDeleted;
     }
-
-    // Helper method to count ingredients for a recipe (for verification)
     public int getIngredientCountForRecipe(int recipeId) {
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = null;
@@ -1576,19 +1507,12 @@ public class Database extends SQLiteOpenHelper {
         }
         return count;
     }
-
-    /**
-     * Get random recipes from the database
-     * @param limit Number of random recipes to retrieve
-     * @return List of random Recipe objects
-     */
-    public List<Recipe> getRandomRecipes(int limit) {
+    public List<Recipe> getRandomRecipes(int limit, String userEmail) {
         List<Recipe> recipes = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
 
-        // Query to get random recipes
-        String query = "SELECT * FROM recipes ORDER BY RANDOM() LIMIT ?";
-        Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(limit)});
+        String query = "SELECT * FROM recipes WHERE " + KEY_USER_EMAIL + " = ? ORDER BY RANDOM() LIMIT ?";
+        Cursor cursor = db.rawQuery(query, new String[]{userEmail, String.valueOf(limit)});
 
         if (cursor.moveToFirst()) {
             do {
@@ -1600,7 +1524,6 @@ public class Database extends SQLiteOpenHelper {
                 int servings = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_SERVINGS));
                 int favorite = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_FAVORITE));
 
-
                 recipes.add(new Recipe(id, title, image, likes, time, servings, favorite));
             } while (cursor.moveToNext());
         }
@@ -1610,57 +1533,62 @@ public class Database extends SQLiteOpenHelper {
         return recipes;
     }
 
-
-
-
     // SHOPPING LIST METHODS
-    private static final String SHOPPING_TABLE_NAME = "my_shoppingList";
+    private static final String SHOPPING_TABLE_NAME = "ShoppingList";
     private static final String SHOPPING_COLUMN_ID = "ShoppingList_ItemID";
     private static final String SHOPPING_COLUMN_NAME = "ShoppingList_ItemName";
     private static final String SHOPPING_COLUMN_QTY = "ShoppingList_ItemQTY";
     private static final String SHOPPING_COLUMN_BOUGHT = "ShoppingList_ItemBought";
+
+
     private void createShoppingListTable(SQLiteDatabase db) {
         String query = "CREATE TABLE " + SHOPPING_TABLE_NAME +
                 " (" + SHOPPING_COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 SHOPPING_COLUMN_NAME + " TEXT, " +
-                SHOPPING_COLUMN_QTY + " INTEGER ," +
-                SHOPPING_COLUMN_BOUGHT + " INTEGER);";
+                SHOPPING_COLUMN_QTY + " INTEGER, " +
+                SHOPPING_COLUMN_BOUGHT + " INTEGER, " +
+                KEY_USER_EMAIL + " TEXT, " +
+                "FOREIGN KEY(" + KEY_USER_EMAIL + ") REFERENCES " + TABLE_USERS + "(" + KEY_EMAIL + ") ON DELETE CASCADE);";
         db.execSQL(query);
     }
-    public long AddItem(String ItemName, int ItemQty){
+    // Modified AddItem method
+    public long AddItem(String ItemName, int ItemQty, String userEmail){
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues cv = new ContentValues();
 
-        SQLiteDatabase db= this.getWritableDatabase();
-        ContentValues cv= new ContentValues();
+        cv.put(SHOPPING_COLUMN_NAME, ItemName);
+        cv.put(SHOPPING_COLUMN_QTY, ItemQty);
+        cv.put(SHOPPING_COLUMN_BOUGHT, 0);
+        cv.put(KEY_USER_EMAIL, userEmail);
 
-        cv.put(SHOPPING_COLUMN_NAME,ItemName);
-        cv.put(SHOPPING_COLUMN_QTY,ItemQty);
-        cv.put(SHOPPING_COLUMN_BOUGHT,0);
+        long results = db.insert(SHOPPING_TABLE_NAME, null, cv);
 
-        long results= db.insert(SHOPPING_TABLE_NAME,null,cv);
-
-        if(results==-1)
-        {
+        if(results == -1) {
             Toast.makeText(context, "Failed", Toast.LENGTH_SHORT).show();
-        }
-        else {
+        } else {
             Toast.makeText(context, "Added Successfully", Toast.LENGTH_SHORT).show();
         }
         return results;
     }
-    public Cursor readAllData(){
 
-        String query = "SELECT * FROM " + SHOPPING_TABLE_NAME;
+    // Modified readAllData method
+    public Cursor readAllData(String userEmail){
+        String query = "SELECT * FROM " + SHOPPING_TABLE_NAME + " WHERE " + KEY_USER_EMAIL + " = ?";
         SQLiteDatabase db = this.getReadableDatabase();
 
         Cursor cursor = null;
         if (db != null) {
-            cursor = db.rawQuery(query, null);
+            cursor = db.rawQuery(query, new String[]{userEmail});
         }
         return cursor;
     }
-    public void deleteItemById(int id) {
+
+    // Modified deleteItemById method
+    public void deleteItemById(int id, String userEmail) {
         SQLiteDatabase db = this.getWritableDatabase();
-        int result = db.delete(SHOPPING_TABLE_NAME, SHOPPING_COLUMN_ID + "=?", new String[]{String.valueOf(id)});
+        int result = db.delete(SHOPPING_TABLE_NAME,
+                SHOPPING_COLUMN_ID + "=? AND " + KEY_USER_EMAIL + "=?",
+                new String[]{String.valueOf(id), userEmail});
 
         if (result == -1) {
             Toast.makeText(context, "Failed to delete item", Toast.LENGTH_SHORT).show();
@@ -1668,18 +1596,25 @@ public class Database extends SQLiteOpenHelper {
             Toast.makeText(context, "Item deleted", Toast.LENGTH_SHORT).show();
         }
     }
-    public void UpdateItemShoppingList(int id){
 
+    // Modified UpdateItemShoppingList method
+    public void UpdateItemShoppingList(int id, String userEmail){
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
-        cv.put(SHOPPING_COLUMN_BOUGHT,1);
-        db.update(SHOPPING_TABLE_NAME, cv  ,SHOPPING_COLUMN_ID+"=?" ,new String[]{String.valueOf(id)});
+        cv.put(SHOPPING_COLUMN_BOUGHT, 1);
+        db.update(SHOPPING_TABLE_NAME, cv,
+                SHOPPING_COLUMN_ID + "=? AND " + KEY_USER_EMAIL + "=?",
+                new String[]{String.valueOf(id), userEmail});
     }
-    public void UpdateItemBackShoppingList(int id) {
+
+    // Modified UpdateItemBackShoppingList method
+    public void UpdateItemBackShoppingList(int id, String userEmail) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
-        cv.put(SHOPPING_COLUMN_BOUGHT, 0); // Unmark as bought
-        db.update(SHOPPING_TABLE_NAME, cv, SHOPPING_COLUMN_ID + " = ?", new String[]{String.valueOf(id)});
+        cv.put(SHOPPING_COLUMN_BOUGHT, 0);
+        db.update(SHOPPING_TABLE_NAME, cv,
+                SHOPPING_COLUMN_ID + "=? AND " + KEY_USER_EMAIL + "=?",
+                new String[]{String.valueOf(id), userEmail});
     }
     public User loadUserByEmail(String email) {
         if (email == null || email.trim().isEmpty()) {
@@ -1721,8 +1656,6 @@ public class Database extends SQLiteOpenHelper {
 
         return user;
     }
-
-
     public int updatePassword(String email, String newPassword) {
         SQLiteDatabase db = this.getWritableDatabase();
 

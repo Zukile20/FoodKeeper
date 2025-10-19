@@ -19,28 +19,29 @@ import java.util.ArrayList;
 
 public class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapter.MyViewHolder> {
     private Context context;
-    private ArrayList itemName,itemQty;
-    private ArrayList<Integer> itemBought;// NEW
+    private ArrayList itemName, itemQty;
+    private ArrayList<Integer> itemBought;
     private ArrayList<String> itemId;
     private Database myDB;
+    private String userEmail; // Add userEmail field
 
-
-    public ShoppingListAdapter(Context context, ArrayList<String> itemName, ArrayList<String> itemQty, ArrayList<Integer> itemBought, ArrayList<String> itemId) {
+    public ShoppingListAdapter(Context context, ArrayList<String> itemName, ArrayList<String> itemQty,
+                               ArrayList<Integer> itemBought, ArrayList<String> itemId, String userEmail) {
         this.context = context;
         this.itemName = itemName;
         this.itemQty = itemQty;
         this.itemBought = itemBought;
         this.itemId = itemId;
+        this.userEmail = userEmail; // Store userEmail
         this.myDB = new Database(context);
     }
-
 
     @NonNull
     @Override
     public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        LayoutInflater inflater= LayoutInflater.from(context);
-        View view= inflater.inflate(R.layout.list_view,parent,false);
-        return  new MyViewHolder(view);
+        LayoutInflater inflater = LayoutInflater.from(context);
+        View view = inflater.inflate(R.layout.list_view, parent, false);
+        return new MyViewHolder(view);
     }
 
     @Override
@@ -62,11 +63,13 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapte
         holder.checkboxBought.setOnCheckedChangeListener((buttonView, isChecked1) -> {
             itemBought.set(position, isChecked1 ? 1 : 0);
             if (isChecked1) {
-                myDB.UpdateItemShoppingList(Integer.parseInt(itemId.get(position)));
+                // Pass userEmail to UpdateItemShoppingList
+                myDB.UpdateItemShoppingList(Integer.parseInt(itemId.get(position)), userEmail);
                 holder.item_Name.setPaintFlags(holder.item_Name.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
-                Toast.makeText(context, "Don’t forget to add items to your fridge!",Toast.LENGTH_LONG).show();
+                Toast.makeText(context, "Don't forget to add items to your fridge!", Toast.LENGTH_LONG).show();
             } else {
-                myDB.UpdateItemBackShoppingList(Integer.parseInt(itemId.get(position)));
+                // Pass userEmail to UpdateItemBackShoppingList
+                myDB.UpdateItemBackShoppingList(Integer.parseInt(itemId.get(position)), userEmail);
                 holder.item_Name.setPaintFlags(holder.item_Name.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
             }
         });
@@ -77,25 +80,22 @@ public class ShoppingListAdapter extends RecyclerView.Adapter<ShoppingListAdapte
         return itemName.size();
     }
 
-    public void updateList(ArrayList names,ArrayList Qty_s, ArrayList<Integer> bought){
-
+    public void updateList(ArrayList names, ArrayList Qty_s, ArrayList<Integer> bought) {
         this.itemName = names;
         this.itemQty = Qty_s;
-        this.itemBought=bought;
+        this.itemBought = bought;
         notifyDataSetChanged();
     }
 
-    public  class MyViewHolder extends RecyclerView.ViewHolder {
+    public class MyViewHolder extends RecyclerView.ViewHolder {
         TextView item_Name, item_Qty;
         CheckBox checkboxBought;
+
         public MyViewHolder(@NonNull View itemView) {
-           super(itemView);
-           item_Name= itemView.findViewById(R.id.item_name);
-           item_Qty=itemView.findViewById(R.id.item_qty);
-           checkboxBought = itemView.findViewById(R.id.item_checkbox);
+            super(itemView);
+            item_Name = itemView.findViewById(R.id.item_name);
+            item_Qty = itemView.findViewById(R.id.item_qty);
+            checkboxBought = itemView.findViewById(R.id.item_checkbox);
         }
-
     }
-
 }
-

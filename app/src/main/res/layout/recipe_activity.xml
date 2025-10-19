@@ -34,6 +34,7 @@
             android:layout_weight="1"
             android:gravity="center"
             android:text="@string/Recipe"
+            android:textColor="@color/black"
             android:textSize="24sp"
             android:textStyle="bold" />
 
