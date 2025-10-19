@@ -246,7 +246,7 @@ public class mealsViewActivity extends AppCompatActivity  {
 
         if(ACTIVITY_MODE==SELECTION_MODE)
         {
-            selectTitle.setText("Select "+ mealType);
+            selectTitle.setText("Select your "+ mealType.toLowerCase()+" meal");
             selectTitle.setVisibility(VISIBLE);
         }
         else

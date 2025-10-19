@@ -185,7 +185,6 @@ public class ItemsViewActivity extends AppCompatActivity {
                 startActivity(new Intent(ItemsViewActivity.this, AddItemActivity.class));
             }
         });
-        allTab.performClick();
     }
 
     private void loadCategories() {

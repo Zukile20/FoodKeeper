@@ -90,6 +90,7 @@ public class MealPlanActivity extends AppCompatActivity {
           requestIntent.putExtra("mealType","Breakfast");
           requestIntent.putExtra("ACTIVITY_MODE",1);
           launcher.launch(requestIntent);
+            finish();
         });
 
         lunchBtn.setOnClickListener(V ->
@@ -98,6 +99,7 @@ public class MealPlanActivity extends AppCompatActivity {
           requestIntent.putExtra("mealType","Lunch");
             requestIntent.putExtra("ACTIVITY_MODE",1);
             launcher.launch(requestIntent);
+            finish();
         });
 
         dinnerBtn.setOnClickListener(V ->
@@ -106,6 +108,7 @@ public class MealPlanActivity extends AppCompatActivity {
           requestIntent.putExtra("mealType","Dinner");
             requestIntent.putExtra("ACTIVITY_MODE",1);
             launcher.launch(requestIntent);
+            finish();
         });
 
         snackBtn.setOnClickListener(V ->
@@ -114,6 +117,7 @@ public class MealPlanActivity extends AppCompatActivity {
           requestIntent.putExtra("mealType","Snack");
             requestIntent.putExtra("ACTIVITY_MODE",1);
             launcher.launch(requestIntent);
+            finish();
         });
 
         updateSelectedDayText();

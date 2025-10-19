@@ -336,10 +336,10 @@ public class ProfileActivity extends AppCompatActivity {
         // Update buttons
         btnEdit.setVisibility(View.GONE);
         btnSave.setVisibility(View.VISIBLE);
-        btnCancel.setVisibility(View.VISIBLE);
+        btnCancel.setVisibility(View.GONE);
         btnChangePassword.setText("Cancel Password Change");
         btnChangePassword.setBackground(ContextCompat.getDrawable(this, R.drawable.grey_button));
-        btnChangePassword.setBackgroundTintList(ColorStateList.valueOf(Color.RED));
+        btnChangePassword.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.grey)));
         btnChangePassword.setTextColor(ContextCompat.getColor(this, R.color.white));
         titleHeader.setText("Change Password");
 
@@ -366,7 +366,7 @@ public class ProfileActivity extends AppCompatActivity {
                 ContextCompat.getColor(this, R.color.light_pink)
         ));
 
-        btnChangePassword.setTextColor(ContextCompat.getColor(this, R.color.dark_blue));
+        btnChangePassword.setTextColor(ContextCompat.getColor(this, R.color.blue));
         titleHeader.setText("My Profile");
 
         // Reset edit mode if it was active

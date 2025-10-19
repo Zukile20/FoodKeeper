@@ -26,6 +26,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.foodkeeper.FoodItem.FoodItem;
+import com.example.foodkeeper.FoodItem.ItemsViewActivity;
 import com.example.foodkeeper.R;
 import com.example.foodkeeper.SessionManager;
 
@@ -35,6 +36,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.List;
 
 public class CreateMealActivity extends AppCompatActivity implements FoodSelectionAdapter.OnItemSelectionChangeListener {
     com.example.foodkeeper.Database db ;
@@ -58,7 +60,6 @@ public class CreateMealActivity extends AppCompatActivity implements FoodSelecti
     private ActivityResultLauncher<Intent> resultLauncher;
     private ActivityResultLauncher<Intent> fullViewLauncher;
     private SessionManager session;
-
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -66,7 +67,7 @@ public class CreateMealActivity extends AppCompatActivity implements FoodSelecti
         db=   com.example.foodkeeper.Database.getInstance(this);
         session= new SessionManager(this);
         initializeViews();
-       initiaLizeData(db);
+        initiaLizeData(db);
         setupAdapter();
         fullViewLauncher = registerForActivityResult( new ActivityResultContracts.StartActivityForResult(), result->
                 {
@@ -273,6 +274,39 @@ public class CreateMealActivity extends AppCompatActivity implements FoodSelecti
         for (FoodItem item : FOOD_ITEMS) {
             String itemId = String.valueOf(item.getId());
             item.setChecked(selectedItemIds.contains(itemId));
+        }
+    }
+    @Override
+    protected void onResume() {
+        super.onResume();
+        refreshFoodItems();
+    }
+
+    private void refreshFoodItems() {
+        if (db != null && session != null) {
+            try {
+                ArrayList<String> selectedIds = new ArrayList<>();
+                if (foodItemAdapter != null) {
+                    selectedIds = foodItemAdapter.getSelectedItemIds();
+                }
+
+                List<FoodItem> freshItems = db.getUserFoodItems(session.getUserEmail());
+
+                for (FoodItem item : freshItems) {
+                    if (selectedIds.contains(String.valueOf(item.getId()))) {
+                        item.setChecked(true);
+                    }
+                }
+
+                if (foodItemAdapter != null) {
+                    foodItemAdapter.updateItems(freshItems);
+                }
+
+                updateCounter();
+
+            } catch (Exception e) {
+                Toast.makeText(this, "Error loading items", Toast.LENGTH_SHORT).show();
+            }
         }
     }
 }

@@ -28,7 +28,6 @@ public class FoodSelectionAdapter extends RecyclerView.Adapter<FoodSelectionAdap
     private Filter searchFilter;
     private OnItemSelectionChangeListener selectionChangeListener;
 
-    // Interface for selection change callbacks
     public interface OnItemSelectionChangeListener {
         void onSelectionChanged(int selectedCount);
         void onItemClick(FoodItem item, int position);
@@ -55,7 +54,6 @@ public class FoodSelectionAdapter extends RecyclerView.Adapter<FoodSelectionAdap
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         FoodItem item = filteredList.get(position);
 
-        // Set data
         holder.textView.setText(item.getName());
 
         byte[]  blobUrl = item.getImage();
@@ -64,21 +62,16 @@ public class FoodSelectionAdapter extends RecyclerView.Adapter<FoodSelectionAdap
                 .placeholder(R.drawable.image_placeholder)
                 .error(R.drawable.place_holder)
                 .into(holder.imgView);
-        //holder.imgView.setImageResource(item.getUri());
 
-        // Clear previous listener to prevent unwanted triggers
         holder.checkBox.setOnCheckedChangeListener(null);
 
         holder.checkBox.setChecked(item.getCheckState());
 
         holder.checkBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            // Update item state
             item.setChecked(isChecked);
 
-            // Update corresponding item in original list
             updateOriginalListCheckState(item, isChecked);
 
-            // Notify listener about selection change
             if (selectionChangeListener != null) {
                 selectionChangeListener.onSelectionChanged(getSelectedItemCount());
             }
@@ -89,10 +82,8 @@ public class FoodSelectionAdapter extends RecyclerView.Adapter<FoodSelectionAdap
             item.setChecked(newState);
            holder.checkBox.setChecked(newState);
 
-            // Update original list
             updateOriginalListCheckState(item, newState);
 
-            // Notify listeners
             if (selectionChangeListener != null) {
                 selectionChangeListener.onSelectionChanged(getSelectedItemCount());
                 selectionChangeListener.onItemClick(item, position);
@@ -121,9 +112,6 @@ public class FoodSelectionAdapter extends RecyclerView.Adapter<FoodSelectionAdap
         }
     }
 
-    /**
-     * Update the check state in the original list to maintain consistency
-     */
     private void updateOriginalListCheckState(FoodItem item, boolean isChecked) {
         for (FoodItem originalItem : originalList) {
             if (originalItem.getId()==item.getId()) {
@@ -133,13 +121,6 @@ public class FoodSelectionAdapter extends RecyclerView.Adapter<FoodSelectionAdap
         }
     }
 
-    /**
-     * Get all selected items
-     */
-
-    /**
-     * Get selected item IDs
-     */
     public ArrayList<String> getSelectedItemIds() {
         ArrayList<String> selectedIds = new ArrayList<>();
         for (FoodItem item : originalList) {
@@ -150,9 +131,6 @@ public class FoodSelectionAdapter extends RecyclerView.Adapter<FoodSelectionAdap
         return selectedIds;
     }
 
-    /**
-     * Get count of selected items
-     */
     public int getSelectedItemCount() {
         int count = 0;
         for (FoodItem item : originalList) {
@@ -162,9 +140,28 @@ public class FoodSelectionAdapter extends RecyclerView.Adapter<FoodSelectionAdap
         }
         return count;
     }
-    /**
-     * Set selections based on item IDs
-     */
+    public void updateItems(List<FoodItem> newItems) {
+        ArrayList<String> selectedIds = getSelectedItemIds();
+
+        originalList.clear();
+        originalList.addAll(newItems);
+
+        for (FoodItem item : originalList) {
+            if (selectedIds.contains(String.valueOf(item.getId()))) {
+                item.setChecked(true);
+            }
+        }
+
+        filteredList.clear();
+        filteredList.addAll(originalList);
+
+        notifyDataSetChanged();
+
+        if (selectionChangeListener != null) {
+            selectionChangeListener.onSelectionChanged(getSelectedItemCount());
+        }
+    }
+
     public void setSelectedItems(ArrayList<String> selectedItemIds) {
         if (selectedItemIds == null) return;
 
