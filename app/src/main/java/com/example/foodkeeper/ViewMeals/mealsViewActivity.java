@@ -28,7 +28,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.foodkeeper.Database;
 import com.example.foodkeeper.FoodkeeperUtils.DeleteConfirmationDialog;
-import com.example.foodkeeper.FoodkeeperUtils.SwipeRevealCallback;
 import com.example.foodkeeper.Meal.CreateMealActivity;
 import com.example.foodkeeper.Meal.Meal;
 import com.example.foodkeeper.Meal.UpdateMealActivity;
@@ -63,7 +62,7 @@ public class mealsViewActivity extends AppCompatActivity  {
     private String mealType;
 
     private ItemTouchHelper itemTouchHelper;
-    SwipeRevealCallback swipeRevealCallback;
+   // SwipeRevealCallback swipeRevealCallback;
 
     private int ACTIVITY_MODE =0;
     private final int SELECTION_MODE=1;
@@ -80,7 +79,7 @@ public class mealsViewActivity extends AppCompatActivity  {
         setUpSpinner();
         setupRecyclerView();
         setOnClickListeners();
-        setupSwipeToDelete();
+       // setupSwipeToDelete();
         loadMeals();
     }
     public void getMealType()
@@ -92,23 +91,7 @@ public class mealsViewActivity extends AppCompatActivity  {
     private void setupRecyclerView() {
         allMeals = new ArrayList<>();
         filteredMeals = new ArrayList<>();
-        mealAdapter = new MealAdapter(this, filteredMeals, new MealAdapter.OnItemActionListener() {
-            @Override
-            public void onItemEdit(Meal meal, int position) {
-                Intent intent = new Intent(mealsViewActivity.this, UpdateMealActivity.class);
-                intent.putExtra("EditMeal", meal.getMealID());
-                startActivity(intent);
-            }
-
-            @Override
-            public void onItemDelete(Meal meal, int position) {
-                try {
-                    db.deleteMeal(meal);
-                    showDeleteConfirmation(meal,position,"");
-                } catch (Exception e) {
-                    showDeleteConfirmation(meal,position,e.getMessage());
-                }
-            }
+        mealAdapter = new MealAdapter( filteredMeals, new MealAdapter.OnMealActionListener() {
             public void showDeleteConfirmation(Meal meal,int position,String message) {
                 if (position >= 0 && position < filteredMeals.size()) {
 
@@ -119,7 +102,6 @@ public class mealsViewActivity extends AppCompatActivity  {
                         public void onDeleteConfirmed() {
                             db.deleteMealPlansForMeal((int) meal.getMealID());
 
-                            // Then delete the meal
                             try {
                                 db.deleteMeal(meal);
                                 mealAdapter.notifyItemRemoved(position);
@@ -141,7 +123,6 @@ public class mealsViewActivity extends AppCompatActivity  {
                         @Override
                         public void onDeleteCancelled() {
                             mealAdapter.notifyItemChanged(position);
-                            mealAdapter.closeSwipeButtons();
                         }
                     });
 
@@ -150,34 +131,21 @@ public class mealsViewActivity extends AppCompatActivity  {
 
             }
 
-            private void showMealInUseDialog(Meal meal, int position, String message) {
-                new AlertDialog.Builder(mealsViewActivity.this)
-                        .setTitle("Cannot Delete Meal")
-                        .setMessage(message + ". Do you want to remove this meal from all meal plans and delete it?")
-                        .setPositiveButton("Delete All", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                // Remove meal from all meal plans first
-                                db.deleteMealPlansForMeal((int) meal.getMealID());
+            @Override
+            public void onEdit(Meal meal, int position) {
+                Intent intent = new Intent(mealsViewActivity.this, UpdateMealActivity.class);
+                intent.putExtra("EditMeal", meal.getMealID());
+                startActivity(intent);
+            }
 
-                                // Then delete the meal
-                                try {
-                                    db.deleteMeal(meal);
-                                    filteredMeals.remove(position);
-                                    mealAdapter.notifyItemRemoved(position);
-                                    Toast.makeText(mealsViewActivity.this,
-                                            "Meal removed from meal plans and deleted",
-                                            Toast.LENGTH_SHORT).show();
-                                } catch (Exception e) {
-                                    Toast.makeText(mealsViewActivity.this,
-                                            "Error: " + e.getMessage(),
-                                            Toast.LENGTH_SHORT).show();
-                                }
-                            }
-                        })
-                        .setNegativeButton("Cancel", null)
-                        .setIcon(android.R.drawable.ic_dialog_alert)
-                        .show();
+            @Override
+            public void onDelete(Meal meal, int position) {
+                try {
+                    db.deleteMeal(meal);
+                    showDeleteConfirmation(meal,position,"");
+                } catch (Exception e) {
+                    showDeleteConfirmation(meal,position,e.getMessage());
+                }
             }
 
             @Override
@@ -200,33 +168,17 @@ public class mealsViewActivity extends AppCompatActivity  {
 
             }
         });
-
         mealsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mealsRecyclerView.setAdapter(mealAdapter);
+
+        // Close open items when scrolling
         mealsRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
                 if (newState == RecyclerView.SCROLL_STATE_DRAGGING) {
-                    swipeRevealCallback.closeOpenSwipe(mealsRecyclerView);
+                    mealAdapter.closeAllItems();
                 }
             }
-        });
-        mealsRecyclerView.setOnTouchListener((v, event) -> {
-            if (event.getAction() == MotionEvent.ACTION_UP) {
-                float x = event.getX();
-                float y = event.getY();
-                return swipeRevealCallback.handleButtonClick(mealsRecyclerView, x, y);
-            }
-            return false;
-        });
-        View rootLayout = findViewById(R.id.rootLayout);
-
-        rootLayout.setOnTouchListener((v, event) -> {
-            // Only close swipe on ACTION_DOWN
-            if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                swipeRevealCallback.closeOpenSwipe(mealsRecyclerView);
-            }
-            return false; // allow event to pass through to children
         });
 
     }
@@ -254,8 +206,90 @@ public class mealsViewActivity extends AppCompatActivity  {
             selectTitle.setVisibility(GONE);
 
         }
-
     }
+//    private void setupSwipeToDelete() {
+//        swipeRevealCallback = new SwipeRevealCallback(new SwipeRevealCallback.SwipeActionListener() {
+//            @Override
+//            public void onEdit(int position) {
+//                if (position < 0 || position >= filteredMeals.size()) {
+//                    return;
+//                }
+//
+//                Meal meal = filteredMeals.get(position);
+//                if (swipeRevealCallback != null) {
+//                    swipeRevealCallback.closeSwipe();
+//                }
+//                    Intent intent = new Intent(mealsViewActivity.this, UpdateMealActivity.class);
+//                    intent.putExtra("EditMeal", meal.getMealID());
+//                    startActivity(intent);
+//            }
+//            public void showDeleteConfirmation(Meal meal,int position,String message) {
+//                if (position >= 0 && position < filteredMeals.size()) {
+//
+//                    DeleteConfirmationDialog dialog = DeleteConfirmationDialog.newInstance("meal",message,"Delete all");
+//
+//                    dialog.setOnDeleteConfirmListener(new DeleteConfirmationDialog.OnDeleteConfirmListener() {
+//                        @Override
+//                        public void onDeleteConfirmed() {
+//                            db.deleteMealPlansForMeal((int) meal.getMealID());
+//
+//                            // Then delete the meal
+//                            try {
+//                                db.deleteMeal(meal);
+//                                mealAdapter.notifyItemRemoved(position);
+//                                Toast.makeText(mealsViewActivity.this,
+//                                        "Meal removed from meal plans and deleted",
+//                                        Toast.LENGTH_SHORT).show();
+//                            } catch (Exception e) {
+//                                Toast.makeText(mealsViewActivity.this,
+//                                        "Error: " + e.getMessage(),
+//                                        Toast.LENGTH_SHORT).show();
+//                            }
+//                            filteredMeals.remove(position);
+//                            mealAdapter.notifyItemRemoved(position);
+//                            mealAdapter.notifyItemRangeChanged(position, filteredMeals.size());
+//                            updateEmptyState();// if the meals now are empty
+//                            Toast.makeText(mealsViewActivity.this, "Meal deleted", Toast.LENGTH_SHORT).show();
+//                        }
+//
+//                        @Override
+//                        public void onDeleteCancelled() {
+//                            mealAdapter.notifyItemChanged(position);
+//                        }
+//                    });
+//
+//                    dialog.show(mealsViewActivity.this.getSupportFragmentManager(), "delete_dialog");
+//                }
+//
+//            }
+//
+//
+//            @Override
+//            public void onDelete(int position) {
+//                if (position < 0 || position >= filteredMeals.size()) {
+//                    return;
+//                }
+//
+//                Meal meal = filteredMeals.get(position);
+//
+//                // Close the swipe action
+//                if (swipeRevealCallback != null) {
+//                    swipeRevealCallback.closeSwipe();
+//                }
+//
+//                // Show confirmation dialog
+//                try {
+//                    db.deleteMeal(meal);
+//                    showDeleteConfirmation(meal,position,"");
+//                } catch (Exception e) {
+//                    showDeleteConfirmation(meal,position,e.getMessage()+". Do you want to remove this meal from all meal plans and delete it?");
+//                }
+//            }
+//        });
+//
+//        itemTouchHelper = new ItemTouchHelper(swipeRevealCallback);
+//        itemTouchHelper.attachToRecyclerView(mealsRecyclerView);
+//    }
 
     private  void setUpSpinner()
     {
@@ -348,12 +382,6 @@ public class mealsViewActivity extends AppCompatActivity  {
                 e.printStackTrace();
             }
         }).start();
-    }
-
-    private void setupSwipeToDelete() {
-        swipeRevealCallback = new SwipeRevealCallback(mealAdapter);
-        itemTouchHelper = new ItemTouchHelper(swipeRevealCallback);
-        itemTouchHelper.attachToRecyclerView(mealsRecyclerView);
     }
     private void showLoadingState() {
         loadingLayout.setVisibility(VISIBLE);

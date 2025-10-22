@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.example.foodkeeper.FoodkeeperUtils.SwipeRevealLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/swipe_container"
     android:layout_width="match_parent"
@@ -10,35 +10,64 @@
 
     <!-- Hidden Action Buttons (Background Layer) -->
     <LinearLayout
-        android:id="@+id/action_buttons"
+        android:id="@+id/background_layout"
         android:layout_width="wrap_content"
-        android:layout_height="80dp"
-        android:layout_marginStart="8dp"
-        android:orientation="horizontal">
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        android:orientation="horizontal"
+        android:visibility="visible">
 
-        <ImageButton
-            android:id="@+id/delete_btn"
-            android:layout_width="70dp"
-            android:layout_height="80dp"
+        <!-- Edit Button -->
+        <LinearLayout
+            android:id="@+id/edit_button"
+            android:layout_width="80dp"
+            android:layout_height="match_parent"
+            android:background="@color/blue"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_edit"
+                app:tint="@android:color/white" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="Edit"
+                android:textColor="@color/white"
+                android:textSize="12sp" />
+        </LinearLayout>
+
+        <!-- Delete Button -->
+        <LinearLayout
+            android:id="@+id/delete_button"
+            android:layout_width="80dp"
+            android:layout_height="match_parent"
             android:background="@color/red"
-            android:contentDescription="@string/delete"
             android:clickable="true"
-            android:src="@android:drawable/ic_menu_delete"
-            android:scaleType="center"
-            app:tint="@android:color/white" />
+            android:focusable="true"
+            android:gravity="center"
+            android:orientation="vertical">
 
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/bin"
+                app:tint="@color/white" />
 
-        <ImageButton
-            android:id="@+id/edit_btn"
-            android:layout_width="70dp"
-            android:layout_height="80dp"
-            android:background="#38A169"
-            android:clickable="true"
-            android:contentDescription="Share"
-            android:scaleType="center"
-            android:src="@drawable/ic_edit"
-            app:tint="@android:color/white" />
-
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="Delete"
+                android:textColor="@color/white"
+                android:textSize="12sp" />
+        </LinearLayout>
     </LinearLayout>
 
     <!-- Main Content Card (Foreground Layer) -->
@@ -94,16 +123,8 @@
                 android:textStyle="bold" />
 
 
-
         </LinearLayout>
 
 
-
     </androidx.cardview.widget.CardView>
-    <Button
-        android:id="@+id/button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:text="Button" />
-</FrameLayout>
+</com.example.foodkeeper.FoodkeeperUtils.SwipeRevealLayout>
