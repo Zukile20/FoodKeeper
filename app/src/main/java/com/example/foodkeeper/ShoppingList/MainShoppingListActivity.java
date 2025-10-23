@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.foodkeeper.Database;
+import com.example.foodkeeper.NotificationHelper;
 import com.example.foodkeeper.R;
 import com.example.foodkeeper.SessionManager;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -32,7 +33,7 @@ public class MainShoppingListActivity extends AppCompatActivity {
 
     EditText Name;
     EditText QTY;
-    Button add;
+    Button add,btnPlus,btnMinus;
     Database myDB;
     ArrayList<String> itemId,itemName,itemQty;
     ArrayList<Integer> itemBought;
@@ -93,10 +94,15 @@ public class MainShoppingListActivity extends AppCompatActivity {
         Name = mView.findViewById(R.id.ItemName);
         QTY = mView.findViewById(R.id.ItemQty);
         add = mView.findViewById(R.id.Add);
+        btnMinus=mView.findViewById(R.id.btn_minus);
+        btnPlus=mView.findViewById(R.id.btn_plus);
 
         mBuilder.setView(mView);
         AlertDialog dialog = mBuilder.create();
         dialog.show();
+
+        btnPlus.setOnClickListener(v -> incrementQuantity());
+        btnMinus.setOnClickListener(v -> decrementQuantity());
 
         add.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -202,5 +208,42 @@ public class MainShoppingListActivity extends AppCompatActivity {
             }
         });
         helper.attachToRecyclerView(recyclerView);
+    }
+
+    private void decrementQuantity() {
+        String qtyText = QTY.getText().toString().trim();
+        int currentQuantity = 0;
+        if (!qtyText.isEmpty()) {
+            try {
+                currentQuantity = Integer.parseInt(qtyText);
+            } catch (NumberFormatException e) {
+                currentQuantity = 0;
+            }
+        }
+
+        if (currentQuantity > 0) {
+            currentQuantity--;
+            QTY.setText(String.valueOf(currentQuantity));
+        } else {
+            Toast.makeText(this, "Quantity cannot be less than 0", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void incrementQuantity() {
+        String qtyText = QTY.getText().toString().trim();
+        int currentQuantity = 0;
+        if (!qtyText.isEmpty()) {
+            try {
+                currentQuantity = Integer.parseInt(qtyText);
+            } catch (NumberFormatException e) {
+                currentQuantity = 0;
+            }
+        }
+        if (currentQuantity < 999) {
+            currentQuantity++;
+            QTY.setText(String.valueOf(currentQuantity));
+        } else {
+            Toast.makeText(this, "Maximum quantity reached", Toast.LENGTH_SHORT).show();
+        }
     }
 }

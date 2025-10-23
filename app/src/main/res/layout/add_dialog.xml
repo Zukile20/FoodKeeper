@@ -31,25 +31,86 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView2" />
 
-    <EditText
-        android:id="@+id/ItemQty"
-        android:layout_width="0dp"
+    <TextView
+        android:id="@+id/quantityLabel"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:ems="10"
-        android:hint="Item Qty"
-        android:inputType="number"
-        android:maxLength="3"
-        android:minHeight="48dp"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="16dp"
+        android:text="Quantity:"
+        android:textSize="16sp"
+        android:textColor="@color/black"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/ItemName" />
+        app:layout_constraintTop_toBottomOf="@+id/ItemName"
+        app:layout_constraintBottom_toBottomOf="@+id/quantityContainer" />
+
+    <LinearLayout
+        android:id="@+id/quantityContainer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="12dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:background="@drawable/quantity_bg"
+        app:layout_constraintStart_toEndOf="@+id/quantityLabel"
+        app:layout_constraintTop_toBottomOf="@+id/ItemName">
+
+        <Button
+            android:id="@+id/btn_minus"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:text="-"
+            android:textSize="20sp"
+            android:textColor="@color/black"
+            android:stateListAnimator="@null"
+            android:elevation="0dp"
+            android:padding="0dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:insetLeft="0dp"
+            android:insetRight="0dp"
+            android:minWidth="0dp"
+            android:minHeight="0dp"
+            android:backgroundTint="@color/white"/>
+
+        <EditText
+            android:id="@+id/ItemQty"
+            android:layout_width="43dp"
+            android:layout_height="wrap_content"
+            android:hint="0"
+            android:ems="10"
+            android:inputType="number"
+            android:maxLength="3"
+            android:minHeight="48dp"
+            android:textSize="16sp"
+            android:textColor="@color/black"
+            android:gravity="center"
+            android:padding="8dp"/>
+
+        <Button
+            android:id="@+id/btn_plus"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:text="+"
+            android:textSize="20sp"
+            android:textColor="@color/mainBlue"
+            android:stateListAnimator="@null"
+            android:elevation="0dp"
+            android:padding="0dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:insetLeft="0dp"
+            android:insetRight="0dp"
+            android:minWidth="0dp"
+            android:minHeight="0dp"
+            android:backgroundTint="@color/white"/>
+    </LinearLayout>
 
     <Button
         android:id="@+id/Add"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="24dp"
         android:background="@drawable/rounded_button"
         android:minWidth="120dp"
         android:minHeight="48dp"
@@ -60,6 +121,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/ItemQty" />
+        app:layout_constraintTop_toBottomOf="@+id/quantityContainer" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
