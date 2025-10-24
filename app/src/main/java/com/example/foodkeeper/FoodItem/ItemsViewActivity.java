@@ -1,6 +1,9 @@
 package com.example.foodkeeper.FoodItem;
 
 import android.annotation.SuppressLint;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
@@ -21,6 +24,7 @@ import com.example.foodkeeper.CustomSpinnerAdapter;
 import com.example.foodkeeper.Database;
 import com.example.foodkeeper.ExpiringActivity;
 
+import com.example.foodkeeper.ExpiryCheckReceiver;
 import com.example.foodkeeper.LoginActivity;
 import com.example.foodkeeper.LandingPageActivity;
 import com.example.foodkeeper.MenuActivity;
@@ -60,10 +64,23 @@ public class ItemsViewActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_items_view);
 
+        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        Intent intent = new Intent(this, ExpiryCheckReceiver.class);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_IMMUTABLE);
+
+        long interval = AlarmManager.INTERVAL_DAY;
+        long triggerAt = System.currentTimeMillis() + 5000;
+
+        alarmManager.setInexactRepeating(
+                AlarmManager.RTC_WAKEUP,
+                triggerAt,
+                interval,
+                pendingIntent
+        );
+
         db = new Database(this);
         session = new SessionManager(this);
 
-        // Load categories from database
         loadCategories();
 
         recyclerView = findViewById(R.id.recyclerView);
@@ -257,7 +274,6 @@ public class ItemsViewActivity extends AppCompatActivity {
             hideEmptyState();
             allFoodItems = userItems;
             foodItemAdapter.updateData(new ArrayList<>(allFoodItems));
-            checkAndNotifyExpiringItems(userItems);
         }
     }
 
@@ -302,32 +318,6 @@ public class ItemsViewActivity extends AppCompatActivity {
             showEmptyState("No items expiring within the next 3 days");
         } else {
             hideEmptyState();
-        }
-    }
-
-    private void checkAndNotifyExpiringItems(List<FoodItem> items) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.HOUR_OF_DAY, 0);
-        calendar.set(Calendar.MINUTE, 0);
-        calendar.set(Calendar.SECOND, 0);
-        calendar.set(Calendar.MILLISECOND, 0);
-        Date today = calendar.getTime();
-
-        calendar.add(Calendar.DAY_OF_YEAR, 3);
-        Date thresholdDate = calendar.getTime();
-
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
-
-        for (FoodItem item : items) {
-            try {
-                Date expiryDate = dateFormat.parse(item.getExpiryDate().trim());
-
-                if (expiryDate != null && !expiryDate.before(today) && !expiryDate.after(thresholdDate)) {
-                    NotificationHelper.showExpiringItemNotification(this, item);
-                }
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
         }
     }
 

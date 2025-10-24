@@ -359,11 +359,37 @@ public class EditItemActivity extends AppCompatActivity {
         String expiryDate = edExpiryDate.getText().toString().trim();
         int quantity = Integer.parseInt(tvQuantity.getText().toString());
 
-        if(name.isEmpty() || category.isEmpty() || expiryDate.isEmpty() || quantity <=0){
-            Toast.makeText(this, "Please fill in all details", Toast.LENGTH_SHORT).show();
+        boolean isValid = true;
+
+        if (name.isEmpty()) {
+            edName.setError("Item name is required");
+            isValid = false;
+        }
+
+        if (category.isEmpty()) {
+            edCategory.setError("Category is required");
+            isValid = false;
+        }
+
+        if (expiryDate.isEmpty()) {
+            edExpiryDate.setError("Expiry date is required");
+            isValid = false;
+        }
+
+        if (!isValid) {
+            Toast.makeText(this, "Please correct errors", Toast.LENGTH_SHORT).show();
             return;
         }
 
+        try {
+            if (quantity <= 0) {
+                Toast.makeText(this, "Quantity must be greater than 0", Toast.LENGTH_SHORT).show();
+                return;
+            }
+        } catch (NumberFormatException e) {
+            Toast.makeText(this, "Invalid quantity", Toast.LENGTH_SHORT).show();
+            return;
+        }
         byte[] imageBytes = null;
         if (selectedImage != null) {
             ByteArrayOutputStream stream = new ByteArrayOutputStream();

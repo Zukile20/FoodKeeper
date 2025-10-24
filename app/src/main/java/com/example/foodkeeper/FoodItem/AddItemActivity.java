@@ -106,10 +106,38 @@ public class AddItemActivity extends AppCompatActivity {
             String expiryDate = edExpiryDate.getText().toString();
             int quantity = Integer.parseInt(tvQuantity.getText().toString());
 
-            if(name.isEmpty() || category.isEmpty() || expiryDate.isEmpty() || quantity <=0){
-                Toast.makeText(this, "Please fill in all details", Toast.LENGTH_SHORT).show();
+            boolean isValid = true;
+
+            if (name.isEmpty()) {
+                edName.setError("Item name is required");
+                isValid = false;
+            }
+
+            if (category.isEmpty()) {
+                edCategory.setError("Category is required");
+                isValid = false;
+            }
+
+            if (expiryDate.isEmpty()) {
+                edExpiryDate.setError("Expiry date is required");
+                isValid = false;
+            }
+
+            if (!isValid) {
+                Toast.makeText(this, "Please correct errors", Toast.LENGTH_SHORT).show();
                 return;
             }
+
+            try {
+                if (quantity <= 0) {
+                    Toast.makeText(this, "Quantity must be greater than 0", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+            } catch (NumberFormatException e) {
+                Toast.makeText(this, "Invalid quantity", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
 
             byte[] imageBytes = null;
             if (selectedImage != null) {
@@ -120,13 +148,7 @@ public class AddItemActivity extends AppCompatActivity {
 
             int categoryId = findCategoryIdByName(category);
 
-            long added = db.addFoodItem(new FoodItem(name, String.valueOf(categoryId), expiryDate, quantity, imageBytes),session.getUserEmail());
-            if(added > 0) {
-                Toast.makeText(this, "Food item added successfully", Toast.LENGTH_SHORT).show();
-                startActivity(new Intent(this, ItemsViewActivity.class));
-            } else {
-                Toast.makeText(this, "Failed to add food item", Toast.LENGTH_SHORT).show();
-            }
+            db.addFoodItem(new FoodItem(name, String.valueOf(categoryId), expiryDate, quantity, imageBytes),session.getUserEmail());
         });
 
         backBtn.setOnClickListener(v -> {

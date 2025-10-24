@@ -7,6 +7,8 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Patterns;
 import android.view.View;
 import android.widget.Button;
@@ -112,37 +114,77 @@ public class RegisterActivity extends AppCompatActivity {
         String fridgeSizeStr = edFridgeSize.getText().toString();
         String fridgeDescription = edFridgeDescription.getText().toString();
 
-        if(name.length() == 0 || surname.length() == 0 || email.length() == 0 ||
-                password.length() == 0 || confirm.length() == 0 ||
-                fridgeBrand.length() == 0 || fridgeModel.length() == 0 || fridgeSizeStr.length() == 0) {
-            Toast.makeText(getApplicationContext(), "Please fill in all the details", Toast.LENGTH_SHORT).show();
+        boolean isValid = true;
+
+        if (name.isEmpty()) {
+            edName.setError("Name is required");
+            isValid = false;
+        }
+        if (surname.isEmpty()) {
+            edSurname.setError("Surname is required");
+            isValid = false;
+        }
+        if (email.isEmpty()) {
+            edEmail.setError("Email is required");
+            isValid = false;
+        }
+        if (phoneStr.isEmpty()) {
+            edPhone.setError("Phone number is required");
+            isValid = false;
+        }
+        if (password.isEmpty()) {
+            edPassword.setError("Password is required");
+            isValid = false;
+        }
+        if (confirm.isEmpty()) {
+            edConfirm.setError("Please confirm your password");
+            isValid = false;
+        }
+        if (fridgeBrand.isEmpty()) {
+            edFridgeBrand.setError("Fridge brand is required");
+            isValid = false;
+        }
+        if (fridgeModel.isEmpty()) {
+            edFridgeModel.setError("Fridge model is required");
+            isValid = false;
+        }
+        if (fridgeSizeStr.isEmpty()) {
+            edFridgeSize.setError("Fridge size is required");
+            isValid = false;
+        }
+        if (fridgeDescription.isEmpty()) {
+            edFridgeDescription.setError("Fridge description is required");
+            isValid = false;
+        }
+
+        if (!isValid) {
+            Toast.makeText(this, "Please correct errors", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        if(!password.equals(confirm)) {
-            Toast.makeText(getApplicationContext(), "Passwords do not match", Toast.LENGTH_SHORT).show();
+        if (!isValidEmail(email)) {
+            edEmail.setError("Invalid email format");
             return;
         }
 
         if (!phoneStr.matches("\\d+")) {
-            Toast.makeText(getApplicationContext(), "Please enter a valid phone number", Toast.LENGTH_SHORT).show();
+            edPhone.setError("Phone number must contain only digits");
             return;
         }
 
-        if(!isValidPassword(password)) {
-            Toast.makeText(getApplicationContext(),
-                    "Password must be at least 8 characters with letter, digit and special symbol",
-                    Toast.LENGTH_SHORT).show();
+        if (!isValidPassword(password)) {
+            edPassword.setError("Password must be at least 8 chars with a letter, digit, and symbol");
             return;
         }
 
-        if(!isValidEmail(email)){
-            Toast.makeText(getApplicationContext(), "Please enter a valid email address", Toast.LENGTH_SHORT).show();
+        if (!password.equals(confirm)) {
+            edConfirm.setError("Passwords do not match");
             return;
         }
 
-        if(isEmailExists(email)) {
-            Toast.makeText(getApplicationContext(), "Email already registered", Toast.LENGTH_SHORT).show();
+        if (isEmailExists(email)) {
+            edEmail.setError("Email already registered");
+            Toast.makeText(this, "Email already exists, please log in", Toast.LENGTH_SHORT).show();
             Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
             intent.putExtra("USER_EMAIL", email);
             startActivity(intent);

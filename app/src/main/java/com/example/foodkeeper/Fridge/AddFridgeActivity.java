@@ -185,15 +185,26 @@ public class AddFridgeActivity extends AppCompatActivity {
         String brand = brandEditText.getText().toString().trim();
         String model = modelEditText.getText().toString().trim();
         String description = descriptionEditText.getText().toString().trim();
-        String sizeStr = numberEditText.getText().toString().trim();
 
-        if (brand.isEmpty() || model.isEmpty()) {
-            Toast.makeText(this, "Please fill in brand and model", Toast.LENGTH_SHORT).show();
-            return;
+        boolean valid = true;
+
+        if (brand.isEmpty()) {
+            brandEditText.setError("Brand is required");
+            valid = false;
         }
 
-        if(fridgeSize <= 0){
-            Toast.makeText(this, "Size must be greater than 0", Toast.LENGTH_SHORT).show();
+        if (model.isEmpty()) {
+            modelEditText.setError("Model is required");
+            valid = false;
+        }
+
+        if (fridgeSize <= 0) {
+            numberEditText.setError("Size must be greater than 0");
+            valid = false;
+        }
+
+        if (!valid) {
+            Toast.makeText(this, "Please correct the errors", Toast.LENGTH_SHORT).show();
             return;
         }
 
