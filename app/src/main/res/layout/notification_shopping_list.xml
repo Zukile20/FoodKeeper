@@ -22,16 +22,6 @@
             app:tint="@color/grey" />
 
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginBottom="8dp"
-            android:text="Add to Shopping List?"
-            android:textColor="@color/black"
-            android:textSize="20sp"
-            android:textStyle="bold" />
-
-        <TextView
             android:id="@+id/dialog_message"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -40,7 +30,8 @@
             android:gravity="center"
             android:text="Would you like to add this item to your shopping list?"
             android:textColor="@color/black"
-            android:textSize="14sp" />
+            android:textSize="18sp"
+            android:textStyle="bold" />
 
         <LinearLayout
             android:layout_width="match_parent"

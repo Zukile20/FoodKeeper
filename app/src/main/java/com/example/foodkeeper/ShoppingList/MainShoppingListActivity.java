@@ -50,14 +50,11 @@ public class MainShoppingListActivity extends AppCompatActivity {
         sessionManager = new SessionManager(this);
         userEmail = sessionManager.getUserEmail();
 
-        if (userEmail == null || userEmail.isEmpty()) {
-            Toast.makeText(this, "User not logged in", Toast.LENGTH_SHORT).show();
-            finish();
-            return;
-        }
 
         iniViews();
         setupListeners();
+
+
         storedDataInArrays();
         customAdapter = new ShoppingListAdapter(MainShoppingListActivity.this, itemName, itemQty, itemBought, itemId, userEmail);
         recyclerView.setAdapter(customAdapter);
@@ -65,6 +62,11 @@ public class MainShoppingListActivity extends AppCompatActivity {
         deleteItem();
 
         updateEmptyState();
+        int mode= getIntent().getIntExtra("notificationAdd",0);
+        if(mode==1)
+        {
+            showAddItemDialog();
+        }
     }
 
     private void iniViews(){

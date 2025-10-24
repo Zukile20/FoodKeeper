@@ -1,12 +1,17 @@
 package com.example.foodkeeper.LandingPage;
 
+import android.app.Dialog;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.view.View;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.activity.result.ActivityResultLauncher;
@@ -30,6 +35,7 @@ import com.example.foodkeeper.Recipe.RecipeActivity;
 import com.example.foodkeeper.Recipe.RecipeDetailsActivity;
 import com.example.foodkeeper.FoodItem.SearchActivity;
 import com.example.foodkeeper.Register.SessionManager;
+import com.example.foodkeeper.ShoppingList.MainShoppingListActivity;
 import com.example.foodkeeper.User;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -49,8 +55,8 @@ public class LandingPageActivity extends AppCompatActivity {
     private MealAdapterLanding adapter;
     private Database database;
     private SessionManager sess;
-    ActivityResultLauncher<Intent> launcher;
     User user;
+
 
 
     @Override
@@ -64,6 +70,8 @@ public class LandingPageActivity extends AppCompatActivity {
         database = new Database(this);
         sess= new SessionManager(this);
         user= database.loadUserByEmail(sess.getUserEmail());
+
+        handleNotificationIntent(getIntent());
 
         // Initialize RecyclerViews
         recipesView = findViewById(R.id.recipesView);
@@ -204,7 +212,6 @@ public class LandingPageActivity extends AppCompatActivity {
         mealsView.setAdapter(adapter);
     }
 
-
     @Override
     protected void onResume() {
         super.onResume();
@@ -255,6 +262,48 @@ public class LandingPageActivity extends AppCompatActivity {
         // Close database connection if needed
         if (database != null) {
             database.close();
+        }
+    }
+
+    public void showAddToShoppingListDialog() {
+        // Create dialog
+        Dialog dialog = new Dialog(this);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.notification_shopping_list);
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        dialog.setCancelable(true);
+
+        Button btnCancel = dialog.findViewById(R.id.btn_cancel);
+        Button btnAdd = dialog.findViewById(R.id.btn_add);
+
+        // Cancel button
+        btnCancel.setOnClickListener(v -> {
+            dialog.dismiss();
+        });
+
+        // Add button
+        btnAdd.setOnClickListener(v -> {
+                Intent intent = new Intent(this, MainShoppingListActivity.class);
+                intent.putExtra("notificationAdd",1);
+                startActivity(intent);
+            dialog.dismiss();
+        });
+
+        dialog.show();
+    }
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+        handleNotificationIntent(intent);
+    }
+
+    private void handleNotificationIntent(Intent intent) {
+        if (intent != null && intent.hasExtra("show_shopping_dialog")) {
+            boolean showDialog = intent.getBooleanExtra("show_shopping_dialog", false);
+            if (showDialog) {
+                showAddToShoppingListDialog();
+            }
         }
     }
 

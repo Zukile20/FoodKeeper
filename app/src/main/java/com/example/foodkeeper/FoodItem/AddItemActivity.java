@@ -25,6 +25,8 @@ import com.example.foodkeeper.FoodItem.view_items.ItemsViewActivity;
 import com.example.foodkeeper.FoodkeeperUtils.Database;
 
 import com.example.foodkeeper.R;
+import com.example.foodkeeper.Register.LoginActivity;
+import com.example.foodkeeper.Register.RegisterActivity;
 import com.example.foodkeeper.Register.SessionManager;
 import com.google.android.material.imageview.ShapeableImageView;
 import com.google.android.material.textfield.TextInputLayout;
@@ -152,6 +154,7 @@ public class AddItemActivity extends AppCompatActivity {
             int categoryId = findCategoryIdByName(category);
 
             db.addFoodItem(new FoodItem(name, String.valueOf(categoryId), expiryDate, quantity, imageBytes),session.getUserEmail());
+            startActivity(new Intent(AddItemActivity.this, ItemsViewActivity.class));
         });
 
         backBtn.setOnClickListener(v -> {

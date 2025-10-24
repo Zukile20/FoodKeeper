@@ -36,12 +36,26 @@ public class NotificationHelper {
     public static void showLowStockNotification(Context context, FoodItem item) {
         NotificationManager notificationManager = createNotificationChannels(context);
 
-        NotificationCompat.Builder builder = createBaseNotification(
+        // Create intent with extra to trigger the dialog
+        Intent intent = new Intent(context, LandingPageActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        intent.putExtra("show_shopping_dialog", true);
+
+        PendingIntent pendingIntent = PendingIntent.getActivity(
                 context,
-                LOW_STOCK_CHANNEL_ID,
-                "Low Stock!",
-                item.getName() + " is running low"
+                generateNotificationId(item, "LOW_STOCK"), // Use unique request code
+                intent,
+                PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT
         );
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, LOW_STOCK_CHANNEL_ID)
+                .setSmallIcon(R.drawable.ic_notification)
+                .setContentTitle("Low Stock!")
+                .setContentText(item.getName() + " is running low")
+                .setContentIntent(pendingIntent)
+                .setAutoCancel(true)
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setCategory(NotificationCompat.CATEGORY_REMINDER);
 
         addCustomView(context, builder, item, "Low Stock!",
                 item.getName() + " is running low");
