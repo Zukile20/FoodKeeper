@@ -146,7 +146,7 @@ public class ExpiringActivity extends AppCompatActivity {
     private void showItemDetails(FoodItem selectedItem) {
         Intent intent = new Intent(this, ViewAnItemActivity.class);
         intent.putExtra("foodItem", selectedItem);
-        startActivity(intent);
+        startActivityForResult(intent, 1001);
         Toast.makeText(this, selectedItem.getName() + " clicked", Toast.LENGTH_SHORT).show();
     }
     private void loadSoonToExpireItems() {
@@ -197,8 +197,20 @@ public class ExpiringActivity extends AppCompatActivity {
         emptyState.setVisibility(View.GONE);
     }
     @Override
+    protected void onResume() {
+        super.onResume();
+        loadSoonToExpireItems();
+    }
+    @Override
     protected void onDestroy() {
         db.close();
         super.onDestroy();
+    }
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == 1001 && resultCode == RESULT_OK) {
+            loadSoonToExpireItems();
+        }
     }
 }

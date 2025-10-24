@@ -69,7 +69,7 @@ public class ItemsViewActivity extends AppCompatActivity {
         PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_IMMUTABLE);
 
         long interval = AlarmManager.INTERVAL_DAY;
-        long triggerAt = System.currentTimeMillis() + 5000;
+        long triggerAt = System.currentTimeMillis() + 5;
 
         alarmManager.setInexactRepeating(
                 AlarmManager.RTC_WAKEUP,
