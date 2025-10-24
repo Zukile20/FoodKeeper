@@ -260,10 +260,6 @@ public class EditItemActivity extends AppCompatActivity {
         if (currentQuantity > 1) {
             currentQuantity--;
             tvQuantity.setText(String.valueOf(currentQuantity));
-            if(currentQuantity==thresholdQuantity)//low stock quantity
-            {
-                NotificationHelper.showLowStockNotification(this,currentItem);
-            }
         } else {
             Toast.makeText(this, "Quantity cannot be less than 1 or delete item", Toast.LENGTH_SHORT).show();
         }
