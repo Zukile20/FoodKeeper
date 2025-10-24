@@ -128,20 +128,15 @@ public class LandingPageActivity extends AppCompatActivity {
         greetText.setText("Hi, "+ sess.getUserName());
     }
     private void setupRecipesRecyclerView() {
-        // Get random recipes from database (e.g., 5 random recipes)
         List<Recipe> recipes = database.getRandomRecipes(5,sess.getUserEmail());
 
-        // Create click listener
         RecipeClickListerner listener = new RecipeClickListerner() {
             @Override
             public void onRecipeClicked(String id) {
-                // Handle recipe click - navigate to recipe detail
                 Intent intent = new Intent(LandingPageActivity.this, RecipeDetailsActivity.class).putExtra("id", id);
                 startActivity(intent);
             }
         };
-
-        // Create and set adapter
         recipeAdapter = new RecipeAdapter(this, recipes, listener);
 
         recipesView.setLayoutManager(new LinearLayoutManager(
@@ -161,8 +156,6 @@ public class LandingPageActivity extends AppCompatActivity {
     {
         MealPlan plan = database.getMealPlanForDay(LocalDate.now(),database.getConnectedFridgeForUser(sess.getUserEmail()).getId());
         List<Meal> meals = new ArrayList<>();
-
-        //load the meals in the meal plan
         if(plan!=null) {
 
             if (plan.getBreakFast() != null) {
@@ -215,8 +208,6 @@ public class LandingPageActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        // Refresh recipes when returning to this activity
-
         refresh();
     }
 
@@ -239,7 +230,6 @@ public class LandingPageActivity extends AppCompatActivity {
     }
 
     private void refreshRecipes() {
-        // Get new random recipes
         List<Recipe> newRecipes = database.getRandomRecipes(5,sess.getUserEmail());
         if (recipeAdapter != null) {
             recipeAdapter.updateRecipes(newRecipes);
@@ -247,7 +237,7 @@ public class LandingPageActivity extends AppCompatActivity {
     }
 
     private void refreshMealPlan() {
-        // Get new random recipes
+
         setupMealAdapter();
     }
     public void showAllRecipes(View v)
@@ -259,14 +249,12 @@ public class LandingPageActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        // Close database connection if needed
         if (database != null) {
             database.close();
         }
     }
 
     public void showAddToShoppingListDialog() {
-        // Create dialog
         Dialog dialog = new Dialog(this);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.notification_shopping_list);
@@ -276,12 +264,10 @@ public class LandingPageActivity extends AppCompatActivity {
         Button btnCancel = dialog.findViewById(R.id.btn_cancel);
         Button btnAdd = dialog.findViewById(R.id.btn_add);
 
-        // Cancel button
         btnCancel.setOnClickListener(v -> {
             dialog.dismiss();
         });
 
-        // Add button
         btnAdd.setOnClickListener(v -> {
                 Intent intent = new Intent(this, MainShoppingListActivity.class);
                 intent.putExtra("notificationAdd",1);

@@ -88,21 +88,7 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
     }
-    private void attemptLogin() {
-        String email = edEmail.getText().toString().trim();
-        String password = edPassword.getText().toString().trim();
 
-        if (db.login(email, password) == 1) {
-            SharedPreferences.Editor editor = getSharedPreferences("user_prefs", MODE_PRIVATE).edit();
-            editor.putString("user_email", email);
-            editor.apply();
-
-            startActivity(new Intent(this, ItemsViewActivity.class));
-            finish();
-        } else {
-            // Show error
-        }
-    }
     @Override
     protected void onDestroy() {
         db.close();
@@ -116,42 +102,30 @@ public class LoginActivity extends AppCompatActivity {
         return exists;
     }
     private  void  recipe() {
-// In your login activity after successful login
-       ; // or however you get user email
 
         RequestManager requestManager = new RequestManager(this);
-
-// Show a loading dialog
         ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("Setting up your recipes...");
         progressDialog.setCancelable(false);
         progressDialog.show();
 
-// Fetch recipes for this specific user (first time only)
         requestManager.getRandomRecipesForUser(new RandomRecipeResponseListener() {
             @Override
             public void didFetch(RandomRecipeApiResponse response, String message) {
                 progressDialog.dismiss();
-                Log.d("Login", message);
                 Toast.makeText(LoginActivity.this, "Recipes loaded!", Toast.LENGTH_SHORT).show();
-
-                // Navigate to main activity
                 Intent intent = new Intent(LoginActivity.this, LandingPageActivity.class);
                 startActivity(intent);
                 finish();
             }
-
             @Override
             public void didError(String message) {
                 progressDialog.dismiss();
-                Log.e("Login", "Error: " + message);
                 Toast.makeText(LoginActivity.this, "Error loading recipes: " + message, Toast.LENGTH_SHORT).show();
-
-                // Still navigate - they can try again later
                 Intent intent = new Intent(LoginActivity.this, LandingPageActivity.class);
                 startActivity(intent);
                 finish();
             }
-        }, null, userEmail); // Pass user email as the last parameter
+        }, null, userEmail);
     }
 }
