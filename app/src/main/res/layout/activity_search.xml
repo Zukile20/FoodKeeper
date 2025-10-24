@@ -136,7 +136,7 @@
             android:layout_width="120dp"
             android:layout_height="120dp"
             android:src="@drawable/ic_empty_box"
-            app:tint="@color/mainBlue" />
+            app:tint="@android:color/darker_gray" />
 
         <TextView
             android:id="@+id/emptyText"

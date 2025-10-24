@@ -74,21 +74,10 @@ public class FoodItem implements Serializable {
         this.image = image;
     }
 
-    public String getCategoryName() {
-        return categoryName;
-    }
-
     public void setCategoryName(String categoryName) {
         this.categoryName = categoryName;
     }
 
-    public int getIsInShopList() {
-        return isInShopList;
-    }
-
-    public void setIsInShopList(int isInShopList) {
-        this.isInShopList = isInShopList;
-    }
     public boolean getCheckState() {
         return checked;
     }

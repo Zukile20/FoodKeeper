@@ -255,7 +255,6 @@ public class Database extends SQLiteOpenHelper {
         return result;
     }
 
-
     public long addFridge(Fridge fridge, String userEmail) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
@@ -376,7 +375,6 @@ public class Database extends SQLiteOpenHelper {
         return fridge;
     }
 
-
     @SuppressLint("Range")
     public Fridge getFridgeById(int fridgeId, String userEmail) {
         SQLiteDatabase db = this.getReadableDatabase();
@@ -409,18 +407,6 @@ public class Database extends SQLiteOpenHelper {
                 new String[]{String.valueOf(fridgeId), userEmail});
         db.close();
         return result > 0;
-    }
-
-    public int getFridgeCountForUser(String userEmail) {
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.rawQuery("SELECT COUNT(*) FROM " + TABLE_FRIDGES +
-                " WHERE " + KEY_USER_EMAIL + "=?", new String[]{userEmail});
-        int count = 0;
-        if (cursor.moveToFirst()) {
-            count = cursor.getInt(0);
-        }
-        cursor.close();
-        return count;
     }
 
     public long addFoodItem(FoodItem item, String userEmail) {
@@ -467,10 +453,6 @@ public class Database extends SQLiteOpenHelper {
         }
         return result;
     }
-
-
-
-
 
     private void createTables(SQLiteDatabase db) {
         fridgeUserItemTables(db);
@@ -616,33 +598,6 @@ public class Database extends SQLiteOpenHelper {
         cursor.close();
         return foodItems;
     }
-    public List<FoodItem> getFoodItemsByFridge(int fridgeId, String userEmail) {
-        List<FoodItem> foodItems = new ArrayList<>();
-        SQLiteDatabase db = this.getReadableDatabase();
-
-        String query = "SELECT fi.* FROM " + TABLE_FOOD_ITEMS + " fi " +
-                "INNER JOIN " + TABLE_FRIDGES + " f ON fi." + KEY_FRIDGE_ID + " = f." + KEY_FRIDGE_ID + " " +
-                "WHERE f." + KEY_FRIDGE_ID + " = ? AND f." + KEY_USER_EMAIL + " = ? " +
-                "ORDER BY fi." + KEY_EXPIRY_DATE + " ASC";
-
-        Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(fridgeId), userEmail});
-
-        if (cursor.moveToFirst()) {
-            do {
-                FoodItem item = new FoodItem();
-                item.setId(cursor.getInt(cursor.getColumnIndexOrThrow(KEY_ID)));
-                item.setName(cursor.getString(cursor.getColumnIndexOrThrow(KEY_ITEM_NAME)));
-                item.setCategory(cursor.getString(cursor.getColumnIndexOrThrow(KEY_CATEGORY)));
-                item.setExpiryDate(cursor.getString(cursor.getColumnIndexOrThrow(KEY_EXPIRY_DATE)));
-                item.setQuantity(cursor.getInt(cursor.getColumnIndexOrThrow(KEY_QUANTITY)));
-                item.setImage(cursor.getBlob(cursor.getColumnIndexOrThrow(KEY_FOOD_IMAGE)));
-
-                foodItems.add(item);
-            } while (cursor.moveToNext());
-        }
-        cursor.close();
-        return foodItems;
-    }
     public boolean deleteFoodItem(int id, String userEmail) {
         SQLiteDatabase db = this.getWritableDatabase();
 
@@ -689,7 +644,7 @@ public class Database extends SQLiteOpenHelper {
             }
         }
     }
-    // MEAL PLAN METHODS
+
     public void deleteMealplan(LocalDate date) {
         SQLiteDatabase db = this.getWritableDatabase();
         String sql = "DELETE FROM mealPlan WHERE planDay = ?";
@@ -1002,13 +957,10 @@ public class Database extends SQLiteOpenHelper {
     public static final String COLUMN_TIME = "Cooking_time";
     public static final String COLUMN_SERVINGS = "Recipe_servings";
     public static final String COLUMN_FAVORITE = "Favorite";
-
     public static final String TABLE_INGREDIENTS = "Ingredients";
     public static final String COLUMN_INGREDIENT_ID = "Ingredient_id";
     public static final String COLUMN_INGREDIENT_NAME = "Ingredient_Name";
-
     public static final String TABLE_RECIPE_INGREDIENTS = "Recipe_Ingredients";
-
     public static final String TABLE_INSTRUCTIONS = "Instructions";
     public static final String COLUMN_INSTRUCTION_ID = "Instruction_id";
     public static final String COLUMN_STEP_NUMBER = "Step_number";
@@ -1048,8 +1000,6 @@ public class Database extends SQLiteOpenHelper {
                 "FOREIGN KEY (" + COLUMN_RECIPE_ID + ") REFERENCES " + TABLE_RECIPES + "(" + COLUMN_ID + ") ON DELETE CASCADE)");
     }
 
-
-
     public void onOpen(SQLiteDatabase db) {
         super.onOpen(db);
         if (!db.isReadOnly()) {
@@ -1061,7 +1011,6 @@ public class Database extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
 
         try {
-            // Check if recipe already exists for this user
             Cursor cursor = db.rawQuery("SELECT " + COLUMN_FAVORITE + " FROM " + TABLE_RECIPES +
                             " WHERE " + COLUMN_ID + " = ? AND " + KEY_USER_EMAIL + " = ?",
                     new String[]{String.valueOf(id), userEmail});
@@ -1248,7 +1197,6 @@ public class Database extends SQLiteOpenHelper {
             values.put(COLUMN_INGREDIENT_NAME, name);
             result = db.insertWithOnConflict(TABLE_INGREDIENTS, null, values, SQLiteDatabase.CONFLICT_IGNORE);
 
-            // If the ingredient already exists, get its ID
             if (result == -1) {
                 cursor = db.rawQuery(
                         "SELECT " + COLUMN_INGREDIENT_ID + " FROM " + TABLE_INGREDIENTS +
@@ -1490,26 +1438,6 @@ public class Database extends SQLiteOpenHelper {
         }
         return rowsDeleted;
     }
-    public int getIngredientCountForRecipe(int recipeId) {
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = null;
-        int count = 0;
-
-        try {
-            cursor = db.rawQuery(
-                    "SELECT COUNT(*) FROM " + TABLE_RECIPE_INGREDIENTS + " WHERE " + COLUMN_RECIPE_ID + " = ?",
-                    new String[]{String.valueOf(recipeId)}
-            );
-            cursor.moveToFirst();
-            count = cursor.getInt(0);
-        } finally {
-            if (cursor != null) {
-                cursor.close();
-            }
-            db.close();
-        }
-        return count;
-    }
     public List<Recipe> getRandomRecipes(int limit, String userEmail) {
         List<Recipe> recipes = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
@@ -1536,7 +1464,6 @@ public class Database extends SQLiteOpenHelper {
         return recipes;
     }
 
-    // SHOPPING LIST METHODS
     private static final String SHOPPING_TABLE_NAME = "ShoppingList";
     private static final String SHOPPING_COLUMN_ID = "ShoppingList_ItemID";
     private static final String SHOPPING_COLUMN_NAME = "ShoppingList_ItemName";
@@ -1554,7 +1481,7 @@ public class Database extends SQLiteOpenHelper {
                 "FOREIGN KEY(" + KEY_USER_EMAIL + ") REFERENCES " + TABLE_USERS + "(" + KEY_EMAIL + ") ON DELETE CASCADE);";
         db.execSQL(query);
     }
-    // Modified AddItem method
+
     public long AddItem(String ItemName, int ItemQty, String userEmail){
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
@@ -1574,7 +1501,6 @@ public class Database extends SQLiteOpenHelper {
         return results;
     }
 
-    // Modified readAllData method
     public Cursor readAllData(String userEmail){
         String query = "SELECT * FROM " + SHOPPING_TABLE_NAME + " WHERE " + KEY_USER_EMAIL + " = ?";
         SQLiteDatabase db = this.getReadableDatabase();
@@ -1586,7 +1512,6 @@ public class Database extends SQLiteOpenHelper {
         return cursor;
     }
 
-    // Modified deleteItemById method
     public void deleteItemById(int id, String userEmail) {
         SQLiteDatabase db = this.getWritableDatabase();
         int result = db.delete(SHOPPING_TABLE_NAME,
@@ -1600,7 +1525,6 @@ public class Database extends SQLiteOpenHelper {
         }
     }
 
-    // Modified UpdateItemShoppingList method
     public void UpdateItemShoppingList(int id, String userEmail){
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
@@ -1610,7 +1534,6 @@ public class Database extends SQLiteOpenHelper {
                 new String[]{String.valueOf(id), userEmail});
     }
 
-    // Modified UpdateItemBackShoppingList method
     public void UpdateItemBackShoppingList(int id, String userEmail) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();

@@ -139,7 +139,6 @@ public class ItemsViewActivity extends AppCompatActivity {
         AdapterView.OnItemSelectedListener categorySpinnerListener = new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                // Reset tab colors
                 allTab.setTextColor(getResources().getColor(android.R.color.black));
                 soonToExpireTab.setTextColor(getResources().getColor(android.R.color.black));
 
@@ -168,7 +167,6 @@ public class ItemsViewActivity extends AppCompatActivity {
             allTab.setTextColor(getResources().getColor(android.R.color.darker_gray));
             spinnerCategory.setSelection(0);
 
-            // Show all items
             foodItemAdapter.updateData(new ArrayList<>(allFoodItems));
             if (allFoodItems.isEmpty()) {
                 showEmptyState("You don't have any items yet");

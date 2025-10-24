@@ -18,32 +18,27 @@ import com.example.foodkeeper.LandingPage.LandingPageActivity;
 import com.example.foodkeeper.R;
 
 public class NotificationHelper {
-    // Channel IDs
     private static final String LOW_STOCK_CHANNEL_ID = "low_stock_channel";
     private static final String EXPIRING_CHANNEL_ID = "expiring_items_channel";
 
-    // Channel Names
     private static final String LOW_STOCK_CHANNEL_NAME = "Low Stock Alerts";
     private static final String EXPIRING_CHANNEL_NAME = "Expiration Alerts";
 
-    // Channel Descriptions
     private static final String LOW_STOCK_CHANNEL_DESC = "Notifications for items running low on stock";
     private static final String EXPIRING_CHANNEL_DESC = "Notifications for items about to expire";
 
-    // Default image
     private static final int DEFAULT_IMAGE_RESOURCE = R.drawable.image_placeholder;
 
     public static void showLowStockNotification(Context context, FoodItem item) {
         NotificationManager notificationManager = createNotificationChannels(context);
 
-        // Create intent with extra to trigger the dialog
         Intent intent = new Intent(context, LandingPageActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
         intent.putExtra("show_shopping_dialog", true);
 
         PendingIntent pendingIntent = PendingIntent.getActivity(
                 context,
-                generateNotificationId(item, "LOW_STOCK"), // Use unique request code
+                generateNotificationId(item, "LOW_STOCK"),
                 intent,
                 PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT
         );
@@ -110,7 +105,6 @@ public class NotificationHelper {
             customView.setTextViewText(R.id.textMessage, message);
             customView.setImageViewResource(R.id.noti_logo_view, R.mipmap.app_logo);
 
-            // Set food item image
             if (item.getImage() != null && item.getImage().length > 0) {
                 Bitmap bitmap = BitmapFactory.decodeByteArray(
                         item.getImage(), 0, item.getImage().length);
@@ -131,7 +125,6 @@ public class NotificationHelper {
                 (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            // Low Stock Channel
             NotificationChannel lowStockChannel = new NotificationChannel(
                     LOW_STOCK_CHANNEL_ID,
                     LOW_STOCK_CHANNEL_NAME,
@@ -141,7 +134,6 @@ public class NotificationHelper {
             lowStockChannel.enableVibration(true);
             lowStockChannel.setShowBadge(true);
 
-            // Expiring Items Channel
             NotificationChannel expiringChannel = new NotificationChannel(
                     EXPIRING_CHANNEL_ID,
                     EXPIRING_CHANNEL_NAME,

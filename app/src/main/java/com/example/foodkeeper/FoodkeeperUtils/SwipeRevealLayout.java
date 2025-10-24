@@ -47,7 +47,6 @@ public class SwipeRevealLayout extends FrameLayout {
     protected void onFinishInflate() {
         super.onFinishInflate();
 
-        // Find views
         backgroundView = findViewById(R.id.background_layout);
         mainContentView = findViewById(R.id.main_content_card);
 
@@ -151,10 +150,6 @@ public class SwipeRevealLayout extends FrameLayout {
         if (isRevealed) {
             animateToClosed();
         }
-    }
-
-    public boolean isRevealed() {
-        return isRevealed;
     }
 
     private class SwipeGestureListener extends GestureDetector.SimpleOnGestureListener {

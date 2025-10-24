@@ -134,7 +134,6 @@ public class SearchActivity extends AppCompatActivity {
         AdapterView.OnItemSelectedListener categorySpinnerListener = new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                // Reset tab colors
                 allTab.setTextColor(getResources().getColor(android.R.color.black));
                 soonToExpireTab.setTextColor(getResources().getColor(android.R.color.black));
 
@@ -163,7 +162,6 @@ public class SearchActivity extends AppCompatActivity {
             allTab.setTextColor(getResources().getColor(android.R.color.darker_gray));
             spinnerCategory.setSelection(0);
 
-            // Show all items
             foodItemAdapter.updateData(new ArrayList<>(allFoodItems));
             if (allFoodItems.isEmpty()) {
                 showEmptyState("You don't have any items yet");
@@ -197,6 +195,39 @@ public class SearchActivity extends AppCompatActivity {
                 startActivity(new Intent(SearchActivity.this, AddItemActivity.class));
             }
         });
+
+        searchEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void afterTextChanged(Editable s) {}
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                String query = s.toString().toLowerCase(Locale.getDefault());
+                filterItems(query);
+            }
+        });
+    }
+    private void filterItems(String query) {
+        List<FoodItem> filtered = new ArrayList<>();
+        String lowerQuery = query.toLowerCase(Locale.getDefault());
+
+        for (FoodItem item : allFoodItems) {
+            String name = item.getName() != null ? item.getName().toLowerCase(Locale.getDefault()) : "";
+            if (name.contains(lowerQuery)) {
+                filtered.add(item);
+            }
+        }
+
+        foodItemAdapter.updateData(filtered);
+
+        if (filtered.isEmpty()) {
+            showEmptyState("No matching items found");
+        } else {
+            hideEmptyState();
+        }
     }
     private void setupSpinnerCategory(AdapterView.OnItemSelectedListener categorySpinnerListener) {
         CustomSpinnerAdapter spinnerAdapter = new CustomSpinnerAdapter(this, android.R.layout.simple_spinner_item, categoryNames);
@@ -206,36 +237,6 @@ public class SearchActivity extends AppCompatActivity {
                 LinearLayout.LayoutParams.WRAP_CONTENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT));
         spinnerCategory.setOnItemSelectedListener(categorySpinnerListener);
-    }
-    private void filterItems(String query,String based) {
-        if (allFoodItems == null || allFoodItems.isEmpty()) return;
-
-        List<FoodItem> filtered = new ArrayList<>();
-        String lowerCaseQuery = query.toLowerCase();
-        if(Objects.equals(based, "category"))
-        {
-            for (FoodItem item : allFoodItems) {
-                String name = item.getCategory() != null ? item.getCategory().toLowerCase() : "";
-                if (name.contains(lowerCaseQuery)) {
-                    filtered.add(item);
-                }
-            }
-        }
-        else {
-            for (FoodItem item : allFoodItems) {
-                String name = item.getName() != null ? item.getName().toLowerCase() : "";
-                if (name.contains(lowerCaseQuery)) {
-                    filtered.add(item);
-                }
-            }
-        }
-
-        foodItemAdapter.updateData(filtered);
-        if (filtered.isEmpty()) {
-            showEmptyState("No items match your search");
-        } else {
-            hideEmptyState();
-        }
     }
     private void filterItemsByCategoryId(int categoryId) {
         if (allFoodItems == null || allFoodItems.isEmpty()) {

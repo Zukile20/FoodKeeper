@@ -97,7 +97,6 @@ public class DeleteConfirmationDialog extends DialogFragment {
     private void dismissWithAnimation() {
         View dialogContainer = getView().findViewById(R.id.dialog_container);
 
-        // Animate out
         getView().animate()
                 .alpha(0f)
                 .setDuration(200)
