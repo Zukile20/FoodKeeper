@@ -137,7 +137,7 @@ public class WeeklyViewActivity extends AppCompatActivity implements CalendarAda
                         if (mealPlan != null) {
                             if((mealPlan.getBreakFast()==null && mealPlan.getLunch()==null && mealPlan.getDinner()==null && mealPlan.getSnack()==null ))// meal plan with no meals must not be stored in the database1
                             {
-                                db.deleteMealPlan(selectedDate);//check if the meal does contain at least one meal ,otherwise delete it
+                                db.deleteMealplan(selectedDate,fridgeId);//check if the meal does contain at least one meal ,otherwise delete it
                             }
                             if (mealPlan.getBreakFast() != null) {
                                 //Obtain the breakfast meal from the database
@@ -256,7 +256,7 @@ public class WeeklyViewActivity extends AppCompatActivity implements CalendarAda
             dialog.setOnDeleteConfirmListener(new DeleteConfirmationDialog.OnDeleteConfirmListener() {
                 @Override
                 public void onDeleteConfirmed() {
-                    db.deleteMealplan(selectedDate);
+                    db.deleteMealplan(selectedDate,db.getConnectedFridgeForUser(sess.getUserEmail()).getId());
                     if (context instanceof AppCompatActivity) {
 
                         Toast.makeText(context,"Meal plan deleted successfully", Toast.LENGTH_SHORT).show();
@@ -376,7 +376,7 @@ public class WeeklyViewActivity extends AppCompatActivity implements CalendarAda
                        }
                         if((plan.getBreakFast()==null && plan.getLunch()==null && plan.getDinner()==null && plan.getSnack()==null ))// meal plan with no meals must not be stored in the database1
                         {
-                            db.deleteMealPlan(selectedDate);
+                            db.deleteMealplan(selectedDate,db.getConnectedFridgeForUser(sess.getUserEmail()).getId());
                         }
                         else {
                             db.updateMealPlan(plan);
@@ -434,7 +434,7 @@ public class WeeklyViewActivity extends AppCompatActivity implements CalendarAda
 
             if((mealPlan.getBreakFast()==null && mealPlan.getLunch()==null && mealPlan.getDinner()==null && mealPlan.getSnack()==null ))// meal plan with no meals must not be stored in the database1
             {
-                db.deleteMealPlan(selectedDate);//check if the meal does contain at least one meal ,otherwise delete it
+                db.deleteMealplan(selectedDate,fridgeID);//check if the meal does contain at least one meal ,otherwise delete it
                 return;
             }
             if(mealPlan.getBreakFast()!=null)

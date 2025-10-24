@@ -2,6 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="horizontal"
     android:paddingTop="4dp"
     android:paddingBottom="4dp"
@@ -47,12 +48,13 @@
             android:ellipsize="end" />
     </LinearLayout>
 
-    <ImageView
+    <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/foodItemImage"
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:layout_marginStart="12dp"
         android:scaleType="centerCrop"
+        app:shapeAppearanceOverlay="@style/CircleImageView"
         android:src="@drawable/image_placeholder"
         android:background="@drawable/circle"
         android:clipToOutline="true" />

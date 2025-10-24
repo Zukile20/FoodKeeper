@@ -73,7 +73,7 @@ public class MealPlanActivity extends AppCompatActivity {
     private void setUpListeners() {
         setupresultslauncher();
         cancelBtn.setOnClickListener(v -> {
-            db.deleteMealplan(selectedDate);
+            db.deleteMealplan(selectedDate,db.getConnectedFridgeForUser(sess.getUserEmail()).getId());
 
             setResult(RESULT_CANCELED);
             finish();})

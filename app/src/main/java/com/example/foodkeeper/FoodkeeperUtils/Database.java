@@ -645,23 +645,11 @@ public class Database extends SQLiteOpenHelper {
         }
     }
 
-    public void deleteMealplan(LocalDate date) {
-        SQLiteDatabase db = this.getWritableDatabase();
-        String sql = "DELETE FROM mealPlan WHERE planDay = ?";
-        db.execSQL(sql, new Object[]{date.toString()});
-    }
-
     public void deleteExpiredMealPlans() {
         SQLiteDatabase db = this.getWritableDatabase();
         String sql = "DELETE FROM mealPlan WHERE planDay < ?";
         LocalDate curDate = CalendarUtils.selectedDate;
         db.execSQL(sql, new Object[]{curDate.toString()});
-    }
-
-    public void deleteMealPlan(LocalDate planDay) {
-        SQLiteDatabase db = this.getWritableDatabase();
-        String sql = "DELETE FROM mealPlan WHERE planDay = ?";
-        db.execSQL(sql, new Object[]{planDay.toString()});
     }
 
     public boolean updateMeal(Meal meal) {
