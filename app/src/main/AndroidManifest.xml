@@ -20,7 +20,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.FoodKeeper">
         <activity
-            android:name=".SplashActivity"
+            android:name=".FoodkeeperUtils.SplashActivity"
             android:theme="@style/Theme.Splash"
             android:exported="true">
             <intent-filter>
@@ -29,7 +29,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".SearchActivity"
+            android:name=".FoodItem.SearchActivity"
             android:exported="false" />
         <activity
             android:name=".ProfileActivity"
@@ -47,13 +47,13 @@
             android:name=".Fridge.EditFridgeActivity"
             android:exported="false" />
         <activity
-            android:name=".ExpiringActivity"
+            android:name=".FoodItem.expiring.ExpiringActivity"
             android:exported="false" />
         <activity
             android:name=".MenuActivity"
             android:exported="false" />
         <activity
-            android:name=".LandingPageActivity"
+            android:name=".LandingPage.LandingPageActivity"
             android:exported="false" />
         <activity
             android:name=".FoodItem.ViewAnItemActivity"
@@ -62,10 +62,10 @@
             android:name=".FoodItem.EditItemActivity"
             android:exported="false" />
         <activity
-            android:name=".RegisterActivity"
+            android:name=".Register.RegisterActivity"
             android:exported="false" />
         <activity
-            android:name=".FoodItem.ItemsViewActivity"
+            android:name=".FoodItem.view_items.ItemsViewActivity"
             android:exported="false" />
         <activity
             android:name=".FoodItem.AddItemActivity"
@@ -102,11 +102,11 @@
             android:name=".Recipe.RecipeActivity"
             android:exported="false" />
         <activity
-            android:name=".LoginActivity"
+            android:name=".Register.LoginActivity"
             android:exported="false">
 
         </activity>
-        <receiver android:name=".ExpiryCheckReceiver" />
+        <receiver android:name=".FoodItem.expiring.ExpiryCheckReceiver" />
     </application>
 
 </manifest>

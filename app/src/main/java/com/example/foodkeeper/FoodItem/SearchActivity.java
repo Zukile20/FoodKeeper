@@ -1,14 +1,14 @@
 package com.example.foodkeeper.FoodItem;
 
 import android.annotation.SuppressLint;
-import android.app.AlarmManager;
-import android.app.PendingIntent;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -19,19 +19,17 @@ import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.foodkeeper.Category;
-import com.example.foodkeeper.CustomSpinnerAdapter;
-import com.example.foodkeeper.Database;
-import com.example.foodkeeper.ExpiringActivity;
-
-import com.example.foodkeeper.ExpiryCheckReceiver;
-import com.example.foodkeeper.LoginActivity;
-import com.example.foodkeeper.LandingPageActivity;
+import com.example.foodkeeper.FoodItem.models.Category;
+import com.example.foodkeeper.FoodItem.view_items.CustomSpinnerAdapter;
+import com.example.foodkeeper.FoodItem.expiring.ExpiringActivity;
+import com.example.foodkeeper.FoodItem.models.FoodItem;
+import com.example.foodkeeper.FoodItem.view_items.ItemsViewActivity;
+import com.example.foodkeeper.FoodkeeperUtils.Database;
+import com.example.foodkeeper.LandingPage.LandingPageActivity;
 import com.example.foodkeeper.MenuActivity;
-import com.example.foodkeeper.NotificationHelper;
 import com.example.foodkeeper.R;
-import com.example.foodkeeper.SearchActivity;
-import com.example.foodkeeper.SessionManager;
+import com.example.foodkeeper.Register.LoginActivity;
+import com.example.foodkeeper.Register.SessionManager;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -44,10 +42,11 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
-public class ItemsViewActivity extends AppCompatActivity {
+public class SearchActivity extends AppCompatActivity {
+    private EditText searchEditText;
     private LinearLayout emptyState;
     private FoodItemAdapter foodItemAdapter;
-    private List<FoodItem> allFoodItems=new ArrayList<>();
+    private List<FoodItem> allFoodItems;
     private FloatingActionButton fabAddItem;
     private TextView soonToExpireTab, allTab, empty;
     private Database db;
@@ -56,33 +55,26 @@ public class ItemsViewActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private List<Category> categories;
     private String[] categoryNames;
-    SessionManager session;
 
+    SessionManager session;
     @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_items_view);
-
-        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-        Intent intent = new Intent(this, ExpiryCheckReceiver.class);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_IMMUTABLE);
-
-        long interval = AlarmManager.INTERVAL_DAY;
-        long triggerAt = System.currentTimeMillis() + 5000;
-
-        alarmManager.setInexactRepeating(
-                AlarmManager.RTC_WAKEUP,
-                triggerAt,
-                interval,
-                pendingIntent
-        );
+        setContentView(R.layout.activity_search);
 
         db = new Database(this);
-        session = new SessionManager(this);
+        session= new SessionManager(this);
 
-        loadCategories();
+        SessionManager userSession = new SessionManager(this);
 
+        if (!userSession.isLoggedIn()) {
+            startActivity(new Intent(this, LoginActivity.class));
+            finish();
+            return;
+        }
+
+        searchEditText = findViewById(R.id.search_bar);
         recyclerView = findViewById(R.id.recyclerView);
         fabAddItem = findViewById(R.id.fabAddItem);
         allTab = findViewById(R.id.allTab);
@@ -96,37 +88,40 @@ public class ItemsViewActivity extends AppCompatActivity {
         foodItemAdapter = new FoodItemAdapter(this, new ArrayList<>());
         recyclerView.setAdapter(foodItemAdapter);
 
-        bottomNav.setOnNavigationItemSelectedListener(item -> {
+        bottomNav.setOnNavigationItemSelectedListener(item ->{
             int id = item.getItemId();
 
-            if (id == R.id.nav_home) {
-                startActivity(new Intent(ItemsViewActivity.this, LandingPageActivity.class));
+            if(id == R.id.nav_home){
+                startActivity(new Intent(SearchActivity.this, LandingPageActivity.class));
                 overridePendingTransition(0, 0);
                 finish();
                 return true;
-            } else if (id == R.id.nav_search) {
-                startActivity(new Intent(ItemsViewActivity.this, SearchActivity.class));
+            } else if(id == R.id.nav_search){
+
+                return true;
+            } else if(id == R.id.nav_view){
+                startActivity(new Intent(SearchActivity.this, ItemsViewActivity.class));
                 overridePendingTransition(0, 0);
                 finish();
                 return true;
-            } else if (id == R.id.nav_view) {
-                return true;
-            } else if (id == R.id.nav_expiring) {
-                startActivity(new Intent(ItemsViewActivity.this, ExpiringActivity.class));
+            }
+            else if(id == R.id.nav_expiring) {
+                startActivity(new Intent(SearchActivity.this, ExpiringActivity.class));
                 overridePendingTransition(0, 0);
                 finish();
                 return true;
             } else if (id == R.id.nav_profileMenu) {
-                startActivity(new Intent(ItemsViewActivity.this, MenuActivity.class));
+                startActivity(new Intent(SearchActivity.this, MenuActivity.class));
                 overridePendingTransition(0, 0);
                 finish();
                 return true;
             } else {
                 return false;
             }
-        });
-        bottomNav.setSelectedItemId(R.id.nav_view);
 
+        });
+        bottomNav.setSelectedItemId(R.id.nav_search);
+        loadCategories();
         loadFoodItems();
 
         foodItemAdapter.setOnItemClickListener(new FoodItemAdapter.OnItemClickListener() {
@@ -199,22 +194,10 @@ public class ItemsViewActivity extends AppCompatActivity {
         fabAddItem.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(ItemsViewActivity.this, AddItemActivity.class));
+                startActivity(new Intent(SearchActivity.this, AddItemActivity.class));
             }
         });
     }
-
-    private void loadCategories() {
-        categories = db.getAllCategories();
-
-        categoryNames = new String[categories.size() + 1];
-        categoryNames[0] = "Category";
-
-        for (int i = 0; i < categories.size(); i++) {
-            categoryNames[i + 1] = categories.get(i).getName();
-        }
-    }
-
     private void setupSpinnerCategory(AdapterView.OnItemSelectedListener categorySpinnerListener) {
         CustomSpinnerAdapter spinnerAdapter = new CustomSpinnerAdapter(this, android.R.layout.simple_spinner_item, categoryNames);
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -224,7 +207,36 @@ public class ItemsViewActivity extends AppCompatActivity {
                 LinearLayout.LayoutParams.WRAP_CONTENT));
         spinnerCategory.setOnItemSelectedListener(categorySpinnerListener);
     }
+    private void filterItems(String query,String based) {
+        if (allFoodItems == null || allFoodItems.isEmpty()) return;
 
+        List<FoodItem> filtered = new ArrayList<>();
+        String lowerCaseQuery = query.toLowerCase();
+        if(Objects.equals(based, "category"))
+        {
+            for (FoodItem item : allFoodItems) {
+                String name = item.getCategory() != null ? item.getCategory().toLowerCase() : "";
+                if (name.contains(lowerCaseQuery)) {
+                    filtered.add(item);
+                }
+            }
+        }
+        else {
+            for (FoodItem item : allFoodItems) {
+                String name = item.getName() != null ? item.getName().toLowerCase() : "";
+                if (name.contains(lowerCaseQuery)) {
+                    filtered.add(item);
+                }
+            }
+        }
+
+        foodItemAdapter.updateData(filtered);
+        if (filtered.isEmpty()) {
+            showEmptyState("No items match your search");
+        } else {
+            hideEmptyState();
+        }
+    }
     private void filterItemsByCategoryId(int categoryId) {
         if (allFoodItems == null || allFoodItems.isEmpty()) {
             showEmptyState("You don't have any items yet");
@@ -260,12 +272,10 @@ public class ItemsViewActivity extends AppCompatActivity {
         emptyState.setVisibility(View.VISIBLE);
         empty.setText(message);
     }
-
     private void hideEmptyState() {
         recyclerView.setVisibility(View.VISIBLE);
         emptyState.setVisibility(View.GONE);
     }
-
     private void loadFoodItems() {
         List<FoodItem> userItems = db.getFoodItemsInConnectedFridge(session.getUserEmail());
         if (userItems.isEmpty()) {
@@ -276,16 +286,24 @@ public class ItemsViewActivity extends AppCompatActivity {
             foodItemAdapter.updateData(new ArrayList<>(allFoodItems));
         }
     }
-
     private void showItemDetails(FoodItem selectedItem) {
         Intent intent = new Intent(this, ViewAnItemActivity.class);
         intent.putExtra("foodItem", selectedItem);
         startActivity(intent);
         Toast.makeText(this, selectedItem.getName() + " clicked", Toast.LENGTH_SHORT).show();
     }
+    private void loadCategories() {
+        categories = db.getAllCategories();
 
+        categoryNames = new String[categories.size() + 1];
+        categoryNames[0] = "Category";
+
+        for (int i = 0; i < categories.size(); i++) {
+            categoryNames[i + 1] = categories.get(i).getName();
+        }
+    }
     private void loadSoonToExpireItems() {
-        List<FoodItem> userItems = db.getFoodItemsInConnectedFridge(session.getUserEmail());
+        List<FoodItem> userItems = db.getUserFoodItems(session.getUserEmail());
         List<FoodItem> soonToExpireItems = new ArrayList<>();
 
         Calendar calendar = Calendar.getInstance();
@@ -320,19 +338,16 @@ public class ItemsViewActivity extends AppCompatActivity {
             hideEmptyState();
         }
     }
-
     @Override
-    protected void onResume() {
+    protected void onResume(){
         super.onResume();
         loadFoodItems();
     }
-
     @Override
     protected void onDestroy() {
         db.close();
         super.onDestroy();
     }
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);

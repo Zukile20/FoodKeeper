@@ -25,10 +25,10 @@ import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.foodkeeper.FoodItem.FoodItem;
-import com.example.foodkeeper.FoodItem.ItemsViewActivity;
+import com.example.foodkeeper.FoodItem.models.FoodItem;
+import com.example.foodkeeper.FoodkeeperUtils.Database;
 import com.example.foodkeeper.R;
-import com.example.foodkeeper.SessionManager;
+import com.example.foodkeeper.Register.SessionManager;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -39,7 +39,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CreateMealActivity extends AppCompatActivity implements FoodSelectionAdapter.OnItemSelectionChangeListener {
-    com.example.foodkeeper.Database db ;
+    Database db ;
 
     private boolean imageSelectedForCurrentMeal = false;
     // UI Components
@@ -64,7 +64,7 @@ public class CreateMealActivity extends AppCompatActivity implements FoodSelecti
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.create_meal_activity);
-        db=   com.example.foodkeeper.Database.getInstance(this);
+        db=   Database.getInstance(this);
         session= new SessionManager(this);
         initializeViews();
         initiaLizeData(db);
@@ -169,7 +169,7 @@ public class CreateMealActivity extends AppCompatActivity implements FoodSelecti
 
     }
 
-    private void initiaLizeData(com.example.foodkeeper.Database db) {
+    private void initiaLizeData(Database db) {
         FOOD_ITEMS.addAll(db.getUserFoodItems(session.getUserEmail()));
     }
     private void setupAdapter() {

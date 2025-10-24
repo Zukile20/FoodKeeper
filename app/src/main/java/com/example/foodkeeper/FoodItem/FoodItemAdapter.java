@@ -10,8 +10,9 @@ import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.foodkeeper.FoodItem.models.FoodItem;
+import com.example.foodkeeper.FoodItem.view_items.ViewHolder;
 import com.example.foodkeeper.R;
-import com.example.foodkeeper.ViewHolder;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;

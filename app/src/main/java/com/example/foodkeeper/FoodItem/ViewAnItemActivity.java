@@ -13,11 +13,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentManager;
 
-import com.example.foodkeeper.Database;
+import com.example.foodkeeper.FoodItem.models.FoodItem;
+import com.example.foodkeeper.FoodItem.view_items.ItemsViewActivity;
+import com.example.foodkeeper.FoodkeeperUtils.Database;
 import com.example.foodkeeper.DeleteDialog;
 
 import com.example.foodkeeper.R;
-import com.example.foodkeeper.SessionManager;
+import com.example.foodkeeper.Register.SessionManager;
 import com.google.android.material.imageview.ShapeableImageView;
 
 import java.text.ParseException;

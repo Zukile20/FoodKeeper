@@ -1,4 +1,4 @@
-package com.example.foodkeeper;
+package com.example.foodkeeper.LandingPage;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.foodkeeper.Meal.Meal;
+import com.example.foodkeeper.R;
 
 import java.util.List;
 

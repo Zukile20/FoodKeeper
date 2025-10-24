@@ -3,7 +3,7 @@ package com.example.foodkeeper.Recipe;
 import android.content.Context;
 import android.util.Log;
 
-import com.example.foodkeeper.Database;
+import com.example.foodkeeper.FoodkeeperUtils.Database;
 import com.example.foodkeeper.R;
 import com.example.foodkeeper.Recipe.Listeners.InstructionsListener;
 import com.example.foodkeeper.Recipe.Listeners.RandomRecipeResponseListener;
@@ -16,7 +16,7 @@ import com.example.foodkeeper.Recipe.Models.Recipe;
 import com.example.foodkeeper.Recipe.Models.RecipeDetailsResponse;
 import com.example.foodkeeper.Recipe.Models.SimilarRecipeResponse;
 import com.example.foodkeeper.Recipe.Models.Step;
-import com.example.foodkeeper.SessionManager;
+import com.example.foodkeeper.Register.SessionManager;
 
 import java.util.List;
 

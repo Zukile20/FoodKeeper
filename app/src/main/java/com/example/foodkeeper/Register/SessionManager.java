@@ -1,4 +1,4 @@
-package com.example.foodkeeper;
+package com.example.foodkeeper.Register;
 
 import android.content.Context;
 import android.content.SharedPreferences;

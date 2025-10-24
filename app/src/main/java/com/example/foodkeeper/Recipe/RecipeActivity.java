@@ -15,14 +15,14 @@ import androidx.appcompat.widget.SearchView;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.foodkeeper.Database;
+import com.example.foodkeeper.FoodkeeperUtils.Database;
 import com.example.foodkeeper.R;
 import com.example.foodkeeper.Recipe.Adapters.RandomRecipeAdapter;
 import com.example.foodkeeper.Recipe.Listeners.RandomRecipeResponseListener;
 import com.example.foodkeeper.Recipe.Listeners.RecipeClickListerner;
 import com.example.foodkeeper.Recipe.Models.RandomRecipeApiResponse;
 import com.example.foodkeeper.Recipe.Models.Recipe;
-import com.example.foodkeeper.SessionManager;
+import com.example.foodkeeper.Register.SessionManager;
 
 import java.util.ArrayList;
 import java.util.List;

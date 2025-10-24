@@ -4,11 +4,8 @@ import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 
 import android.annotation.SuppressLint;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.health.connect.datatypes.MealType;
 import android.os.Bundle;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -19,22 +16,19 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.foodkeeper.Database;
+import com.example.foodkeeper.FoodkeeperUtils.Database;
 import com.example.foodkeeper.FoodkeeperUtils.DeleteConfirmationDialog;
 import com.example.foodkeeper.Meal.CreateMealActivity;
 import com.example.foodkeeper.Meal.Meal;
 import com.example.foodkeeper.Meal.UpdateMealActivity;
 import com.example.foodkeeper.Meal.ViewMealActivity;
-import com.example.foodkeeper.MealPlan.CalendarUtils;
 import com.example.foodkeeper.R;
-import com.example.foodkeeper.SessionManager;
+import com.example.foodkeeper.Register.SessionManager;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.time.LocalDate;

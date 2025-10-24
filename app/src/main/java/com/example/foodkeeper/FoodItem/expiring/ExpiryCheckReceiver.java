@@ -1,10 +1,13 @@
-package com.example.foodkeeper;
+package com.example.foodkeeper.FoodItem.expiring;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
-import com.example.foodkeeper.FoodItem.FoodItem;
+import com.example.foodkeeper.FoodItem.models.FoodItem;
+import com.example.foodkeeper.FoodkeeperUtils.Database;
+import com.example.foodkeeper.FoodkeeperUtils.NotificationHelper;
+import com.example.foodkeeper.Register.SessionManager;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;

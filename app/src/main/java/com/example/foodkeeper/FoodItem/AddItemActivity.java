@@ -19,10 +19,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
-import com.example.foodkeeper.Database;
+import com.example.foodkeeper.FoodItem.models.Category;
+import com.example.foodkeeper.FoodItem.models.FoodItem;
+import com.example.foodkeeper.FoodItem.view_items.ItemsViewActivity;
+import com.example.foodkeeper.FoodkeeperUtils.Database;
 
 import com.example.foodkeeper.R;
-import com.example.foodkeeper.SessionManager;
+import com.example.foodkeeper.Register.SessionManager;
 import com.google.android.material.imageview.ShapeableImageView;
 import com.google.android.material.textfield.TextInputLayout;
 
@@ -47,7 +50,7 @@ public class AddItemActivity extends AppCompatActivity {
     Bitmap selectedImage;
     Button btnMinus, btnPlus, btnSavePopup, btnCancelPopup, btnSave, backBtn;
     SessionManager session;
-    private List<com.example.foodkeeper.Category> categories;
+    private List<Category> categories;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -161,13 +164,13 @@ public class AddItemActivity extends AppCompatActivity {
             return 15;
         }
 
-        for (com.example.foodkeeper.Category category : categories) {
+        for (Category category : categories) {
             if (category.getName().equals(categoryName)) {
                 return category.getId();
             }
         }
 
-        for (com.example.foodkeeper.Category category : categories) {
+        for (Category category : categories) {
             if ("Other".equals(category.getName())) {
                 return category.getId();
             }
@@ -278,7 +281,7 @@ public class AddItemActivity extends AppCompatActivity {
             return;
         }
 
-        for (com.example.foodkeeper.Category category : categories) {
+        for (Category category : categories) {
             RadioButton radioButton = new RadioButton(this);
             radioButton.setText(category.getName());
             radioButton.setTextSize(15);

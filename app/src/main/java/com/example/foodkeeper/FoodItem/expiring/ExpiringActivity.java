@@ -1,4 +1,4 @@
-package com.example.foodkeeper;
+package com.example.foodkeeper.FoodItem.expiring;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
@@ -16,10 +16,16 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.foodkeeper.FoodItem.FoodItem;
+import com.example.foodkeeper.FoodItem.models.FoodItem;
 import com.example.foodkeeper.FoodItem.FoodItemAdapter;
-import com.example.foodkeeper.FoodItem.ItemsViewActivity;
 import com.example.foodkeeper.FoodItem.ViewAnItemActivity;
+import com.example.foodkeeper.FoodItem.view_items.ItemsViewActivity;
+import com.example.foodkeeper.FoodkeeperUtils.Database;
+import com.example.foodkeeper.LandingPage.LandingPageActivity;
+import com.example.foodkeeper.MenuActivity;
+import com.example.foodkeeper.R;
+import com.example.foodkeeper.FoodItem.SearchActivity;
+import com.example.foodkeeper.Register.SessionManager;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.text.ParseException;
@@ -39,7 +45,7 @@ public class ExpiringActivity extends AppCompatActivity {
     private List<FoodItem> allFoodItems;
     private Database db;
     private BottomNavigationView bottomNav;
-    private  SessionManager session;
+    private SessionManager session;
 
     @SuppressLint("MissingInflatedId")
     @Override

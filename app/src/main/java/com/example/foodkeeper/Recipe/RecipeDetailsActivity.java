@@ -13,7 +13,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.foodkeeper.Database;
+import com.example.foodkeeper.FoodkeeperUtils.Database;
 import com.example.foodkeeper.R;
 import com.example.foodkeeper.Recipe.Adapters.InstructionsAdapter;
 import com.example.foodkeeper.Recipe.Adapters.SimilarRecipeAdapter;
@@ -29,7 +29,7 @@ import com.example.foodkeeper.Recipe.Models.RecipeDetailsResponse;
 import com.example.foodkeeper.Recipe.Models.SimilarRecipeResponse;
 import com.example.foodkeeper.Recipe.Models.Step;
 import com.example.foodkeeper.Recipe.Models.TTSHelper;
-import com.example.foodkeeper.SessionManager;
+import com.example.foodkeeper.Register.SessionManager;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;

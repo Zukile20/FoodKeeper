@@ -3,17 +3,21 @@ package com.example.foodkeeper;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.foodkeeper.FoodItem.ItemsViewActivity;
+import com.example.foodkeeper.FoodItem.SearchActivity;
+import com.example.foodkeeper.FoodItem.expiring.ExpiringActivity;
+import com.example.foodkeeper.FoodItem.view_items.ItemsViewActivity;
 import com.example.foodkeeper.Fridge.ManageFridgeActivity;
+import com.example.foodkeeper.LandingPage.LandingPageActivity;
 import com.example.foodkeeper.MealPlan.WeeklyViewActivity;
 import com.example.foodkeeper.Recipe.RecipeActivity;
+import com.example.foodkeeper.Register.LoginActivity;
+import com.example.foodkeeper.Register.SessionManager;
 import com.example.foodkeeper.ShoppingList.MainShoppingListActivity;
 import com.example.foodkeeper.ViewMeals.mealsViewActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;

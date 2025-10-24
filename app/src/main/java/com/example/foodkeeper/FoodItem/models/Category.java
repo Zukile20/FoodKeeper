@@ -1,4 +1,4 @@
-package com.example.foodkeeper;
+package com.example.foodkeeper.FoodItem.models;
 
 public class Category {
     private int id;

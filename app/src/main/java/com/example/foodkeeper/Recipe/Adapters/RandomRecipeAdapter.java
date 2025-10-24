@@ -12,11 +12,11 @@ import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.foodkeeper.Database;
+import com.example.foodkeeper.FoodkeeperUtils.Database;
 import com.example.foodkeeper.R;
 import com.example.foodkeeper.Recipe.Listeners.RecipeClickListerner;
 import com.example.foodkeeper.Recipe.Models.Recipe;
-import com.example.foodkeeper.SessionManager;
+import com.example.foodkeeper.Register.SessionManager;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;

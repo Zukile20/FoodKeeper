@@ -1,10 +1,13 @@
-package com.example.foodkeeper;
+package com.example.foodkeeper.FoodkeeperUtils;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.widget.TextView;
+
+import com.example.foodkeeper.Register.LoginActivity;
+import com.example.foodkeeper.R;
 
 public class SplashActivity extends Activity {
 

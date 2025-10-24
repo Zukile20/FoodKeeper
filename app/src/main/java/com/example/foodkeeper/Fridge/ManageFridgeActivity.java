@@ -2,7 +2,6 @@ package com.example.foodkeeper.Fridge;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.se.omapi.Session;
 import android.view.View;
 import android.widget.ImageButton;
 
@@ -11,10 +10,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.foodkeeper.Database;
-import com.example.foodkeeper.MenuActivity;
+import com.example.foodkeeper.FoodkeeperUtils.Database;
 import com.example.foodkeeper.R;
-import com.example.foodkeeper.SessionManager;
+import com.example.foodkeeper.Register.SessionManager;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;

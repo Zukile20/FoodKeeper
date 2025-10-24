@@ -1,4 +1,4 @@
-package com.example.foodkeeper;
+package com.example.foodkeeper.FoodkeeperUtils;
 
 import android.annotation.SuppressLint;
 import android.content.ContentValues;
@@ -10,7 +10,8 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.example.foodkeeper.FoodItem.FoodItem;
+import com.example.foodkeeper.FoodItem.models.Category;
+import com.example.foodkeeper.FoodItem.models.FoodItem;
 import com.example.foodkeeper.Fridge.Fridge;
 import com.example.foodkeeper.Meal.Meal;
 import com.example.foodkeeper.MealPlan.CalendarUtils;
@@ -20,6 +21,8 @@ import com.example.foodkeeper.Recipe.Models.InstructionsResponse;
 import com.example.foodkeeper.Recipe.Models.Recipe;
 import com.example.foodkeeper.Recipe.Models.RecipeDetailsResponse;
 import com.example.foodkeeper.Recipe.Models.Step;
+import com.example.foodkeeper.Register.SessionManager;
+import com.example.foodkeeper.User;
 
 import java.time.LocalDate;
 import java.util.ArrayList;

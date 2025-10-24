@@ -1,4 +1,4 @@
-package com.example.foodkeeper;
+package com.example.foodkeeper.LandingPage;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -15,14 +15,22 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-import com.example.foodkeeper.FoodItem.ItemsViewActivity;
+import com.example.foodkeeper.FoodkeeperUtils.Database;
+import com.example.foodkeeper.FoodItem.expiring.ExpiringActivity;
+import com.example.foodkeeper.FoodItem.view_items.ItemsViewActivity;
 import com.example.foodkeeper.Meal.Meal;
 import com.example.foodkeeper.MealPlan.MealPlan;
 import com.example.foodkeeper.MealPlan.WeeklyViewActivity;
+import com.example.foodkeeper.MenuActivity;
+import com.example.foodkeeper.ProfileActivity;
+import com.example.foodkeeper.R;
 import com.example.foodkeeper.Recipe.Listeners.RecipeClickListerner;
 import com.example.foodkeeper.Recipe.Models.Recipe;
 import com.example.foodkeeper.Recipe.RecipeActivity;
 import com.example.foodkeeper.Recipe.RecipeDetailsActivity;
+import com.example.foodkeeper.FoodItem.SearchActivity;
+import com.example.foodkeeper.Register.SessionManager;
+import com.example.foodkeeper.User;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.time.LocalDate;

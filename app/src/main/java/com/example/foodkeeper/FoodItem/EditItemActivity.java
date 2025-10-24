@@ -28,10 +28,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
-import com.example.foodkeeper.Database;
-import com.example.foodkeeper.NotificationHelper;
+import com.example.foodkeeper.FoodItem.models.Category;
+import com.example.foodkeeper.FoodItem.models.FoodItem;
+import com.example.foodkeeper.FoodkeeperUtils.Database;
+import com.example.foodkeeper.FoodkeeperUtils.NotificationHelper;
 import com.example.foodkeeper.R;
-import com.example.foodkeeper.SessionManager;
+import com.example.foodkeeper.Register.SessionManager;
 import com.google.android.material.imageview.ShapeableImageView;
 import com.google.android.material.textfield.TextInputLayout;
 
@@ -67,7 +69,7 @@ public class EditItemActivity extends AppCompatActivity {
     private RadioGroup categoryRadioGroup;
     private String selectedCategory = "";
     SessionManager session;
-    private List<com.example.foodkeeper.Category> categories;
+    private List<Category> categories;
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -136,7 +138,7 @@ public class EditItemActivity extends AppCompatActivity {
     }
 
     private int findCategoryIdByName(String categoryName) {
-        for (com.example.foodkeeper.Category category : categories) {
+        for (Category category : categories) {
             if (category.getName().equals(categoryName)) {
                 return category.getId();
             }
@@ -316,7 +318,7 @@ public class EditItemActivity extends AppCompatActivity {
 
         String currentCategoryName = db.getCategoryNameById(Integer.parseInt(currentItem.getCategory()));
 
-        for (com.example.foodkeeper.Category category : categories) {
+        for (Category category : categories) {
             RadioButton radioButton = new RadioButton(this);
             radioButton.setText(category.getName());
             radioButton.setTextSize(15);

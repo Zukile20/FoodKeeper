@@ -22,10 +22,10 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-import com.example.foodkeeper.Database;
-import com.example.foodkeeper.FoodItem.FoodItem;
+import com.example.foodkeeper.FoodkeeperUtils.Database;
+import com.example.foodkeeper.FoodItem.models.FoodItem;
 import com.example.foodkeeper.R;
-import com.example.foodkeeper.SessionManager;
+import com.example.foodkeeper.Register.SessionManager;
 
 import java.io.File;
 import java.io.FileOutputStream;

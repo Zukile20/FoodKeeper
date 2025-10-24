@@ -1,4 +1,4 @@
-package com.example.foodkeeper.FoodItem;
+package com.example.foodkeeper.FoodItem.models;
 
 import androidx.annotation.NonNull;
 

@@ -14,10 +14,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.foodkeeper.Database;
-import com.example.foodkeeper.FoodItem.FoodItem;
+import com.example.foodkeeper.FoodkeeperUtils.Database;
+import com.example.foodkeeper.FoodItem.models.FoodItem;
 import com.example.foodkeeper.R;
-import com.example.foodkeeper.SessionManager;
+import com.example.foodkeeper.Register.SessionManager;
 
 import java.util.ArrayList;
 

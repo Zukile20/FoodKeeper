@@ -1,4 +1,4 @@
-package com.example.foodkeeper;
+package com.example.foodkeeper.FoodkeeperUtils;
 
 import android.annotation.SuppressLint;
 import android.app.NotificationChannel;
@@ -13,8 +13,8 @@ import android.widget.RemoteViews;
 
 import androidx.core.app.NotificationCompat;
 
-import com.example.foodkeeper.FoodItem.FoodItem;
-import com.example.foodkeeper.LandingPageActivity;
+import com.example.foodkeeper.FoodItem.models.FoodItem;
+import com.example.foodkeeper.LandingPage.LandingPageActivity;
 import com.example.foodkeeper.R;
 
 public class NotificationHelper {

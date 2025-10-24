@@ -1,4 +1,4 @@
-package com.example.foodkeeper;
+package com.example.foodkeeper.FoodItem.view_items;
 
 import android.content.Context;
 import android.graphics.Color;

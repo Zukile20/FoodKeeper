@@ -1,4 +1,4 @@
-package com.example.foodkeeper;
+package com.example.foodkeeper.LandingPage;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -11,6 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.foodkeeper.R;
 import com.example.foodkeeper.Recipe.Listeners.RecipeClickListerner;
 import com.example.foodkeeper.Recipe.Models.Recipe;
 import com.squareup.picasso.Picasso;

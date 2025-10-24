@@ -14,7 +14,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-import com.example.foodkeeper.FoodItem.FoodItem;
+import com.example.foodkeeper.FoodItem.models.FoodItem;
 import com.example.foodkeeper.R;
 
 import java.util.ArrayList;
