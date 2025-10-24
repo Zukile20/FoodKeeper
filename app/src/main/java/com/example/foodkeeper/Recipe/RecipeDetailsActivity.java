@@ -7,7 +7,6 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.Toolbar;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -37,22 +36,16 @@ import java.util.List;
 
 public class RecipeDetailsActivity extends AppCompatActivity implements TTSHelper.TTSListener {
     int id;
-
-    // UI Elements
-    ImageView mealImage, imageView4, imageView6, favButton;
-    Toolbar toolbar;
+    ImageView mealImage,favButton;
     TextView textView_meal_name;
     RecyclerView recycler_meal_ingredients, recycler_meal_instructions, recycler_meal_similar;
-
     RequestManager manager;
     ProgressDialog dialog;
     ingredientsAdapter adapter;
     InstructionsAdapter instructionsAdapter;
     SimilarRecipeAdapter similarRecipeAdapter;
-
     private Database dbHelper;
     private boolean isFavorite = false;
-
     private TTSHelper ttsHelper;
     private ImageView btnPlayPause;
 
@@ -208,7 +201,6 @@ public class RecipeDetailsActivity extends AppCompatActivity implements TTSHelpe
                 if (instruction.steps != null && !instruction.steps.isEmpty()) {
                     for (Step step : instruction.steps) {
                         if (step.step != null && !step.step.isEmpty()) {
-                            // Clean the instruction text of HTML tags
                             String cleanStep = step.step.replaceAll("<[^>]*>", "").trim();
                             textSegments.add("Step " + stepNumber + ": " + cleanStep);
                             stepNumber++;

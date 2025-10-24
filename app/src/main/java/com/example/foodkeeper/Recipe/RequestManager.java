@@ -52,17 +52,12 @@ public class RequestManager {
 
     private String getUserEmail() {
         String email = sessionManager.getUserEmail();
-        if (email == null || email.isEmpty()) {
-            Log.e(TAG, "User email is null or empty!");
-        }
         return email;
     }
 
     public void getRandomRecipesForUser(RandomRecipeResponseListener listener, List<String> tags, String userEmail) {
         try {
             if (fetchStateManager.hasFetchedRecipes(userEmail)) {
-                Log.d(TAG, "User " + userEmail + " has already fetched recipes. Loading from database.");
-
                 List<Recipe> cachedRecipes = dbHelper.getAllRecipes(userEmail);
                 if (!cachedRecipes.isEmpty()) {
                     RandomRecipeApiResponse cachedResponse = new RandomRecipeApiResponse();
@@ -71,13 +66,9 @@ public class RequestManager {
                     return;
                 }
             }
-
-            Log.d(TAG, "First time login for user " + userEmail + ". Fetching recipes from API.");
-
             fetchRandomRecipesFromAPIForUser(listener, tags, userEmail);
 
         } catch (Exception e) {
-            Log.e(TAG, "Error in getRandomRecipesForUser: " + e.getMessage());
             listener.didError("Error: " + e.getMessage());
         }
     }
@@ -110,13 +101,11 @@ public class RequestManager {
                                     userEmail
                             );
                         } catch (Exception e) {
-                            Log.e(TAG, "Error caching recipe: " + e.getMessage());
+                             e.getMessage();
                         }
                     }
 
                     fetchStateManager.setRecipesFetched(userEmail, true);
-                    Log.d(TAG, "Successfully fetched and cached recipes for user " + userEmail);
-
                     listener.didFetch(data, "Fetched from API (first login)");
                 } else {
                     listener.didError("No recipes received from API");
@@ -125,7 +114,6 @@ public class RequestManager {
 
             @Override
             public void onFailure(Call<RandomRecipeApiResponse> call, Throwable t) {
-                Log.e(TAG, "Network error: " + t.getMessage());
                 listener.didError("Network Error: " + t.getMessage());
             }
         });
@@ -148,7 +136,7 @@ public class RequestManager {
                 return;
             }
         } catch (Exception e) {
-            Log.e(TAG, "Error loading cached recipes: " + e.getMessage());
+           e.getMessage();
         }
 
         fetchRandomRecipesFromAPI(listener, tags);
@@ -221,7 +209,6 @@ public class RequestManager {
                 listener.didError("No data available");
             }
         } catch (Exception e) {
-            Log.e(TAG, "Error loading fallback data: " + e.getMessage());
             listener.didError("Database error: " + e.getMessage());
         }
     }
@@ -234,28 +221,21 @@ public class RequestManager {
         }
 
         try {
-            Log.d(TAG, "Getting recipe details for ID: " + id);
-
             RecipeDetailsResponse cachedDetails = dbHelper.getCachedRecipeDetails(id, userEmail);
 
             if (cachedDetails != null) {
-                Log.d(TAG, "Found cached recipe: " + cachedDetails.title);
-
                 boolean hasIngredients = cachedDetails.extendedIngredients != null &&
                         !cachedDetails.extendedIngredients.isEmpty();
                 boolean hasInstructions = dbHelper.hasInstructionsForRecipe(id);
 
                 if (cachedDetails.title != null && hasIngredients && hasInstructions) {
-                    Log.d(TAG, "Using cached recipe with " + cachedDetails.extendedIngredients.size() +
-                            " ingredients and instructions available");
                     listener.didFetch(cachedDetails, "Loaded from database");
                     return;
                 }
             }
 
-            Log.d(TAG, "No complete cached data found, fetching from API");
         } catch (Exception e) {
-            Log.e(TAG, "Error checking cached recipe details: " + e.getMessage());
+             e.getMessage();
         }
 
         fetchRecipeDetailsFromAPI(listener, id);
@@ -268,7 +248,6 @@ public class RequestManager {
             return;
         }
 
-        Log.d(TAG, "Fetching recipe details from API for ID: " + id);
 
         CallRecipeDetails callRecipeDetails = retrofit.create(CallRecipeDetails.class);
         Call<RecipeDetailsResponse> call = callRecipeDetails.callRecipeDetails(
@@ -279,7 +258,6 @@ public class RequestManager {
             @Override
             public void onResponse(Call<RecipeDetailsResponse> call, retrofit2.Response<RecipeDetailsResponse> response) {
                 if (!response.isSuccessful()) {
-                    Log.e(TAG, "API error: " + response.code() + " " + response.message());
                     try {
                         RecipeDetailsResponse cachedDetails = dbHelper.getCachedRecipeDetails(id, userEmail);
                         if (cachedDetails != null && cachedDetails.title != null) {
@@ -295,14 +273,11 @@ public class RequestManager {
 
                 RecipeDetailsResponse details = response.body();
                 if (details != null) {
-                    Log.d(TAG, "Received recipe from API: " + details.title);
-
                     try {
                         cacheCompleteRecipeDetails(details, userEmail);
-                        Log.d(TAG, "Successfully cached recipe details");
                         fetchAndCacheInstructions(id);
                     } catch (Exception e) {
-                        Log.e(TAG, "Error caching recipe details: " + e.getMessage());
+                        e.getMessage();
                     }
 
                     listener.didFetch(details, "Fetched from API and cached");
@@ -313,7 +288,6 @@ public class RequestManager {
 
             @Override
             public void onFailure(Call<RecipeDetailsResponse> call, Throwable t) {
-                Log.e(TAG, "Network error: " + t.getMessage());
                 try {
                     RecipeDetailsResponse cachedDetails = dbHelper.getCachedRecipeDetails(id, userEmail);
                     if (cachedDetails != null && cachedDetails.title != null) {
@@ -329,7 +303,6 @@ public class RequestManager {
     }
 
     private void fetchAndCacheInstructions(int recipeId) {
-        Log.d(TAG, "Auto-fetching instructions for recipe " + recipeId);
 
         CallInstructions callInstructions = retrofit.create(CallInstructions.class);
         Call<List<InstructionsResponse>> call = callInstructions.callInstructions(
@@ -344,9 +317,8 @@ public class RequestManager {
                     if (!instructions.isEmpty()) {
                         try {
                             cacheInstructions(recipeId, instructions);
-                            Log.d(TAG, "Instructions auto-cached successfully for recipe " + recipeId);
                         } catch (Exception e) {
-                            Log.e(TAG, "Error auto-caching instructions: " + e.getMessage());
+                            e.getMessage();
                         }
                     }
                 }
@@ -354,33 +326,28 @@ public class RequestManager {
 
             @Override
             public void onFailure(Call<List<InstructionsResponse>> call, Throwable t) {
-                Log.w(TAG, "Network error while auto-fetching instructions: " + t.getMessage());
+               t.getMessage();
             }
         });
     }
 
     public void getInstructions(InstructionsListener listener, int recipeId) {
         try {
-            Log.d(TAG, "Getting instructions for recipe ID: " + recipeId);
-
             List<InstructionsResponse> cachedInstructions = dbHelper.getCachedInstructions(recipeId);
 
             if (cachedInstructions != null && !cachedInstructions.isEmpty()) {
-                Log.d(TAG, "Found cached instructions");
                 listener.didFetch(cachedInstructions, "Loaded from database");
                 return;
             }
 
-            Log.d(TAG, "No cached instructions found, fetching from API");
         } catch (Exception e) {
-            Log.e(TAG, "Error checking cached instructions: " + e.getMessage());
+           e.getMessage();
         }
 
         fetchInstructionsFromAPI(listener, recipeId);
     }
 
     private void fetchInstructionsFromAPI(InstructionsListener listener, int recipeId) {
-        Log.d(TAG, "Fetching instructions from API for recipe ID: " + recipeId);
 
         CallInstructions callInstructions = retrofit.create(CallInstructions.class);
         Call<List<InstructionsResponse>> call = callInstructions.callInstructions(
@@ -391,8 +358,6 @@ public class RequestManager {
             @Override
             public void onResponse(Call<List<InstructionsResponse>> call, retrofit2.Response<List<InstructionsResponse>> response) {
                 if (!response.isSuccessful()) {
-                    Log.e(TAG, "Instructions API error: " + response.code() + " " + response.message());
-
                     try {
                         List<InstructionsResponse> cachedInstructions = dbHelper.getCachedInstructions(recipeId);
                         if (cachedInstructions != null && !cachedInstructions.isEmpty()) {
@@ -408,13 +373,11 @@ public class RequestManager {
 
                 List<InstructionsResponse> instructions = response.body();
                 if (instructions != null && !instructions.isEmpty()) {
-                    Log.d(TAG, "Received instructions from API");
 
                     try {
                         cacheInstructions(recipeId, instructions);
-                        Log.d(TAG, "Successfully cached instructions");
                     } catch (Exception e) {
-                        Log.e(TAG, "Error caching instructions: " + e.getMessage());
+                        e.getMessage();
                     }
 
                     listener.didFetch(instructions, "Fetched from API and cached");
@@ -425,7 +388,6 @@ public class RequestManager {
 
             @Override
             public void onFailure(Call<List<InstructionsResponse>> call, Throwable t) {
-                Log.e(TAG, "Instructions network error: " + t.getMessage());
 
                 try {
                     List<InstructionsResponse> cachedInstructions = dbHelper.getCachedInstructions(recipeId);
@@ -462,14 +424,13 @@ public class RequestManager {
                 listener.didError(t.getMessage());
             }
         });
-    }private void cacheCompleteRecipeDetails(RecipeDetailsResponse details, String userEmail) {
+    }
+    private void cacheCompleteRecipeDetails(RecipeDetailsResponse details, String userEmail) {
         try {
             if (details == null || details.title == null) {
-                Log.w(TAG, "Cannot cache null or incomplete recipe details");
                 return;
             }
 
-            Log.d(TAG, "Caching recipe details for: " + details.title);
 
             dbHelper.insertRecipe(
                     details.id,
@@ -483,11 +444,9 @@ public class RequestManager {
             );
 
             if (details.extendedIngredients != null && !details.extendedIngredients.isEmpty()) {
-                Log.d(TAG, "Caching " + details.extendedIngredients.size() + " ingredients");
                 cacheIngredientsForRecipe(details.id, details.extendedIngredients);
             }
         } catch (Exception e) {
-            Log.e(TAG, "Error in cacheCompleteRecipeDetails: " + e.getMessage());
             throw e;
         }
     }
@@ -495,8 +454,6 @@ public class RequestManager {
     private void cacheIngredientsForRecipe(int recipeId, List<ExtendedIngredient> ingredients) {
         try {
             dbHelper.deleteIngredientsForRecipe(recipeId);
-            Log.d(TAG, "Caching " + ingredients.size() + " ingredients for recipe " + recipeId);
-
             for (int i = 0; i < ingredients.size(); i++) {
                 ExtendedIngredient ingredient = ingredients.get(i);
                 if (ingredient != null && ingredient.name != null && !ingredient.name.trim().isEmpty()) {
@@ -513,12 +470,7 @@ public class RequestManager {
                     }
                 }
             }
-
-            int cachedCount = dbHelper.getIngredientCountForRecipe(recipeId);
-            Log.d(TAG, "Verification: " + cachedCount + " ingredients cached for recipe " + recipeId);
-
         } catch (Exception e) {
-            Log.e(TAG, "Error caching ingredients: " + e.getMessage());
             throw e;
         }
     }
@@ -526,14 +478,9 @@ public class RequestManager {
     private void cacheInstructions(int recipeId, List<InstructionsResponse> instructionsResponses) {
         try {
             if (instructionsResponses == null || instructionsResponses.isEmpty()) {
-                Log.w(TAG, "Cannot cache null or empty instructions");
                 return;
             }
-
-            Log.d(TAG, "Caching instructions for recipe " + recipeId);
-
             int deletedCount = dbHelper.deleteInstructionsForRecipe(recipeId);
-            Log.d(TAG, "Deleted " + deletedCount + " existing instructions");
 
             int totalSteps = 0;
             for (InstructionsResponse instructionsBlock : instructionsResponses) {
@@ -549,10 +496,8 @@ public class RequestManager {
                 }
             }
 
-            Log.d(TAG, "Successfully cached " + totalSteps + " instruction steps for recipe " + recipeId);
 
         } catch (Exception e) {
-            Log.e(TAG, "Error caching instructions: " + e.getMessage());
             throw e;
         }
     }
