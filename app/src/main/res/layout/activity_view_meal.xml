@@ -104,7 +104,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingTop="180dp"
+            android:paddingTop="100dp"
             android:paddingHorizontal="20dp"
             android:paddingBottom="20dp"
             android:orientation="vertical">
@@ -138,8 +138,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="10dp"
                 android:clickable="true"
-                android:divider="@color/white"
-                android:dividerHeight="1dp" />
+                android:divider="@null"
+                android:dividerHeight="0dp" />
 
             <TextView
                 android:id="@+id/lastUsedView"

@@ -91,7 +91,7 @@ public class mealsViewActivity extends AppCompatActivity  {
     private void setupRecyclerView() {
         allMeals = new ArrayList<>();
         filteredMeals = new ArrayList<>();
-        mealAdapter = new MealAdapter( filteredMeals, new MealAdapter.OnMealActionListener() {
+        mealAdapter = new MealAdapter( this,filteredMeals, new MealAdapter.OnMealActionListener() {
             public void showDeleteConfirmation(Meal meal,int position,String message) {
                 if (position >= 0 && position < filteredMeals.size()) {
 
@@ -132,14 +132,14 @@ public class mealsViewActivity extends AppCompatActivity  {
             }
 
             @Override
-            public void onEdit(Meal meal, int position) {
+            public void onItemEdit(Meal meal, int position) {
                 Intent intent = new Intent(mealsViewActivity.this, UpdateMealActivity.class);
                 intent.putExtra("EditMeal", meal.getMealID());
                 startActivity(intent);
             }
 
             @Override
-            public void onDelete(Meal meal, int position) {
+            public void onItemDelete(Meal meal, int position) {
                 try {
                     db.deleteMeal(meal);
                     showDeleteConfirmation(meal,position,"");
@@ -171,16 +171,6 @@ public class mealsViewActivity extends AppCompatActivity  {
         mealsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mealsRecyclerView.setAdapter(mealAdapter);
 
-        // Close open items when scrolling
-        mealsRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
-                if (newState == RecyclerView.SCROLL_STATE_DRAGGING) {
-                    mealAdapter.closeAllItems();
-                }
-            }
-        });
-
     }
     private void initViews()
     {
@@ -207,90 +197,6 @@ public class mealsViewActivity extends AppCompatActivity  {
 
         }
     }
-//    private void setupSwipeToDelete() {
-//        swipeRevealCallback = new SwipeRevealCallback(new SwipeRevealCallback.SwipeActionListener() {
-//            @Override
-//            public void onEdit(int position) {
-//                if (position < 0 || position >= filteredMeals.size()) {
-//                    return;
-//                }
-//
-//                Meal meal = filteredMeals.get(position);
-//                if (swipeRevealCallback != null) {
-//                    swipeRevealCallback.closeSwipe();
-//                }
-//                    Intent intent = new Intent(mealsViewActivity.this, UpdateMealActivity.class);
-//                    intent.putExtra("EditMeal", meal.getMealID());
-//                    startActivity(intent);
-//            }
-//            public void showDeleteConfirmation(Meal meal,int position,String message) {
-//                if (position >= 0 && position < filteredMeals.size()) {
-//
-//                    DeleteConfirmationDialog dialog = DeleteConfirmationDialog.newInstance("meal",message,"Delete all");
-//
-//                    dialog.setOnDeleteConfirmListener(new DeleteConfirmationDialog.OnDeleteConfirmListener() {
-//                        @Override
-//                        public void onDeleteConfirmed() {
-//                            db.deleteMealPlansForMeal((int) meal.getMealID());
-//
-//                            // Then delete the meal
-//                            try {
-//                                db.deleteMeal(meal);
-//                                mealAdapter.notifyItemRemoved(position);
-//                                Toast.makeText(mealsViewActivity.this,
-//                                        "Meal removed from meal plans and deleted",
-//                                        Toast.LENGTH_SHORT).show();
-//                            } catch (Exception e) {
-//                                Toast.makeText(mealsViewActivity.this,
-//                                        "Error: " + e.getMessage(),
-//                                        Toast.LENGTH_SHORT).show();
-//                            }
-//                            filteredMeals.remove(position);
-//                            mealAdapter.notifyItemRemoved(position);
-//                            mealAdapter.notifyItemRangeChanged(position, filteredMeals.size());
-//                            updateEmptyState();// if the meals now are empty
-//                            Toast.makeText(mealsViewActivity.this, "Meal deleted", Toast.LENGTH_SHORT).show();
-//                        }
-//
-//                        @Override
-//                        public void onDeleteCancelled() {
-//                            mealAdapter.notifyItemChanged(position);
-//                        }
-//                    });
-//
-//                    dialog.show(mealsViewActivity.this.getSupportFragmentManager(), "delete_dialog");
-//                }
-//
-//            }
-//
-//
-//            @Override
-//            public void onDelete(int position) {
-//                if (position < 0 || position >= filteredMeals.size()) {
-//                    return;
-//                }
-//
-//                Meal meal = filteredMeals.get(position);
-//
-//                // Close the swipe action
-//                if (swipeRevealCallback != null) {
-//                    swipeRevealCallback.closeSwipe();
-//                }
-//
-//                // Show confirmation dialog
-//                try {
-//                    db.deleteMeal(meal);
-//                    showDeleteConfirmation(meal,position,"");
-//                } catch (Exception e) {
-//                    showDeleteConfirmation(meal,position,e.getMessage()+". Do you want to remove this meal from all meal plans and delete it?");
-//                }
-//            }
-//        });
-//
-//        itemTouchHelper = new ItemTouchHelper(swipeRevealCallback);
-//        itemTouchHelper.attachToRecyclerView(mealsRecyclerView);
-//    }
-
     private  void setUpSpinner()
     {
         String[] sortOptions =  {"A-Z", "Z-A", "Recent"};

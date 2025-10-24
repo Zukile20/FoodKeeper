@@ -1,5 +1,7 @@
 package com.example.foodkeeper;
 
+import static android.view.View.INVISIBLE;
+import static android.view.View.VISIBLE;
 import static com.example.foodkeeper.RegisterActivity.isValidPassword;
 
 import android.Manifest;
@@ -12,7 +14,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
@@ -38,6 +39,8 @@ import androidx.core.content.ContextCompat;
 
 import com.bumptech.glide.Glide;
 import com.google.android.material.imageview.ShapeableImageView;
+import com.google.android.material.textfield.TextInputLayout;
+import com.google.android.material.textfield.TextInputEditText;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -51,14 +54,11 @@ public class ProfileActivity extends AppCompatActivity {
     private ImageButton loadPicture;
     private TextView titleHeader;
     private EditText etName, etSurname, etEmail, etPhone;
-    private Button btnSave, btnEdit, btnCancel, btnChangePassword;
+    private Button btnSave, btnEdit, btnCancel, btnChangePassword, btnSavePassword, btnCancelPassword;
 
     private LinearLayout currentPasswordLayout, newPasswordLayout, confirmPasswordLayout;
-    private EditText etCurrentPassword, etNewPassword, etConfirmPassword;
-    private ImageButton btnToggleCurrentPassword, btnToggleNewPassword, btnToggleConfirmPassword;
-    private boolean isCurrentPasswordVisible = false;
-    private boolean isNewPasswordVisible = false;
-    private boolean isConfirmPasswordVisible = false;
+    private TextInputLayout currentPasswordInputLayout, newPasswordInputLayout, confirmPasswordInputLayout;
+    private TextInputEditText etCurrentPassword, etNewPassword, etConfirmPassword;
 
     private Database dbHelper;
     private boolean isEditMode = false;
@@ -112,75 +112,37 @@ public class ProfileActivity extends AppCompatActivity {
         btnSave = findViewById(R.id.btnSave);
         btnCancel = findViewById(R.id.btnCancel);
         btnChangePassword = findViewById(R.id.btnChangePassword);
+        btnSavePassword = findViewById(R.id.btnSavePassword);
+        btnCancelPassword = findViewById(R.id.btnCancelPassword);
 
+        // Password layouts (LinearLayout containers)
         currentPasswordLayout = findViewById(R.id.currentPasswordLayout);
         newPasswordLayout = findViewById(R.id.newPasswordLayout);
         confirmPasswordLayout = findViewById(R.id.confirmPasswordLayout);
+
+        // Get TextInputLayouts from the XML
+        currentPasswordInputLayout = (TextInputLayout) currentPasswordLayout.findViewById(R.id.etCurrentPassword).getParent().getParent();
+        newPasswordInputLayout = (TextInputLayout) newPasswordLayout.findViewById(R.id.etNewPassword).getParent().getParent();
+        confirmPasswordInputLayout = (TextInputLayout) confirmPasswordLayout.findViewById(R.id.etConfirmPassword).getParent().getParent();
+
+        // Get TextInputEditTexts
         etCurrentPassword = findViewById(R.id.etCurrentPassword);
         etNewPassword = findViewById(R.id.etNewPassword);
         etConfirmPassword = findViewById(R.id.etConfirmPassword);
 
-        createPasswordToggleButtons();
+        // Configure TextInputLayouts for proper error handling
+        currentPasswordInputLayout.setErrorEnabled(true);
+        currentPasswordInputLayout.setErrorIconDrawable(null);
+
+        newPasswordInputLayout.setErrorEnabled(true);
+        newPasswordInputLayout.setErrorIconDrawable(null);
+
+        confirmPasswordInputLayout.setErrorEnabled(true);
+        confirmPasswordInputLayout.setErrorIconDrawable(null);
 
         setFieldsEditable(false);
     }
 
-    private void createPasswordToggleButtons() {
-        // Create toggle buttons for password visibility
-        btnToggleCurrentPassword = new ImageButton(this);
-        btnToggleCurrentPassword.setBackground(null);
-        btnToggleCurrentPassword.setPadding(8, 8, 8, 8);
-
-        btnToggleNewPassword = new ImageButton(this);
-        btnToggleNewPassword.setBackground(null);
-        btnToggleNewPassword.setPadding(8, 8, 8, 8);
-
-        btnToggleConfirmPassword = new ImageButton(this);
-        btnToggleConfirmPassword.setBackground(null);
-        btnToggleConfirmPassword.setPadding(8, 8, 8, 8);
-
-        addToggleButtonToLayout(currentPasswordLayout, btnToggleCurrentPassword);
-        addToggleButtonToLayout(newPasswordLayout, btnToggleNewPassword);
-        addToggleButtonToLayout(confirmPasswordLayout, btnToggleConfirmPassword);
-    }
-
-    private void addToggleButtonToLayout(LinearLayout passwordLayout, ImageButton toggleButton) {
-        LinearLayout horizontalLayout = new LinearLayout(this);
-        horizontalLayout.setOrientation(LinearLayout.HORIZONTAL);
-        horizontalLayout.setLayoutParams(new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-        ));
-
-        EditText passwordField = null;
-        for (int i = 0; i < passwordLayout.getChildCount(); i++) {
-            View child = passwordLayout.getChildAt(i);
-            if (child instanceof EditText) {
-                passwordField = (EditText) child;
-                break;
-            }
-        }
-
-        if (passwordField != null) {
-            passwordLayout.removeView(passwordField);
-
-            LinearLayout.LayoutParams editTextParams = new LinearLayout.LayoutParams(
-                    0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f
-            );
-            passwordField.setLayoutParams(editTextParams);
-
-            LinearLayout.LayoutParams buttonParams = new LinearLayout.LayoutParams(
-                    48, 48
-            );
-            buttonParams.setMargins(8, 0, 0, 0);
-            toggleButton.setLayoutParams(buttonParams);
-
-            horizontalLayout.addView(passwordField);
-            horizontalLayout.addView(toggleButton);
-
-            passwordLayout.addView(horizontalLayout);
-        }
-    }
     public static boolean isValid(String password) {
         int f1 = 0, f2 = 0, f3 = 0;
         if(password.length() < 8){
@@ -213,37 +175,31 @@ public class ProfileActivity extends AppCompatActivity {
         dbHelper = new Database(this);
     }
 
-    private void setupClickListeners() {backBtn.setOnClickListener(v->finish());
+    private void setupClickListeners() {
+        backBtn.setOnClickListener(v->finish());
         loadPicture.setOnClickListener(v -> showImagePickerDialog());
         btnEdit.setOnClickListener(v -> enableEditMode());
 
-        btnSave.setOnClickListener(v -> {
-            if (isPasswordChangeMode) {
-                savePasswordChange();
-            } else {
-                saveUserData();
-            }
-        });
+        // Save button for profile changes
+        btnSave.setOnClickListener(v -> saveUserData());
 
+        // Cancel button for profile changes
         btnCancel.setOnClickListener(v -> {
-            if (isPasswordChangeMode) {
-                cancelPasswordChange();
-            } else {
-                disableEditMode();
-                loadUserData();
-                if (user != null) {
-                    initializeFields();
-                }
+            disableEditMode();
+            loadUserData();
+            if (user != null) {
+                initializeFields();
             }
         });
 
-        btnChangePassword.setOnClickListener(v -> {
-            if (isPasswordChangeMode) {
-                cancelPasswordChange();
-            } else {
-                enablePasswordChangeMode();
-            }
-        });
+        // Change Password button - toggles password mode
+        btnChangePassword.setOnClickListener(v -> enablePasswordChangeMode());
+
+        // Save Password button - saves password changes
+        btnSavePassword.setOnClickListener(v -> savePasswordChange());
+
+        // Cancel Password button - cancels password changes
+        btnCancelPassword.setOnClickListener(v -> cancelPasswordChange());
 
         profileImage.setOnClickListener(v -> {
             if (isEditMode && !isPasswordChangeMode) {
@@ -300,9 +256,9 @@ public class ProfileActivity extends AppCompatActivity {
         setFieldsEditable(true);
 
         btnEdit.setVisibility(View.GONE);
-        btnSave.setVisibility(View.VISIBLE);
-        btnCancel.setVisibility(View.VISIBLE);
-        loadPicture.setVisibility(View.VISIBLE);
+        btnSave.setVisibility(VISIBLE);
+        btnCancel.setVisibility(VISIBLE);
+        loadPicture.setVisibility(VISIBLE);
         titleHeader.setText("Edit Profile");
 
         Toast.makeText(this, "You can now edit your profile", Toast.LENGTH_SHORT).show();
@@ -312,7 +268,7 @@ public class ProfileActivity extends AppCompatActivity {
         isEditMode = false;
         setFieldsEditable(false);
 
-        btnEdit.setVisibility(View.VISIBLE);
+        btnEdit.setVisibility(VISIBLE);
         btnSave.setVisibility(View.GONE);
         btnCancel.setVisibility(View.GONE);
         loadPicture.setVisibility(View.GONE);
@@ -322,26 +278,16 @@ public class ProfileActivity extends AppCompatActivity {
     private void enablePasswordChangeMode() {
         isPasswordChangeMode = true;
 
-        // Hide profile edit functionality
-        etName.setEnabled(false);
-        etSurname.setEnabled(false);
-        etPhone.setEnabled(false);
-        loadPicture.setVisibility(View.GONE);
-
         // Show password fields
-        currentPasswordLayout.setVisibility(View.VISIBLE);
-        newPasswordLayout.setVisibility(View.VISIBLE);
-        confirmPasswordLayout.setVisibility(View.VISIBLE);
+        currentPasswordLayout.setVisibility(VISIBLE);
+        newPasswordLayout.setVisibility(VISIBLE);
+        confirmPasswordLayout.setVisibility(VISIBLE);
 
         // Update buttons
-        btnEdit.setVisibility(View.GONE);
-        btnSave.setVisibility(View.VISIBLE);
-        btnCancel.setVisibility(View.GONE);
-        btnChangePassword.setText("Cancel Password Change");
-        btnChangePassword.setBackground(ContextCompat.getDrawable(this, R.drawable.grey_button));
-        btnChangePassword.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, R.color.grey)));
-        btnChangePassword.setTextColor(ContextCompat.getColor(this, R.color.white));
-        titleHeader.setText("Change Password");
+        btnChangePassword.setVisibility(View.GONE);
+        btnSavePassword.setVisibility(VISIBLE);
+        btnCancelPassword.setVisibility(VISIBLE);
+        btnEdit.setVisibility(INVISIBLE);
 
         // Clear and reset password fields
         clearPasswordFields();
@@ -357,26 +303,9 @@ public class ProfileActivity extends AppCompatActivity {
         confirmPasswordLayout.setVisibility(View.GONE);
 
         // Reset buttons
-        btnEdit.setVisibility(View.VISIBLE);
-        btnSave.setVisibility(View.GONE);
-        btnCancel.setVisibility(View.GONE);
-        btnChangePassword.setText("Change Password");
-        btnChangePassword.setBackground(ContextCompat.getDrawable(this, R.drawable.grey_button));
-        btnChangePassword.setBackgroundTintList(ColorStateList.valueOf(
-                ContextCompat.getColor(this, R.color.light_pink)
-        ));
-
-        btnChangePassword.setTextColor(ContextCompat.getColor(this, R.color.blue));
-        titleHeader.setText("My Profile");
-
-        // Reset edit mode if it was active
-        if (isEditMode) {
-            disableEditMode();
-            loadUserData();
-            if (user != null) {
-                initializeFields();
-            }
-        }
+        btnChangePassword.setVisibility(VISIBLE);
+        btnSavePassword.setVisibility(View.GONE);
+        btnCancelPassword.setVisibility(View.GONE);
 
         clearPasswordFields();
     }
@@ -386,14 +315,10 @@ public class ProfileActivity extends AppCompatActivity {
         etNewPassword.setText("");
         etConfirmPassword.setText("");
 
-        // Reset password visibility
-        isCurrentPasswordVisible = false;
-        isNewPasswordVisible = false;
-        isConfirmPasswordVisible = false;
-
-        etCurrentPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-        etNewPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-        etConfirmPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+        // Clear all errors
+        currentPasswordInputLayout.setError(null);
+        newPasswordInputLayout.setError(null);
+        confirmPasswordInputLayout.setError(null);
     }
 
     private void savePasswordChange() {
@@ -410,10 +335,11 @@ public class ProfileActivity extends AppCompatActivity {
         String newPassword = etNewPassword.getText().toString().trim();
 
         if (!verifyCurrentPassword(currentPassword)) {
-            etCurrentPassword.setError("Current password is incorrect");
+            currentPasswordInputLayout.setError("Current password is incorrect");
             etCurrentPassword.requestFocus();
             return;
         }
+
         if(isValid(newPassword)) {
             int result = dbHelper.updatePassword(user.getEmail(), newPassword);
             if (result > 0) {
@@ -422,9 +348,10 @@ public class ProfileActivity extends AppCompatActivity {
             } else {
                 Toast.makeText(this, "Failed to change password", Toast.LENGTH_SHORT).show();
             }
+        } else {
+            newPasswordInputLayout.setError("Password must be at least 8 characters with letter, digit and special symbol");
+            etNewPassword.requestFocus();
         }
-
-
     }
 
     private boolean validatePasswordChange() {
@@ -432,22 +359,38 @@ public class ProfileActivity extends AppCompatActivity {
         String password = etNewPassword.getText().toString().trim();
         String confirm = etConfirmPassword.getText().toString().trim();
 
-        if(!password.equals(confirm)) {
-            Toast.makeText(getApplicationContext(), "Passwords do not match", Toast.LENGTH_SHORT).show();
+        // Clear previous errors
+        currentPasswordInputLayout.setError(null);
+        newPasswordInputLayout.setError(null);
+        confirmPasswordInputLayout.setError(null);
+
+        if (currentPassword.isEmpty()) {
+            currentPasswordInputLayout.setError("Current password is required");
+            etCurrentPassword.requestFocus();
+            return false;
+        }
+
+        if (password.isEmpty()) {
+            newPasswordInputLayout.setError("New password is required");
+            etNewPassword.requestFocus();
+            return false;
+        }
+
+        if (!isValidPassword(password)) {
+            newPasswordInputLayout.setError("Password must be at least 8 characters with letter, digit and special symbol");
+            etNewPassword.requestFocus();
+            return false;
+        }
+
+        if (confirm.isEmpty()) {
+            confirmPasswordInputLayout.setError("Please confirm your password");
             etConfirmPassword.requestFocus();
             return false;
         }
 
-        if(!isValidPassword(password)) {
-            etCurrentPassword.setError(
-                    "Password must be at least 8 characters with letter, digit and special symbol"
-            );
-            return false;
-        }
-
-        if (currentPassword.isEmpty()) {
-            etCurrentPassword.setError("Current password is required");
-            etCurrentPassword.requestFocus();
+        if(!password.equals(confirm)) {
+            confirmPasswordInputLayout.setError("Passwords do not match");
+            etConfirmPassword.requestFocus();
             return false;
         }
 
@@ -520,7 +463,7 @@ public class ProfileActivity extends AppCompatActivity {
             }
             else
             {
-             values.put(KEY_PROFILE, (byte[]) null);
+                values.put(KEY_PROFILE, (byte[]) null);
             }
 
             String whereClause = KEY_EMAIL + " = ?";

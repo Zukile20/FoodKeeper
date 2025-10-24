@@ -386,6 +386,10 @@ public class EditItemActivity extends AppCompatActivity {
             resultIntent.putExtra("updatedItem", currentItem);
             setResult(RESULT_OK, resultIntent);
             finish();
+            if(currentItem.getQuantity()==thresholdQuantity)//low stock quantity
+            {
+                NotificationHelper.showLowStockNotification(this,currentItem);
+            }
         } else {
             Toast.makeText(this, "Failed to update item", Toast.LENGTH_SHORT).show();
         }

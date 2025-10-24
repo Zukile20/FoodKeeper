@@ -1,5 +1,6 @@
 package com.example.foodkeeper.ViewMeals;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -7,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -18,19 +20,22 @@ import com.example.foodkeeper.R;
 import java.util.List;
 
 public class MealAdapter extends RecyclerView.Adapter<MealAdapter.MealViewHolder> {
+
     private List<Meal> meals;
-    private OnMealActionListener listener;
-    private SwipeRevealLayout currentlyOpenLayout = null;
+    private Context context;
 
     public interface OnMealActionListener {
-        void onEdit(Meal meal, int position);
-        void onDelete(Meal meal, int position);
+        void onItemEdit(Meal meal, int position);
+        void onItemDelete(Meal meal, int position);
         void onItemClick(Meal meal, int position);
     }
 
-    public MealAdapter(List<Meal> meals, OnMealActionListener listener) {
+    private OnMealActionListener onItemActionListener;
+
+    public MealAdapter(Context context, List<Meal> meals, OnMealActionListener listener) {
         this.meals = meals;
-        this.listener = listener;
+        this.onItemActionListener = listener;
+        this.context = context;
     }
 
     @NonNull
@@ -44,7 +49,11 @@ public class MealAdapter extends RecyclerView.Adapter<MealAdapter.MealViewHolder
     @Override
     public void onBindViewHolder(@NonNull MealViewHolder holder, int position) {
         Meal meal = meals.get(position);
-        holder.bind(meal, position);
+        holder.bind(meal);
+    }
+
+    public Context getContext() {
+        return context;
     }
 
     @Override
@@ -52,74 +61,89 @@ public class MealAdapter extends RecyclerView.Adapter<MealAdapter.MealViewHolder
         return meals.size();
     }
 
-    public void removeMeal(int position) {
-        meals.remove(position);
-        notifyItemRemoved(position);
+    public void updateMeals(List<Meal> newMeals) {
+        this.meals = newMeals;
+        notifyDataSetChanged();
     }
 
-    public void closeAllItems() {
-        if (currentlyOpenLayout != null) {
-            currentlyOpenLayout.close();
-            currentlyOpenLayout = null;
-        }
+    // Close all open swipe buttons
+    public void closeSwipeButtons() {
+        notifyDataSetChanged(); // This will rebind all items and close them
     }
 
-    class MealViewHolder extends RecyclerView.ViewHolder {
-        private SwipeRevealLayout swipeLayout;
+    @SuppressLint("ResourceAsColor")
+    public class MealViewHolder extends RecyclerView.ViewHolder {
         private ImageView mealImageView;
         private TextView mealNameText;
+        private View mainContent;
+        private SwipeRevealLayout swipeRevealLayout;
         private LinearLayout editButton;
         private LinearLayout deleteButton;
-        private Context context;
 
         public MealViewHolder(@NonNull View itemView) {
             super(itemView);
-            swipeLayout = itemView.findViewById(R.id.swipe_container);
+
+            // Initialize views
+            swipeRevealLayout = (SwipeRevealLayout) itemView;
             mealImageView = itemView.findViewById(R.id.mealImageView);
             mealNameText = itemView.findViewById(R.id.mealNameText);
+            mainContent = itemView.findViewById(R.id.main_content_card);
             editButton = itemView.findViewById(R.id.edit_button);
             deleteButton = itemView.findViewById(R.id.delete_button);
-            context =itemView.getRootView().getContext();
+
+            setupClickListeners();
         }
 
-        public void bind(Meal meal, int position) {
-            mealNameText.setText(meal.getMealName());
-            Glide.with(context)
-                    .load(meal.getUri())
-                    .placeholder(R.drawable.image_placeholder)
-                    .error(R.drawable.place_holder)
-                    .into(mealImageView);
-
-            // Close this item if another is opened
-            swipeLayout.setOnTouchListener((v, event) -> {
-                if (currentlyOpenLayout != null && currentlyOpenLayout != swipeLayout) {
-                    currentlyOpenLayout.close();
-                }
-                currentlyOpenLayout = swipeLayout;
-                return false;
-            });
-
+        private void setupClickListeners() {
             // Edit button click
             editButton.setOnClickListener(v -> {
-                swipeLayout.close();
-                if (listener != null) {
-                    listener.onEdit(meal, position);
+                int position = getAdapterPosition();
+                if (position != RecyclerView.NO_POSITION && onItemActionListener != null) {
+                    swipeRevealLayout.close(); // Close the swipe after clicking
+                    onItemActionListener.onItemEdit(meals.get(position), position);
                 }
             });
 
             // Delete button click
             deleteButton.setOnClickListener(v -> {
-                if (listener != null) {
-                    listener.onDelete(meal, position);
+                int position = getAdapterPosition();
+                if (position != RecyclerView.NO_POSITION && onItemActionListener != null) {
+                    swipeRevealLayout.close(); // Close the swipe after clicking
+                    onItemActionListener.onItemDelete(meals.get(position), position);
                 }
             });
 
-            // Main content click
-            itemView.findViewById(R.id.main_content_card).setOnClickListener(v -> {
-                if (!swipeLayout.isRevealed() && listener != null) {
-                    listener.onItemClick(meal, position);
+            // Main content click (when not swiped)
+            mainContent.setOnClickListener(v -> {
+                int position = getAdapterPosition();
+                if (position != RecyclerView.NO_POSITION && onItemActionListener != null) {
+                    // Only trigger click if not revealed
+                    if (!swipeRevealLayout.isRevealed()) {
+                        onItemActionListener.onItemClick(meals.get(position), position);
+                    } else {
+                        // If revealed, just close it
+                        swipeRevealLayout.close();
+                    }
                 }
             });
+        }
+
+        public void bind(Meal meal) {
+            mealNameText.setText(meal.getMealName());
+
+            // Close swipe when rebinding (important for recycling)
+            swipeRevealLayout.close();
+
+            // Load image with Glide
+            Glide.with(itemView.getContext())
+                    .load(meal.getUri())
+                    .placeholder(R.drawable.image_placeholder)
+                    .error(R.drawable.place_holder)
+                    .into(mealImageView);
+        }
+
+        public SwipeRevealLayout getSwipeRevealLayout() {
+            return swipeRevealLayout;
         }
     }
 }

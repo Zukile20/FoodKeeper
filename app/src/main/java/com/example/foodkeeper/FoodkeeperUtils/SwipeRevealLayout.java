@@ -52,7 +52,7 @@ public class SwipeRevealLayout extends FrameLayout {
         mainContentView = findViewById(R.id.main_content_card);
 
         if (backgroundView != null) {
-            backgroundView.setVisibility(GONE);  // Hide by default
+            backgroundView.setVisibility(GONE);
         }
     }
 
@@ -71,7 +71,15 @@ public class SwipeRevealLayout extends FrameLayout {
 
     @Override
     public boolean onInterceptTouchEvent(MotionEvent ev) {
-        return gestureDetector.onTouchEvent(ev) || super.onInterceptTouchEvent(ev);
+        gestureDetector.onTouchEvent(ev);
+
+        if (ev.getAction() == MotionEvent.ACTION_MOVE) {
+            if (isRevealed || Math.abs(currentOffset) > 0) {
+                return true;
+            }
+        }
+
+        return super.onInterceptTouchEvent(ev);
     }
 
     @Override
@@ -87,7 +95,6 @@ public class SwipeRevealLayout extends FrameLayout {
     }
 
     private void handleTouchUp() {
-        // Check if we've swiped past the threshold
         if (Math.abs(currentOffset) > maxOffset * REVEAL_THRESHOLD) {
             animateToRevealed();
         } else {
@@ -96,7 +103,7 @@ public class SwipeRevealLayout extends FrameLayout {
     }
 
     private void animateToRevealed() {
-        animateOffset(currentOffset, maxOffset);  // Positive for right swipe
+        animateOffset(currentOffset, maxOffset);
         isRevealed = true;
         if (backgroundView != null) {
             backgroundView.setVisibility(VISIBLE);
@@ -120,7 +127,6 @@ public class SwipeRevealLayout extends FrameLayout {
             updateViewPosition();
         });
 
-        // Hide background when animation ends if closing
         if (to == 0f) {
             animator.addListener(new android.animation.AnimatorListenerAdapter() {
                 @Override
@@ -160,16 +166,11 @@ public class SwipeRevealLayout extends FrameLayout {
         @Override
         public boolean onScroll(@NonNull MotionEvent e1, @NonNull MotionEvent e2,
                                 float distanceX, float distanceY) {
-            // Show background when starting to swipe right
             if (backgroundView != null && backgroundView.getVisibility() != VISIBLE && distanceX < 0) {
                 backgroundView.setVisibility(VISIBLE);
             }
 
-            // Swipe right (negative distanceX) = positive offset (moves content right)
-            // Only allow swiping right (revealing actions on the left)
             float newOffset = currentOffset - distanceX;
-
-            // Constrain: 0 (closed) to maxOffset (fully open to the right)
             currentOffset = Math.max(0, Math.min(maxOffset, newOffset));
 
             updateViewPosition();
@@ -179,11 +180,10 @@ public class SwipeRevealLayout extends FrameLayout {
         @Override
         public boolean onFling(@NonNull MotionEvent e1, @NonNull MotionEvent e2,
                                float velocityX, float velocityY) {
-            // velocityX is positive when flinging right, negative when flinging left
-            if (velocityX > 1000) {  // Fast right fling
+            if (velocityX > 1000) {
                 animateToRevealed();
                 return true;
-            } else if (velocityX < -1000) {  // Fast left fling
+            } else if (velocityX < -1000) {
                 animateToClosed();
                 return true;
             }

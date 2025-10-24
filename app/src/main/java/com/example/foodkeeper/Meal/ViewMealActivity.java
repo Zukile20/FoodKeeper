@@ -51,14 +51,14 @@ public class ViewMealActivity extends AppCompatActivity {
         if (intent.hasExtra("viewMeal")) {
             long mealID = intent.getLongExtra("viewMeal",0);
             meal = db.getMealWithFoodItems(mealID);
-                loadItems(meal);
+            loadItems(meal);
         }
     }
 
     public void loadItems(Meal meal)
-   {
-      foodItems  = (ArrayList<FoodItem>)db.getFoodItemsForMeal(meal.getMealID());
-   }
+    {
+        foodItems  = (ArrayList<FoodItem>)db.getFoodItemsForMeal(meal.getMealID());
+    }
     private ImageView mealImage;
     private TextView mealName,      lastUsed;
     private ListView listView;
@@ -106,50 +106,18 @@ public class ViewMealActivity extends AppCompatActivity {
         }
     }
     private void loadMealImage(ImageView imageView, Meal meal) {
-        String imagePath = meal.getUri();
+        if(mealImage!=null) {
+            if (meal.getUri() != null) {//since a meal might not have an image
 
-        Log.d("MealImage", "Loading image from path: " + imagePath);
+                File imageFile  = new File(meal.getUri());
+                Glide.with(this)
+                        .load(imageFile)
+                        .centerCrop()
+                        .placeholder(R.drawable.image_placeholder)
+                        .error(R.drawable.ic_no_meals)
+                        .into(mealImage);
 
-        if (imagePath != null && !imagePath.isEmpty()) {
-            File imageFile = new File(imagePath);
-
-            // Check if file exists
-            if (!imageFile.exists()) {
-                Log.e("MealImage", "File does not exist: " + imagePath);
-                imageView.setImageResource(R.drawable.place_holder);
-                return;
             }
-
-            Log.d("MealImage", "File exists, size: " + imageFile.length() + " bytes");
-
-            Glide.with(this)
-                    .load(imageFile)
-                    .placeholder(R.drawable.place_holder)
-                    .error(R.drawable.place_holder)
-                    .fallback(R.drawable.place_holder)
-                    .override(64, 64)
-                    .centerCrop()
-                    .listener(new RequestListener<Drawable>() {
-                        @Override
-                        public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
-                            Log.e("ImageLoad", "Failed to load image from: " + imagePath);
-                            if (e != null) {
-                                Log.e("ImageLoad", "Glide error details: " + e.getMessage());
-                                e.printStackTrace();
-                            }
-                            return false;
-                        }
-
-                        @Override
-                        public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
-                            Log.d("ImageLoad", "Image loaded successfully from: " + imagePath);
-                            return false;
-                        }
-                    })
-                    .into(imageView);
-        } else {
-            Log.d("MealImage", "No image path provided, using placeholder");
-            imageView.setImageResource(R.drawable.place_holder);
         }
     }
 

@@ -90,7 +90,6 @@ public class MealPlanActivity extends AppCompatActivity {
           requestIntent.putExtra("mealType","Breakfast");
           requestIntent.putExtra("ACTIVITY_MODE",1);
           launcher.launch(requestIntent);
-            finish();
         });
 
         lunchBtn.setOnClickListener(V ->
