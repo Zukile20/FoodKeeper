@@ -279,14 +279,17 @@ public class SearchActivity extends AppCompatActivity {
     }
     private void loadFoodItems() {
         List<FoodItem> userItems = db.getFoodItemsInConnectedFridge(session.getUserEmail());
-        if (userItems.isEmpty()) {
+        allFoodItems = new ArrayList<>(userItems);
+
+        if (allFoodItems.isEmpty()) {
             showEmptyState("You don't have any items yet");
         } else {
             hideEmptyState();
-            allFoodItems = userItems;
-            foodItemAdapter.updateData(new ArrayList<>(allFoodItems));
         }
+
+        foodItemAdapter.updateData(new ArrayList<>(allFoodItems));
     }
+
     private void showItemDetails(FoodItem selectedItem) {
         Intent intent = new Intent(this, ViewAnItemActivity.class);
         intent.putExtra("foodItem", selectedItem);
