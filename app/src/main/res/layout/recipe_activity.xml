@@ -126,7 +126,7 @@
             <ImageView
                 android:layout_width="80dp"
                 android:layout_height="80dp"
-                android:src="@drawable/heart_unselected"
+                android:src="@drawable/ic_favorite"
                 android:alpha="0.5"
                 android:layout_marginBottom="16dp" />
 

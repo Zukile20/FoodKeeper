@@ -32,6 +32,7 @@
             android:layout_weight="1"
             android:gravity="center"
             android:text="Refrigerators"
+            android:textColor="@color/black"
             android:textSize="24sp"
             android:textStyle="bold" />
 
