@@ -21,7 +21,7 @@ public class SwipeRevealLayout extends FrameLayout {
     private GestureDetectorCompat gestureDetector;
     private float currentOffset = 0f;
     private float maxOffset = 0f;
-    private boolean isRevealed = false;
+    public boolean isRevealed = false;
     private ValueAnimator animator;
 
     public SwipeRevealLayout(@NonNull Context context) {
@@ -150,6 +150,10 @@ public class SwipeRevealLayout extends FrameLayout {
         if (isRevealed) {
             animateToClosed();
         }
+    }
+
+    public boolean isRevealed() {
+        return isRevealed;
     }
 
     private class SwipeGestureListener extends GestureDetector.SimpleOnGestureListener {
