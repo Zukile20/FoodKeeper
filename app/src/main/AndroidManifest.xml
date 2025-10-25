@@ -92,14 +92,12 @@
         <activity
             android:name=".MealPlan.MealPlanActivity"
             android:exported="false"
-            android:label=""
             android:theme="@style/PopupTheme" />
         <activity android:name=".MealPlan.WeeklyViewActivity" />
         <activity
             android:name=".MealPlan.MonthlyViewActivity"
-            android:label=""
-            android:theme="@style/PopupTheme"
-            android:windowSoftInputMode="adjustPan" />
+            android:exported="false"
+            android:theme="@style/PopupTheme" />
         <activity android:name=".Meal.FullView" />
         <activity android:name=".Meal.CreateMealActivity" />
         <activity

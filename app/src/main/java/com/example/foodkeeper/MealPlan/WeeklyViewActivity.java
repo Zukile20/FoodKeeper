@@ -77,6 +77,7 @@ public class WeeklyViewActivity extends AppCompatActivity implements CalendarAda
         initWidgets();
         initLayouts();
         setUpListeners();
+        setupMonthlyViewLauncher();
         try {
             setWeekView();
         } catch (Exception e) {
@@ -194,16 +195,29 @@ public class WeeklyViewActivity extends AppCompatActivity implements CalendarAda
         snackLayout.setVisibility(VISIBLE);
         addButton.setVisibility(VISIBLE);
     }
-    private void showMonthly()
-    {
+    private ActivityResultLauncher<Intent> monthlyViewLauncher;
 
-        Intent intent = new Intent(this, MonthlyViewActivity.class);
-        startActivity(intent);
-        overridePendingTransition(R.anim.fade_in, 0);
-
+    private void setupMonthlyViewLauncher() {
+        monthlyViewLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == RESULT_OK) {
+                        try {
+                            setWeekView();
+                        } catch (Exception e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                }
+        );
     }
 
-
+    private void showMonthly()
+    {
+        Intent intent = new Intent(this, MonthlyViewActivity.class);
+        monthlyViewLauncher.launch(intent);
+        overridePendingTransition(R.anim.fade_in, 0);
+    }
     FrameLayout breakFastLayout ;
     FrameLayout lunchLayout ;
     FrameLayout dinnerLayout ;
@@ -474,20 +488,18 @@ public class WeeklyViewActivity extends AppCompatActivity implements CalendarAda
         }
     }
     private void loadMealImage(ImageView imageView, Meal meal) {
-        String imagePath = meal.getUri(); // This is the absolute file path from saveImageToInternalStorage
+        String imagePath = meal.getUri();
 
 
         if (imagePath != null && !imagePath.isEmpty()) {
             File imageFile = new File(imagePath);
 
-            // Check if file exists
             if (!imageFile.exists()) {
                 imageView.setImageResource(R.drawable.place_holder);
                 return;
             }
 
 
-            // Load the image directly from the file path
             Glide.with(this)
                     .load(imageFile)
                     .placeholder(R.drawable.place_holder)

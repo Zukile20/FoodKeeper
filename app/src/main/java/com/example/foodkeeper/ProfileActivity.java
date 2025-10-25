@@ -125,17 +125,13 @@ public class ProfileActivity extends AppCompatActivity {
     private void enableEditMode() {
         isEditMode = true;
 
-        // Enable input fields (except email)
         etName.setEnabled(true);
         etSurname.setEnabled(true);
         etPhone.setEnabled(true);
-        // Email remains disabled
         etEmail.setEnabled(false);
 
-        // Show camera button
         btnSelectImage.setVisibility(View.VISIBLE);
 
-        // Toggle buttons
         btnEditProfile.setVisibility(View.GONE);
         btnSaveProfile.setVisibility(View.VISIBLE);
 
@@ -198,13 +194,11 @@ public class ProfileActivity extends AppCompatActivity {
         String surname = etSurname.getText().toString().trim();
         String phone = etPhone.getText().toString().trim();
 
-        // Validation
         if (name.isEmpty() || surname.isEmpty() || phone.isEmpty()) {
             Toast.makeText(this, "Please fill all fields", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        // Update user in database (email cannot be changed)
         boolean isUpdated = dbHelper.updateUserProfile(currentEmail, name, surname,
                 currentEmail, phone, profileImage);
 

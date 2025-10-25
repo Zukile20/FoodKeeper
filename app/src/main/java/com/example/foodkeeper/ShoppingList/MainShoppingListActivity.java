@@ -65,7 +65,8 @@ public class MainShoppingListActivity extends AppCompatActivity {
         int mode= getIntent().getIntExtra("notificationAdd",0);
         if(mode==1)
         {
-            showAddItemDialog();
+            String itemName = getIntent().getStringExtra("item_name");
+            showAddItemDialog(itemName);
         }
     }
 
@@ -90,13 +91,22 @@ public class MainShoppingListActivity extends AppCompatActivity {
     }
 
     private void showAddItemDialog() {
+        showAddItemDialog(null);
+    }
+
+    private void showAddItemDialog(String prefilledItemName) {
         AlertDialog.Builder mBuilder = new AlertDialog.Builder(MainShoppingListActivity.this);
         View mView = getLayoutInflater().inflate(R.layout.add_dialog, null);
         Name = mView.findViewById(R.id.ItemName);
         QTY = mView.findViewById(R.id.ItemQty);
         add = mView.findViewById(R.id.Add);
-        btnMinus=mView.findViewById(R.id.btn_minus);
-        btnPlus=mView.findViewById(R.id.btn_plus);
+        btnMinus = mView.findViewById(R.id.btn_minus);
+        btnPlus = mView.findViewById(R.id.btn_plus);
+
+        if (prefilledItemName != null && !prefilledItemName.isEmpty()) {
+            Name.setText(prefilledItemName);
+            QTY.requestFocus();
+        }
 
         mBuilder.setView(mView);
         AlertDialog dialog = mBuilder.create();

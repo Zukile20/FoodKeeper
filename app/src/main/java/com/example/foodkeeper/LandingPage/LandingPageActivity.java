@@ -254,7 +254,7 @@ public class LandingPageActivity extends AppCompatActivity {
         }
     }
 
-    public void showAddToShoppingListDialog() {
+    public void showAddToShoppingListDialog(String itemName) {
         Dialog dialog = new Dialog(this);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.notification_shopping_list);
@@ -263,6 +263,9 @@ public class LandingPageActivity extends AppCompatActivity {
 
         Button btnCancel = dialog.findViewById(R.id.btn_cancel);
         Button btnAdd = dialog.findViewById(R.id.btn_add);
+        TextView message = dialog.findViewById(R.id.dialog_message);
+        String dialogPrompt = "Would you like to add '" + itemName + "' to your shopping list?";
+        message.setText(dialogPrompt);
 
         btnCancel.setOnClickListener(v -> {
             dialog.dismiss();
@@ -271,7 +274,8 @@ public class LandingPageActivity extends AppCompatActivity {
         btnAdd.setOnClickListener(v -> {
                 Intent intent = new Intent(this, MainShoppingListActivity.class);
                 intent.putExtra("notificationAdd",1);
-                startActivity(intent);
+            intent.putExtra("item_name", itemName);
+            startActivity(intent);
             dialog.dismiss();
         });
 
@@ -288,7 +292,8 @@ public class LandingPageActivity extends AppCompatActivity {
         if (intent != null && intent.hasExtra("show_shopping_dialog")) {
             boolean showDialog = intent.getBooleanExtra("show_shopping_dialog", false);
             if (showDialog) {
-                showAddToShoppingListDialog();
+                String itemName = intent.getStringExtra("item_name");
+                showAddToShoppingListDialog(itemName);
             }
         }
     }

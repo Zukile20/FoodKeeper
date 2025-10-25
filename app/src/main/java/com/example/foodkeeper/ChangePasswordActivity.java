@@ -26,11 +26,9 @@ public class ChangePasswordActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Make activity look like a dialog
         supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_change_password);
 
-        // Initialize views
         etCurrentPassword = findViewById(R.id.etCurrentPassword);
         etNewPassword = findViewById(R.id.etNewPassword);
         etConfirmPassword = findViewById(R.id.etConfirmPassword);
@@ -72,12 +70,10 @@ public class ChangePasswordActivity extends AppCompatActivity {
         String newPassword = etNewPassword.getText().toString().trim();
         String confirmPassword = etConfirmPassword.getText().toString().trim();
 
-        // Clear previous errors
         hideError(tvCurrentPasswordError);
         hideError(tvNewPasswordError);
         hideError(tvConfirmPasswordError);
 
-        // Validation
         if (currentPassword.isEmpty()) {
             showError(tvCurrentPasswordError, "Please enter current password");
             etCurrentPassword.requestFocus();
@@ -96,7 +92,6 @@ public class ChangePasswordActivity extends AppCompatActivity {
             return;
         }
 
-        // Verify current password
         User user = dbHelper.loadUserByEmail(userEmail);
         if (user == null || !user.getPassword().equals(currentPassword)) {
             showError(tvCurrentPasswordError, "Current password is incorrect");
@@ -104,28 +99,24 @@ public class ChangePasswordActivity extends AppCompatActivity {
             return;
         }
 
-        // Validate new password
         if (!isValidPassword(newPassword)) {
             showError(tvNewPasswordError, "Password must be at least 8 chars with a letter, digit, and symbol");
             etNewPassword.requestFocus();
             return;
         }
 
-        // Check if new passwords match
         if (!newPassword.equals(confirmPassword)) {
             showError(tvConfirmPasswordError, "Passwords do not match");
             etConfirmPassword.requestFocus();
             return;
         }
 
-        // Check if new password is same as current
         if (currentPassword.equals(newPassword)) {
             showError(tvNewPasswordError, "New password must be different from current password");
             etNewPassword.requestFocus();
             return;
         }
 
-        // Update password in database
         int isUpdated = dbHelper.updatePassword(userEmail, newPassword);
 
         if (isUpdated != -1) {

@@ -6,6 +6,7 @@ import static com.example.foodkeeper.MealPlan.CalendarUtils.monthYearFromDate;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.view.Window;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -23,40 +24,58 @@ public class MonthlyViewActivity extends AppCompatActivity implements CalendarAd
     private RecyclerView calendarRecyclerView;
     private TextView okBtn;
     private TextView cancelBtn;
-
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState)
-    {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_monthly_view);
-        initWidgets();
-        CalendarUtils.selectedDate = LocalDate.now();
-        setMonthView();
-        okBtn.setOnClickListener(this::weeklyAction);
-        cancelBtn.setOnClickListener(v->finish());
-    }
+    private TextView yearTV;
+    private TextView selectedDateTV;
 
     private void initWidgets()
     {
         calendarRecyclerView = findViewById(R.id.calendarRecyclerView);
         monthYearText = findViewById(R.id.monthYearTV);
+        yearTV = findViewById(R.id.yearTV);
+        selectedDateTV = findViewById(R.id.selectedDateTV);
         okBtn = findViewById(R.id.okTextView);
         cancelBtn = findViewById(R.id.cancelBtn);
-
     }
 
     private void setMonthView()
     {
-        monthYearText.setText(monthYearFromDate(CalendarUtils.selectedDate));
-        ArrayList<LocalDate> daysInMonth = daysInMonthArray(CalendarUtils.selectedDate);
+        yearTV.setText(String.valueOf(CalendarUtils.selectedDate.getYear()));
 
+        String dayOfWeek = CalendarUtils.selectedDate.getDayOfWeek().getDisplayName(java.time.format.TextStyle.SHORT, java.util.Locale.getDefault());
+        String month = CalendarUtils.selectedDate.getMonth().getDisplayName(java.time.format.TextStyle.SHORT, java.util.Locale.getDefault());
+        String day = String.valueOf(CalendarUtils.selectedDate.getDayOfMonth());
+        selectedDateTV.setText(dayOfWeek + ", " + month + " " + day);
+
+        monthYearText.setText(monthYearFromDate(CalendarUtils.selectedDate));
+
+        ArrayList<LocalDate> daysInMonth = daysInMonthArray(CalendarUtils.selectedDate);
         CalendarAdapter calendarAdapter = new CalendarAdapter(daysInMonth, this);
         RecyclerView.LayoutManager layoutManager = new GridLayoutManager(getApplicationContext(), 7);
         calendarRecyclerView.setLayoutManager(layoutManager);
         calendarRecyclerView.setAdapter(calendarAdapter);
     }
 
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState)
+    {
+        super.onCreate(savedInstanceState);
+        supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
+        setContentView(R.layout.activity_monthly_view);
+        initWidgets();
+        CalendarUtils.selectedDate = LocalDate.now();
+        setMonthView();
+
+        okBtn.setOnClickListener(v -> {
+            setResult(RESULT_OK);
+            finish();
+        });
+
+        cancelBtn.setOnClickListener(v -> {
+            setResult(RESULT_CANCELED);
+            finish();
+        });
+    }
     public void prevMonthAction(View view)
     {
         CalendarUtils.selectedDate = CalendarUtils.selectedDate.minusMonths(1);

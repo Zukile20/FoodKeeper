@@ -41,10 +41,10 @@ public class MealPlanActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
 
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_meal_plan);
         if (getSupportActionBar() != null) {
-            getSupportActionBar().hide();//hide the app title
+            getSupportActionBar().hide();
         }
         initializeLayouts();
         initializeViews();

@@ -4,164 +4,221 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
-    android:layout_width="320dp"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:foregroundGravity="center"
-    app:layout_constraintVertical_bias="0.145"
-    android:layout_marginStart="40dp"
     android:orientation="vertical"
-    android:layout_marginTop="55dp"
+    android:background="@color/light_pink"
     tools:context=".MealPlan.MonthlyViewActivity">
 
+    <!-- Header with year and selected date -->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="37dp"
-        android:background="@color/light_pink"
-        android:layout_marginBottom="0dp"
-        android:orientation="horizontal">
+        android:layout_height="wrap_content"
+        android:background="@color/blue"
+        android:orientation="vertical"
+        android:padding="16dp">
 
-        <Button
-            android:layout_width="26dp"
-            android:layout_height="33dp"
-            android:layout_weight="1"
-            android:background="@null"
-            android:onClick="prevMonthAction"
-            android:text="&lt;"
-            android:textColor="@color/blue"
-            android:textSize="25sp"
-            android:textStyle="bold"
+        <TextView
+            android:id="@+id/yearTV"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="2025"
+            android:textColor="@android:color/white"
+            android:textSize="16sp"
+            android:alpha="0.7"
             tools:ignore="HardcodedText" />
 
         <TextView
-            android:id="@+id/monthYearTV"
+            android:id="@+id/selectedDateTV"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Feb 2021"
-            android:textAlignment="center"
-            android:textColor="@color/blue"
-            android:textSize="20sp"
-            android:textStyle="bold" />
-
-        <Button
-            android:layout_width="2dp"
-            android:layout_height="33dp"
-            android:layout_weight="1"
-            android:background="@null"
-            android:onClick="nextMonthAction"
-            android:text=" &gt;"
-            android:textColor="@color/blue"
-            android:textSize="25sp"
-            android:textStyle="bold" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/light_pink"
-        android:orientation="horizontal">
-
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Sun"
-            android:textAlignment="center"
-            android:textColor="@color/blue"
-            android:textSize="16sp" />
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Mon"
-            android:textAlignment="center"
-            android:textColor="@color/blue"
-            android:textSize="16sp" />
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Tues"
-            android:textAlignment="center"
-            android:textColor="@color/blue"
-            android:textSize="16sp" />
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-
-            android:text="Wed"
-            android:textAlignment="center"
-            android:textColor="@color/blue"
-            android:textSize="16sp" />
-
-        <TextView
-            android:layout_width="50dp"
-            android:layout_height="wrap_content"
-            android:text="Thur"
-            android:textAlignment="center"
-            android:textColor="@color/blue"
-            android:textSize="16sp" />
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Fri"
-            android:textAlignment="center"
-            android:textColor="@color/blue"
-            android:textSize="16sp" />
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Sat"
-            android:textAlignment="center"
-            android:textColor="@color/blue"
-            android:textSize="16sp" />
-
+            android:text="Fri, Oct 31"
+            android:textColor="@color/white"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:layout_marginTop="4dp"
+            tools:ignore="HardcodedText" />
 
     </LinearLayout>
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/calendarRecyclerView"
-        android:background="@color/light_pink"
-        android:layout_width="match_parent"
-        android:layout_height="204dp" />
-
+    <!-- Calendar section -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/light_pink"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!-- Month navigation -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:paddingVertical="8dp"
+            android:orientation="horizontal">
+
+            <Button
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:onClick="prevMonthAction"
+                android:text="&lt;"
+                android:textColor="@color/blue"
+                android:textSize="20sp"
+                tools:ignore="HardcodedText" />
+
+            <TextView
+                android:id="@+id/monthYearTV"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="October 2025"
+                android:textAlignment="center"
+                android:textColor="@color/blue"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                tools:ignore="HardcodedText" />
+
+            <Button
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:onClick="nextMonthAction"
+                android:text="&gt;"
+                android:textColor="@color/blue"
+                android:textSize="20sp"
+                tools:ignore="HardcodedText" />
+        </LinearLayout>
+
+        <!-- Day headers -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingVertical="8dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="S"
+                android:textAlignment="center"
+                android:textColor="@android:color/black"
+                android:textSize="12sp"
+                android:alpha="0.6"
+                tools:ignore="HardcodedText" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="M"
+                android:textAlignment="center"
+                android:textColor="@android:color/black"
+                android:textSize="12sp"
+                android:alpha="0.6"
+                tools:ignore="HardcodedText" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="T"
+                android:textAlignment="center"
+                android:textColor="@android:color/black"
+                android:textSize="12sp"
+                android:alpha="0.6"
+                tools:ignore="HardcodedText" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="W"
+                android:textAlignment="center"
+                android:textColor="@android:color/black"
+                android:textSize="12sp"
+                android:alpha="0.6"
+                tools:ignore="HardcodedText" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="T"
+                android:textAlignment="center"
+                android:textColor="@android:color/black"
+                android:textSize="12sp"
+                android:alpha="0.6"
+                tools:ignore="HardcodedText" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="F"
+                android:textAlignment="center"
+                android:textColor="@android:color/black"
+                android:textSize="12sp"
+                android:alpha="0.6"
+                tools:ignore="HardcodedText" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="S"
+                android:textAlignment="center"
+                android:textColor="@android:color/black"
+                android:textSize="12sp"
+                android:alpha="0.6"
+                tools:ignore="HardcodedText" />
+        </LinearLayout>
+
+        <!-- Calendar grid -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/calendarRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="252dp"
+            android:background="@color/light_pink" />
+
+    </LinearLayout>
+
+    <!-- Action buttons -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="end"
+        android:paddingHorizontal="16dp"
+        android:paddingBottom="16dp"
         android:orientation="horizontal">
 
         <TextView
             android:id="@+id/cancelBtn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="200dp"
-            android:layout_marginEnd="10dp"
-            android:text="Cancel"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="12dp"
+            android:layout_marginEnd="8dp"
+            android:text="CANCEL"
             android:textColor="@color/blue"
-            android:textSize="18sp"
-            android:textStyle="bold"/>
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:background="?attr/selectableItemBackground"
+            tools:ignore="HardcodedText"/>
 
         <TextView
             android:id="@+id/okTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="18sp"
-            android:text="Ok"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="12dp"
+            android:text="OK"
             android:onClick="closeMothlyView"
             android:textColor="@color/blue"
-            android:textStyle="bold"/>
-
-
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:background="?attr/selectableItemBackground"
+            tools:ignore="HardcodedText"/>
     </LinearLayout>
-
 
 </LinearLayout>

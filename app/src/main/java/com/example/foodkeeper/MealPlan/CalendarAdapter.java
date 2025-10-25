@@ -33,10 +33,16 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarViewHolder>
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         View view = inflater.inflate(R.layout.calendar_cell, parent, false);
         ViewGroup.LayoutParams layoutParams = view.getLayoutParams();
-        if(days.size() > 15) //month view
-            layoutParams.height = (int) (parent.getHeight() * 0.166666666);
+
+        if(days.size() > 15) // month view
+        {
+            int cellHeight = (int) (40 * parent.getContext().getResources().getDisplayMetrics().density);
+            layoutParams.height = cellHeight;
+        }
         else // week view
-            layoutParams.height = (int) parent.getHeight();
+        {
+            layoutParams.height = ViewGroup.LayoutParams.MATCH_PARENT;
+        }
 
         return new CalendarViewHolder(view, onItemListener, days);
     }
@@ -53,12 +59,12 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarViewHolder>
             if(date.equals(CalendarUtils.selectedDate))
             {
                 holder.parentView.setBackgroundResource(R.drawable.selected_date_background);
-                holder.dayOfMonth.setTextColor(Color.WHITE); // White text on blue background
+                holder.dayOfMonth.setTextColor(Color.WHITE);
             }
             else
             {
-                holder.parentView.setBackgroundResource(0); // Remove background
-                holder.dayOfMonth.setTextColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.blue));                // Default text color
+                holder.parentView.setBackgroundResource(0);
+                holder.dayOfMonth.setTextColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.blue));
             }
         }
     }
@@ -69,17 +75,19 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarViewHolder>
         return days.size();
     }
 
-    public interface  OnItemListener
+    public interface OnItemListener
     {
         void onItemClick(int position, LocalDate date);
     }
 }
+
 class CalendarViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener
 {
     private final ArrayList<LocalDate> days;
     public final View parentView;
     public final TextView dayOfMonth;
     private final CalendarAdapter.OnItemListener onItemListener;
+
     public CalendarViewHolder(@NonNull View itemView, CalendarAdapter.OnItemListener onItemListener, ArrayList<LocalDate> days)
     {
         super(itemView);
@@ -95,5 +103,4 @@ class CalendarViewHolder extends RecyclerView.ViewHolder implements View.OnClick
     {
         onItemListener.onItemClick(getAdapterPosition(), days.get(getAdapterPosition()));
     }
-
 }

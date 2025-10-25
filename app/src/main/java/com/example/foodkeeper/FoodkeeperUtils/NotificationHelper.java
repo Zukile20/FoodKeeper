@@ -35,6 +35,7 @@ public class NotificationHelper {
         Intent intent = new Intent(context, LandingPageActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
         intent.putExtra("show_shopping_dialog", true);
+        intent.putExtra("item_name", item.getName());
 
         PendingIntent pendingIntent = PendingIntent.getActivity(
                 context,

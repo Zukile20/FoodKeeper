@@ -18,7 +18,6 @@ public class MealPlan {
         this.fridgeID =fridgeID;
     }
 
-    //Store a pointer to the meal i.e ID
     private Long breakFast=null;//
     private Long lunch=null;//
     private Long dinner=null;//
