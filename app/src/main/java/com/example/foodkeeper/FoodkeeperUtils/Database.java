@@ -1584,4 +1584,24 @@ public class Database extends SQLiteOpenHelper {
 
         return result;
     }
+    public boolean updateUserProfile(String oldEmail, String name, String surname,
+                                     String email, String phone, byte[] profileImage) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+
+        values.put(KEY_NAME, name);
+        values.put(KEY_SURNAME, surname);
+        values.put(KEY_EMAIL, email);
+        values.put(KEY_PHONE, phone);
+
+        if (profileImage != null) {
+            values.put(KEY_PROFILE, profileImage);
+        }
+
+        int rowsAffected = db.update(TABLE_USERS, values,
+                KEY_EMAIL + "=?", new String[]{oldEmail});
+
+        return rowsAffected > 0;
+    }
+
 }

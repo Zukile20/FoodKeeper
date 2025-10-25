@@ -1,13 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/mainBlue"
-    tools:context=".ProfileActivity">
+    android:background="@color/mainBlue">
 
+    <!-- Header Layout -->
     <LinearLayout
         android:id="@+id/headerLayout"
         android:layout_width="match_parent"
@@ -39,9 +37,8 @@
             android:gravity="center" />
 
         <View
-            android:layout_width="40dp"
-            android:layout_height="40dp" />
-
+            android:layout_width="45dp"
+            android:layout_height="45dp" />
     </LinearLayout>
 
     <!-- Guideline at 25% of screen height -->
@@ -52,381 +49,18 @@
         android:orientation="horizontal"
         app:layout_constraintGuide_percent="0.3" />
 
-    <!-- White bottom background with scrollable content -->
-    <ScrollView
+    <!-- White Background -->
+    <ImageView
         android:id="@+id/whiteBackground"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:background="@drawable/white_background"
-        android:fillViewport="true"
+        app:srcCompat="@drawable/white_background"
         app:layout_constraintTop_toTopOf="@id/guidelineMiddle"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent">
+        app:layout_constraintStart_toStartOf="parent" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-            <LinearLayout
-                android:id="@+id/profileFieldsLayout"
-                android:layout_width="match_parent"
-                android:layout_marginTop="100dp"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="8dp">
-
-                <!-- Name Field -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="8dp"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="8dp"
-                        android:text="Name"
-                        android:textColor="#666666"
-                        android:textSize="14sp" />
-
-                    <EditText
-                        android:id="@+id/etName"
-                        android:layout_width="match_parent"
-                        android:layout_height="48dp"
-                        android:enabled="false"
-                        android:textColor="@color/black"
-                        android:hint="Enter your name"
-                        android:inputType="textPersonName"
-                        android:padding="12dp"
-                        android:textSize="16sp" />
-
-                </LinearLayout>
-
-                <!-- Surname Field -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="8dp"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="8dp"
-                        android:text="Surname"
-                        android:textColor="#666666"
-                        android:textSize="14sp" />
-
-                    <EditText
-                        android:id="@+id/etSurname"
-                        android:layout_width="match_parent"
-                        android:layout_height="48dp"
-                        android:enabled="false"
-                        android:textColor="@color/black"
-                        android:hint="Enter your surname"
-                        android:inputType="textPersonName"
-                        android:padding="12dp"
-                        android:textSize="16sp" />
-
-                </LinearLayout>
-
-                <!-- Email Field -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="16dp"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="8dp"
-                        android:text="Email"
-                        android:textColor="#666666"
-                        android:textSize="14sp" />
-
-                    <EditText
-                        android:id="@+id/etEmail"
-                        android:layout_width="match_parent"
-                        android:layout_height="48dp"
-                        android:enabled="false"
-                        android:focusable="false"
-                        android:hint="Enter your email"
-                        android:textColor="@color/black"
-                        android:inputType="textEmailAddress"
-                        android:padding="12dp"
-                        android:textSize="16sp" />
-
-                </LinearLayout>
-
-                <!-- Phone Field -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="8dp"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="8dp"
-                        android:text="Phone"
-                        android:textColor="#666666"
-                        android:textSize="14sp" />
-
-                    <EditText
-                        android:id="@+id/etPhone"
-                        android:layout_width="match_parent"
-                        android:layout_height="48dp"
-                        android:enabled="false"
-                        android:hint="Enter your phone number"
-                        android:inputType="phone"
-                        android:textColor="@color/black"
-                        android:padding="12dp"
-                        android:textSize="16sp" />
-
-                </LinearLayout>
-
-                <!-- Password Section -->
-                <LinearLayout
-                    android:id="@+id/passwordSection"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="@color/light_blue_background"
-                    android:orientation="vertical"
-                    android:padding="8dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="16dp"
-                        android:text="Password &amp; Security"
-                        android:textColor="#333333"
-                        android:textSize="16sp"
-                        android:textStyle="bold" />
-
-                    <!-- Current Password Field -->
-                    <LinearLayout
-                        android:id="@+id/currentPasswordLayout"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="12dp"
-                        android:orientation="vertical"
-                        android:visibility="gone">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginBottom="8dp"
-                            android:text="Current Password"
-                            android:textColor="#666666"
-                            android:textSize="14sp" />
-
-                        <com.google.android.material.textfield.TextInputLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginBottom="5dp"
-                            app:endIconMode="password_toggle">
-
-                            <com.google.android.material.textfield.TextInputEditText
-                                android:id="@+id/etCurrentPassword"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:hint="Enter current password"
-                                android:inputType="textPassword"
-                                android:padding="12dp"
-                                android:textSize="16sp"
-                                android:textColorHint="@color/blue"/>
-                        </com.google.android.material.textfield.TextInputLayout>
-
-                    </LinearLayout>
-
-                    <!-- New Password Field -->
-                    <LinearLayout
-                        android:id="@+id/newPasswordLayout"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="12dp"
-                        android:orientation="vertical"
-                        android:visibility="gone">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginBottom="8dp"
-                            android:text="New Password"
-                            android:textColor="#666666"
-                            android:textSize="14sp" />
-
-                        <com.google.android.material.textfield.TextInputLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginBottom="5dp"
-                            app:endIconMode="password_toggle">
-
-                            <com.google.android.material.textfield.TextInputEditText
-                                android:id="@+id/etNewPassword"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:hint="Password"
-                                android:inputType="textPassword"
-                                android:textColorHint="@color/blue"/>
-                        </com.google.android.material.textfield.TextInputLayout>
-
-                    </LinearLayout>
-
-                    <!-- Confirm Password Field -->
-                    <LinearLayout
-                        android:id="@+id/confirmPasswordLayout"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="16dp"
-                        android:orientation="vertical"
-                        android:visibility="gone">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginBottom="8dp"
-                            android:text="Confirm New Password"
-                            android:textColor="#666666"
-                            android:textSize="14sp" />
-
-                        <com.google.android.material.textfield.TextInputLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginBottom="5dp"
-                            app:endIconMode="password_toggle">
-
-                            <com.google.android.material.textfield.TextInputEditText
-                                android:id="@+id/etConfirmPassword"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:hint="Password"
-                                android:inputType="textPassword"
-                                android:textColorHint="@color/blue"/>
-                        </com.google.android.material.textfield.TextInputLayout>
-
-                    </LinearLayout>
-
-                    <!-- Password Action Buttons -->
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center">
-
-                        <!-- Change Password Button (shown by default) -->
-                        <Button
-                            android:id="@+id/btnChangePassword"
-                            android:layout_width="match_parent"
-                            android:layout_height="44dp"
-                            android:background="@drawable/grey_button"
-                            android:text="Change Password"
-                            android:textAllCaps="false"
-                            android:textColor="@color/blue"
-                            android:textSize="16sp"
-                            android:textStyle="bold" />
-
-                        <!-- Cancel Password Button (hidden by default) -->
-                        <Button
-                            android:id="@+id/btnCancelPassword"
-                            android:layout_width="0dp"
-                            android:layout_height="44dp"
-                            android:layout_weight="1"
-                            android:layout_marginEnd="8dp"
-                            android:background="@drawable/grey_button"
-                            android:backgroundTint="@color/grey"
-                            android:text="Cancel"
-                            android:textAllCaps="false"
-                            android:textColor="@color/white"
-                            android:textSize="16sp"
-                            android:textStyle="bold"
-                            android:visibility="gone" />
-
-                        <!-- Save Password Button (hidden by default) -->
-                        <Button
-                            android:id="@+id/btnSavePassword"
-                            android:layout_width="0dp"
-                            android:layout_height="44dp"
-                            android:layout_weight="1"
-                            android:background="@drawable/blue_button"
-                            android:backgroundTint="@color/blue"
-                            android:text="Save Password"
-                            android:textAllCaps="false"
-                            android:textColor="@color/white"
-                            android:textSize="16sp"
-                            android:textStyle="bold"
-                            android:visibility="gone" />
-                    </LinearLayout>
-
-                </LinearLayout>
-
-                <!-- Profile Action Buttons -->
-                <LinearLayout
-                    android:id="@+id/buttonContainer"
-                    android:layout_width="match_parent"
-                    android:padding="8dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:gravity="center"
-                    android:orientation="horizontal">
-
-                    <!-- Edit Button -->
-                    <Button
-                        android:id="@+id/btnEdit"
-                        android:visibility="visible"
-                        android:layout_width="0dp"
-                        android:layout_height="48dp"
-                        android:layout_marginEnd="8dp"
-                        android:textAllCaps="false"
-                        android:layout_weight="1"
-                        android:background="@drawable/blue_button"
-                        android:text="Edit Profile"
-                        android:textColor="#FFFFFF"
-                        android:textSize="18sp"
-                        android:textStyle="bold" />
-
-                    <!-- Cancel Button -->
-                    <Button
-                        android:id="@+id/btnCancel"
-                        android:layout_width="0dp"
-                        android:layout_height="48dp"
-                        android:layout_weight="1"
-                        android:layout_marginEnd="8dp"
-                        android:background="@drawable/blue_button"
-                        android:text="Cancel"
-                        android:textColor="@color/white"
-                        android:textSize="18sp"
-                        android:textAllCaps="false"
-                        android:backgroundTint="@color/grey"
-                        android:visibility="gone" />
-
-                    <!-- Save Button -->
-                    <Button
-                        android:id="@+id/btnSave"
-                        android:layout_width="0dp"
-                        android:layout_height="48dp"
-                        android:layout_weight="1"
-                        android:background="@drawable/blue_button"
-                        android:text="Save"
-                        android:textAllCaps="false"
-                        android:textColor="#FFFFFF"
-                        android:textSize="18sp"
-                        android:textStyle="bold"
-                        android:visibility="gone" />
-
-                </LinearLayout>
-
-            </LinearLayout>
-        </LinearLayout>
-
-    </ScrollView>
-
-    <!-- Profile image section (60% overlapping white background) -->
+    <!-- Profile Image Section -->
     <RelativeLayout
         android:id="@+id/imageSection"
         android:layout_width="265dp"
@@ -445,9 +79,9 @@
             android:scaleType="centerCrop"
             android:src="@drawable/circle_background_white" />
 
-        <!-- Profile image -->
+        <!-- Food image -->
         <com.google.android.material.imageview.ShapeableImageView
-            android:id="@+id/profileImageView"
+            android:id="@+id/ivProfile"
             android:layout_width="200dp"
             android:layout_height="200dp"
             android:layout_centerInParent="true"
@@ -458,17 +92,134 @@
 
         <!-- Camera icon button -->
         <ImageButton
-            android:id="@+id/loadPicture"
+            android:id="@+id/btnSelectImage"
             android:layout_width="44dp"
             android:layout_height="44dp"
-            android:layout_alignBottom="@id/profileImageView"
-            android:layout_alignEnd="@id/profileImageView"
+            android:layout_alignBottom="@id/ivProfile"
+            android:layout_alignEnd="@id/ivProfile"
             android:layout_marginBottom="4dp"
             android:layout_marginEnd="4dp"
             android:background="@drawable/camera_icon_background"
             android:src="@android:drawable/ic_menu_camera"
             android:elevation="6dp"
-            android:contentDescription="change photo" />
+            android:contentDescription="food photo" />
     </RelativeLayout>
+
+    <!-- Content ScrollView -->
+    <ScrollView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        app:layout_constraintTop_toTopOf="@id/guidelineMiddle"
+        app:layout_constraintBottom_toTopOf="@id/buttonLayout"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="150dp"
+            android:paddingHorizontal="20dp"
+            android:paddingBottom="20dp"
+            android:orientation="vertical">
+
+            <!-- Name Input -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                android:hint="Name">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textPersonName"
+                    android:padding="12dp" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Surname Input -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                android:hint="Surname">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etSurname"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textPersonName"
+                    android:padding="12dp" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Email Input -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                android:hint="Email">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etEmail"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textEmailAddress"
+                    android:padding="12dp" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Phone Input -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="24dp"
+                android:hint="Phone">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etPhone"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="phone"
+                    android:padding="12dp" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+        </LinearLayout>
+
+    </ScrollView>
+
+    <!-- Bottom Buttons Layout -->
+    <LinearLayout
+        android:id="@+id/buttonLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <Button
+            android:id="@+id/btnChangePassword"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:text="Change Password"
+            android:textSize="18sp"
+            android:textAllCaps="false"
+            android:textColor="@color/mainBlue"
+            android:background="@drawable/white_blue_textbox" />
+
+        <Button
+            android:id="@+id/btnUpdateProfile"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Update Profile"
+            android:textSize="18sp"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            android:background="@drawable/rounded_button"
+            app:backgroundTint="@color/mainBlue" />
+
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

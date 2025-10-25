@@ -25,11 +25,16 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.FoodKeeper">
         <activity
+            android:name=".ChangePasswordActivity"
+            android:exported="false"
+            android:theme="@style/PopupTheme" />
+        <activity
             android:name=".FoodkeeperUtils.SplashActivity"
-            android:theme="@style/Theme.Splash"
-            android:exported="true">
+            android:exported="true"
+            android:theme="@style/Theme.Splash">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -108,9 +113,8 @@
             android:exported="false" />
         <activity
             android:name=".Register.LoginActivity"
-            android:exported="false">
+            android:exported="false"></activity>
 
-        </activity>
         <receiver android:name=".FoodItem.expiring.ExpiryCheckReceiver" />
     </application>
 
