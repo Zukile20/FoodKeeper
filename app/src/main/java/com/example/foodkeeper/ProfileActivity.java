@@ -9,9 +9,7 @@ import android.provider.MediaStore;
 import android.se.omapi.Session;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
@@ -19,42 +17,46 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.foodkeeper.FoodkeeperUtils.Database;
 import com.example.foodkeeper.Register.SessionManager;
+import com.google.android.material.imageview.ShapeableImageView;
+import com.google.android.material.textfield.TextInputEditText;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 public class ProfileActivity extends AppCompatActivity {
 
-    private EditText etName, etSurname, etEmail, etPhone;
-    private ImageView ivProfile;
+    private TextInputEditText etName, etSurname, etEmail, etPhone;
+    private ShapeableImageView ivProfile;
     private ImageButton btnSelectImage;
-    private Button btnUpdateProfile, btnChangePassword, backBtn;
+    private Button btnEditProfile, btnSaveProfile, btnChangePassword, backBtn;
 
     private Database dbHelper;
     private String currentEmail;
     private byte[] profileImage;
+    private boolean isEditMode = false;
+    SessionManager session;
 
     private static final int PICK_IMAGE_REQUEST = 1;
-    SessionManager session ;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile_activtty);
 
+        // Initialize views
         etName = findViewById(R.id.etName);
         etSurname = findViewById(R.id.etSurname);
         etEmail = findViewById(R.id.etEmail);
         etPhone = findViewById(R.id.etPhone);
         ivProfile = findViewById(R.id.ivProfile);
         btnSelectImage = findViewById(R.id.btnSelectImage);
-        btnUpdateProfile = findViewById(R.id.btnUpdateProfile);
+        btnEditProfile = findViewById(R.id.btnEditProfile);
+        btnSaveProfile = findViewById(R.id.btnSaveProfile);
         btnChangePassword = findViewById(R.id.btnChangePassword);
         backBtn = findViewById(R.id.backBtn);
 
         dbHelper = new Database(this);
         session = new SessionManager(this);
-
         currentEmail = session.getUserEmail();
 
         if (currentEmail == null || currentEmail.isEmpty()) {
@@ -72,10 +74,17 @@ public class ProfileActivity extends AppCompatActivity {
             }
         });
 
-        btnUpdateProfile.setOnClickListener(new View.OnClickListener() {
+        btnEditProfile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                updateProfile();
+                enableEditMode();
+            }
+        });
+
+        btnSaveProfile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                saveProfile();
             }
         });
 
@@ -113,7 +122,46 @@ public class ProfileActivity extends AppCompatActivity {
         }
     }
 
+    private void enableEditMode() {
+        isEditMode = true;
+
+        // Enable input fields (except email)
+        etName.setEnabled(true);
+        etSurname.setEnabled(true);
+        etPhone.setEnabled(true);
+        // Email remains disabled
+        etEmail.setEnabled(false);
+
+        // Show camera button
+        btnSelectImage.setVisibility(View.VISIBLE);
+
+        // Toggle buttons
+        btnEditProfile.setVisibility(View.GONE);
+        btnSaveProfile.setVisibility(View.VISIBLE);
+
+        Toast.makeText(this, "Edit mode enabled", Toast.LENGTH_SHORT).show();
+    }
+
+    private void disableEditMode() {
+        isEditMode = false;
+
+        etName.setEnabled(false);
+        etSurname.setEnabled(false);
+        etEmail.setEnabled(false);
+        etPhone.setEnabled(false);
+
+        btnSelectImage.setVisibility(View.GONE);
+
+        btnEditProfile.setVisibility(View.VISIBLE);
+        btnSaveProfile.setVisibility(View.GONE);
+    }
+
     private void selectImage() {
+        if (!isEditMode) {
+            Toast.makeText(this, "Please enable edit mode first", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         Intent intent = new Intent(Intent.ACTION_PICK,
                 MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         startActivityForResult(intent, PICK_IMAGE_REQUEST);
@@ -145,28 +193,24 @@ public class ProfileActivity extends AppCompatActivity {
         return stream.toByteArray();
     }
 
-    private void updateProfile() {
+    private void saveProfile() {
         String name = etName.getText().toString().trim();
         String surname = etSurname.getText().toString().trim();
-        String email = etEmail.getText().toString().trim();
         String phone = etPhone.getText().toString().trim();
 
-        if (name.isEmpty() || surname.isEmpty() || email.isEmpty() || phone.isEmpty()) {
+        // Validation
+        if (name.isEmpty() || surname.isEmpty() || phone.isEmpty()) {
             Toast.makeText(this, "Please fill all fields", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            Toast.makeText(this, "Invalid email format", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
+        // Update user in database (email cannot be changed)
         boolean isUpdated = dbHelper.updateUserProfile(currentEmail, name, surname,
-                email, phone, profileImage);
+                currentEmail, phone, profileImage);
 
         if (isUpdated) {
             Toast.makeText(this, "Profile updated successfully", Toast.LENGTH_SHORT).show();
-            currentEmail = email; // Update current email if changed
+            disableEditMode();
         } else {
             Toast.makeText(this, "Failed to update profile", Toast.LENGTH_SHORT).show();
         }

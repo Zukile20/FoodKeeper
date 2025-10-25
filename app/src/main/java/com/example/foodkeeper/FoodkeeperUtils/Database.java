@@ -1541,19 +1541,14 @@ public class Database extends SQLiteOpenHelper {
         String[] columns = {
                 KEY_NAME, KEY_SURNAME, KEY_EMAIL, KEY_PHONE, KEY_PASSWORD, KEY_PROFILE
         };
-
         String selection = KEY_EMAIL + " = ?";
         String[] selectionArgs = {email};
-
         Cursor cursor = db.query(TABLE_USERS, columns, selection, selectionArgs, null, null, null);
-
         if (cursor.moveToFirst()) {
             user = cursorToUser(cursor);
         }
-
         cursor.close();
         db.close();
-
         return user;
     }
     private User cursorToUser(Cursor cursor) {
