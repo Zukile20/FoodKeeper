@@ -152,10 +152,6 @@ public class RegisterActivity extends AppCompatActivity {
             edFridgeSize.setError("Fridge size is required");
             isValid = false;
         }
-        if (fridgeDescription.isEmpty()) {
-            edFridgeDescription.setError("Fridge description is required");
-            isValid = false;
-        }
 
         if (!isValid) {
             Toast.makeText(this, "Please correct errors", Toast.LENGTH_SHORT).show();

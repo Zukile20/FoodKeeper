@@ -66,7 +66,7 @@ public class ViewAnItemActivity extends AppCompatActivity implements DeleteDialo
         }
 
         goBack.setOnClickListener(v -> {
-            startActivity(new Intent(this, ItemsViewActivity.class));
+            finish();
         });
 
         btnEdit.setOnClickListener(v -> {

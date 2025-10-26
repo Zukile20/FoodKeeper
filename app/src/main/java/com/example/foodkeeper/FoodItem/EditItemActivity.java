@@ -60,7 +60,7 @@ public class EditItemActivity extends AppCompatActivity {
     private ImageButton cameraIconButton;
     private Button btnMinus, btnPlus, btnCancel, btnSave, btnClose;
     private Bitmap selectedImage;
-    int thresholdQuantity=1;
+    int thresholdQuantity = 1;
     private Calendar calendar;
     private DatePickerDialog datePickerDialog;
     private RadioGroup categoryRadioGroup;

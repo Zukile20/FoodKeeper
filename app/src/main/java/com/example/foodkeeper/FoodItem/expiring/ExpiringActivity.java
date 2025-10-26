@@ -147,7 +147,6 @@ public class ExpiringActivity extends AppCompatActivity {
         Intent intent = new Intent(this, ViewAnItemActivity.class);
         intent.putExtra("foodItem", selectedItem);
         startActivityForResult(intent, 1001);
-        Toast.makeText(this, selectedItem.getName() + " clicked", Toast.LENGTH_SHORT).show();
     }
     private void loadSoonToExpireItems() {
         List<FoodItem> userItems = db.getUserFoodItems(session.getUserEmail());

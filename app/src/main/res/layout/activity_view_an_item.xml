@@ -39,7 +39,6 @@
             android:layout_height="45dp" />
     </LinearLayout>
 
-    <!-- Guideline at 25% of screen height -->
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guidelineMiddle"
         android:layout_width="wrap_content"
@@ -67,7 +66,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
-        <!-- White circle background -->
         <ImageView
             android:id="@+id/circleBackground"
             android:layout_width="match_parent"
@@ -75,7 +73,6 @@
             android:scaleType="centerCrop"
             android:src="@drawable/circle_background_white" />
 
-        <!-- Item image -->
         <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/itemDetailImage"
             android:layout_width="200dp"
@@ -88,7 +85,6 @@
 
     </RelativeLayout>
 
-    <!-- Content ScrollView -->
     <ScrollView
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -106,15 +102,30 @@
             android:paddingBottom="20dp"
             android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/itemDetailName"
+            <LinearLayout
+                android:id="@+id/nameLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                android:textSize="24sp"
-                android:textStyle="bold"
-                android:textAlignment="center"
-                android:textColor="@color/black" />
+                android:orientation="horizontal"
+                android:layout_marginTop="25dp"
+                android:layout_marginBottom="12dp"
+                android:paddingHorizontal="8dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Name: "
+                    android:textStyle="bold"
+                    android:textSize="18sp"
+                    android:textColor="@color/black"/>
+
+                <TextView
+                    android:id="@+id/itemDetailName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/black"
+                    android:textSize="18sp"/>
+            </LinearLayout>
 
             <LinearLayout
                 android:id="@+id/categoryLayout"

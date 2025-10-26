@@ -279,7 +279,6 @@ public class ItemsViewActivity extends AppCompatActivity {
         Intent intent = new Intent(this, ViewAnItemActivity.class);
         intent.putExtra("foodItem", selectedItem);
         startActivity(intent);
-        Toast.makeText(this, selectedItem.getName() + " clicked", Toast.LENGTH_SHORT).show();
     }
 
     private void loadSoonToExpireItems() {
