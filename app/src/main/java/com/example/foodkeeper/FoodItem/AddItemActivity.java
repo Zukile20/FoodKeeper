@@ -143,7 +143,6 @@ public class AddItemActivity extends AppCompatActivity {
                 return;
             }
 
-
             byte[] imageBytes = null;
             if (selectedImage != null) {
                 ByteArrayOutputStream stream = new ByteArrayOutputStream();

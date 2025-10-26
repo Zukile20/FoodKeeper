@@ -41,6 +41,10 @@ public class LoginActivity extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_login);
 
+        SQLiteDatabase database = openOrCreateDatabase("FoodKeeper.db", MODE_PRIVATE, null);
+        database.execSQL("CREATE TABLE IF NOT EXISTS sample (id INTEGER PRIMARY KEY, name TEXT)");
+        database.close();
+
         edEmail = findViewById(R.id.email);
         edPassword = findViewById(R.id.passwordField);
         btn = findViewById(R.id.loginBtn);
