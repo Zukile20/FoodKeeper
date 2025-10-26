@@ -55,17 +55,14 @@ public class EditItemActivity extends AppCompatActivity {
     private FoodItem currentItem;
     private Database db;
     private EditText edName, edCategory, edExpiryDate;
-    private TextInputLayout txtDateLayout;
     private TextView tvQuantity;
     private ShapeableImageView foodImage;
     private ImageButton cameraIconButton;
     private Button btnMinus, btnPlus, btnCancel, btnSave, btnClose;
     private Bitmap selectedImage;
     int thresholdQuantity=1;
-
     private Calendar calendar;
     private DatePickerDialog datePickerDialog;
-    private Dialog categoryDialog;
     private RadioGroup categoryRadioGroup;
     private String selectedCategory = "";
     SessionManager session;
@@ -87,7 +84,6 @@ public class EditItemActivity extends AppCompatActivity {
         edName = findViewById(R.id.nameEditText);
         edCategory = findViewById(R.id.categoryEditText);
         edExpiryDate = findViewById(R.id.expiryDateEditText);
-        txtDateLayout = findViewById(R.id.txtDateLayout);
         tvQuantity = findViewById(R.id.tv_quantity);
         btnMinus = findViewById(R.id.btn_minus);
         btnPlus = findViewById(R.id.btn_plus);
@@ -136,7 +132,29 @@ public class EditItemActivity extends AppCompatActivity {
         btnCancel.setOnClickListener(v -> finish());
         btnSave.setOnClickListener(v -> saveItem());
     }
+    private void CheckExpiringItem(FoodItem item) {
+        try {
+            SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
 
+            Calendar cal = Calendar.getInstance();
+            cal.set(Calendar.HOUR_OF_DAY, 0);
+            cal.set(Calendar.MINUTE, 0);
+            cal.set(Calendar.SECOND, 0);
+            cal.set(Calendar.MILLISECOND, 0);
+            Date today = cal.getTime();
+
+            cal.add(Calendar.DAY_OF_YEAR, 3);
+            Date threshold = cal.getTime();
+
+            Date expiryDate = format.parse(item.getExpiryDate().trim());
+
+            if (expiryDate != null && !expiryDate.before(today) && !expiryDate.after(threshold)) {
+                NotificationHelper.showExpiringItemNotification(this, item);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
     private int findCategoryIdByName(String categoryName) {
         for (Category category : categories) {
             if (category.getName().equals(categoryName)) {
@@ -403,17 +421,18 @@ public class EditItemActivity extends AppCompatActivity {
         currentItem.setQuantity(quantity);
         currentItem.setImage(imageBytes);
 
-        boolean updated = db.updateFoodItem(currentItem,session.getUserEmail());
+        boolean updated = db.updateFoodItem(currentItem, session.getUserEmail());
 
         if (updated) {
             Intent resultIntent = new Intent();
             resultIntent.putExtra("updatedItem", currentItem);
             setResult(RESULT_OK, resultIntent);
             finish();
-            if(currentItem.getQuantity()==thresholdQuantity)//low stock quantity
+            if(currentItem.getQuantity()==thresholdQuantity)
             {
                 NotificationHelper.showLowStockNotification(this,currentItem);
             }
+            CheckExpiringItem(currentItem);
         } else {
             Toast.makeText(this, "Failed to update item", Toast.LENGTH_SHORT).show();
         }

@@ -24,6 +24,7 @@ import com.example.foodkeeper.FoodItem.models.FoodItem;
 import com.example.foodkeeper.FoodItem.view_items.ItemsViewActivity;
 import com.example.foodkeeper.FoodkeeperUtils.Database;
 
+import com.example.foodkeeper.FoodkeeperUtils.NotificationHelper;
 import com.example.foodkeeper.R;
 import com.example.foodkeeper.Register.LoginActivity;
 import com.example.foodkeeper.Register.RegisterActivity;
@@ -33,9 +34,12 @@ import com.google.android.material.textfield.TextInputLayout;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class AddItemActivity extends AppCompatActivity {
     private static final int PERMISSION_REQUEST_CODE = 100;
@@ -151,14 +155,43 @@ public class AddItemActivity extends AppCompatActivity {
             }
 
             int categoryId = findCategoryIdByName(category);
-
-            db.addFoodItem(new FoodItem(name, String.valueOf(categoryId), expiryDate, quantity, imageBytes),session.getUserEmail());
+            
+            FoodItem item = new FoodItem(name, String.valueOf(categoryId), expiryDate, quantity, imageBytes);
+            long num = db.addFoodItem(item ,session.getUserEmail());
+            
+            if(num != -1)
+                CheckExpiringItem(item);
+            
             startActivity(new Intent(AddItemActivity.this, ItemsViewActivity.class));
         });
 
         backBtn.setOnClickListener(v -> {
             startActivity(new Intent(this, ItemsViewActivity.class));
         });
+    }
+
+    private void CheckExpiringItem(FoodItem item) {
+        try {
+            SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+
+            Calendar cal = Calendar.getInstance();
+            cal.set(Calendar.HOUR_OF_DAY, 0);
+            cal.set(Calendar.MINUTE, 0);
+            cal.set(Calendar.SECOND, 0);
+            cal.set(Calendar.MILLISECOND, 0);
+            Date today = cal.getTime();
+
+            cal.add(Calendar.DAY_OF_YEAR, 3);
+            Date threshold = cal.getTime();
+
+            Date expiryDate = format.parse(item.getExpiryDate().trim());
+
+            if (expiryDate != null && !expiryDate.before(today) && !expiryDate.after(threshold)) {
+                NotificationHelper.showExpiringItemNotification(this, item);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private int findCategoryIdByName(String categoryName) {
@@ -335,15 +368,6 @@ public class AddItemActivity extends AppCompatActivity {
 
     private void updateQuantityViews() {
         tvQuantity.setText(String.valueOf(quantity));
-    }
-
-    public int getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(int quantity) {
-        this.quantity = Math.max(0, Math.min(quantity, 999999));
-        updateQuantityViews();
     }
 
     @Override
