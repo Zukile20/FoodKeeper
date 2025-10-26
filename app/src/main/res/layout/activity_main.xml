@@ -149,6 +149,17 @@
                 android:textSize="20sp"
                 android:textStyle="bold" />
 
+            <TextView
+                android:id="@+id/weeklyPlan"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="WeeklyMealPlan"
+                android:text="Weekly plan"
+                android:drawableEnd="@drawable/ic_arrow_forward"
+                android:drawablePadding="8dp"
+                android:textSize="18sp"
+                android:padding="8dp" />
+
         </LinearLayout>
 
         <!-- Container for RecyclerView and Empty State -->

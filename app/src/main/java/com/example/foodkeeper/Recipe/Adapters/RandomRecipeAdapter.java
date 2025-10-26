@@ -73,23 +73,12 @@ public class RandomRecipeAdapter extends RecyclerView.Adapter<RandomRecipeViewHo
         updateFavoriteButton(holder, recipe);
 
         holder.favButton.setOnClickListener(v -> {
-            // Check if user is logged in
-            if (userEmail == null || userEmail.isEmpty()) {
-                Toast.makeText(contex, "Please log in to favorite recipes", Toast.LENGTH_SHORT).show();
-                return;
-            }
-
-            // Toggle favorite status
             boolean newFavoriteStatus = recipe.fav != 1;
-
-            // Update database - pass userEmail
             boolean success = db.toggleFavorite(recipe.id, newFavoriteStatus, userEmail);
 
             if (success) {
-                // Update the recipe object
                 recipe.fav = newFavoriteStatus ? 1 : 0;
 
-                // Update the UI
                 updateFavoriteButton(holder, recipe);
                 String message = newFavoriteStatus ? "Added to favorites!" : "Removed from favorites!";
                 Toast.makeText(contex, message, Toast.LENGTH_SHORT).show();

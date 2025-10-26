@@ -244,8 +244,9 @@ public class LandingPageActivity extends AppCompatActivity {
     {
         startActivity(new Intent(this,RecipeActivity.class));
     }
-
-
+    public void WeeklyMealPlan(View v){
+        startActivity(new Intent(this,WeeklyViewActivity.class));
+    }
     @Override
     protected void onDestroy() {
         super.onDestroy();
