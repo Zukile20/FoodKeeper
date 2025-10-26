@@ -1,14 +1,19 @@
 package com.example.foodkeeper.Meal;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Base64;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -25,34 +30,36 @@ import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.foodkeeper.FoodItem.models.FoodItem;
 import com.example.foodkeeper.FoodkeeperUtils.Database;
 import com.example.foodkeeper.R;
 import com.example.foodkeeper.Register.SessionManager;
+import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
 
-import java.io.File;
-import java.io.FileOutputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
 public class CreateMealActivity extends AppCompatActivity implements FoodSelectionAdapter.OnItemSelectionChangeListener {
-    Database db ;
+    Database db;
 
     private boolean imageSelectedForCurrentMeal = false;
     // UI Components
+    private TextInputEditText nameField;
+    private TextInputLayout tilMealName;
+    private TextView tvMealNameError;
     private EditText searchText;
-    private EditText nameField;
     private RecyclerView recyclerView;
     private ImageButton loadImageBtn;
     private ImageView mealImage;
-    private Button backBtn,createBtn;
+    private Button backBtn, createBtn;
     private Uri selectedImageUri;
     private Button fullViewBtn;
     private TextView counterTextViewer;
-
 
     // Adapter
     private FoodSelectionAdapter foodItemAdapter;
@@ -60,30 +67,30 @@ public class CreateMealActivity extends AppCompatActivity implements FoodSelecti
     private ActivityResultLauncher<Intent> resultLauncher;
     private ActivityResultLauncher<Intent> fullViewLauncher;
     private SessionManager session;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.create_meal_activity);
-        db=   Database.getInstance(this);
-        session= new SessionManager(this);
+        db = Database.getInstance(this);
+        session = new SessionManager(this);
         initializeViews();
         initiaLizeData(db);
         setupAdapter();
-        fullViewLauncher = registerForActivityResult( new ActivityResultContracts.StartActivityForResult(), result->
-                {
-                    if (result.getResultCode() == RESULT_OK) {
-                        Intent data = result.getData();
-                        if (data != null) {
-                            ArrayList<String> selectedItems = data.getStringArrayListExtra("selectedItems");
-                            markSelectedItems(selectedItems);
-                            foodItemAdapter.notifyDataSetChanged();
-                            updateCounter();
-                        }
-                    }
+        fullViewLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result ->
+        {
+            if (result.getResultCode() == RESULT_OK) {
+                Intent data = result.getData();
+                if (data != null) {
+                    ArrayList<String> selectedItems = data.getStringArrayListExtra("selectedItems");
+                    markSelectedItems(selectedItems);
+                    foodItemAdapter.notifyDataSetChanged();
+                    updateCounter();
                 }
-        );
-      setupListeners();
-       setupImagePicker();
+            }
+        });
+        setupListeners();
+        setupImagePicker();
     }
 
     private void initializeViews() {
@@ -91,16 +98,40 @@ public class CreateMealActivity extends AppCompatActivity implements FoodSelecti
         loadImageBtn = findViewById(R.id.loadPicture);
         mealImage = findViewById(R.id.mealImage);
         nameField = findViewById(R.id.nameField);
+        tilMealName = findViewById(R.id.tilMealName);
+        tvMealNameError = findViewById(R.id.tvMealNameError);
         backBtn = findViewById(R.id.backBtn);
         searchText = findViewById(R.id.searchField);
-        fullViewBtn =findViewById(R.id.fullViewBtn);
-        createBtn= findViewById(R.id.createBtn);
+        fullViewBtn = findViewById(R.id.fullViewBtn);
+        createBtn = findViewById(R.id.createBtn);
         counterTextViewer = findViewById(R.id.counterTextView);
     }
 
     private void setupListeners() {
         backBtn.setOnClickListener(view -> finish());
         loadImageBtn.setOnClickListener(v -> pickImage());
+
+        // Real-time validation for meal name
+        nameField.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                String mealName = s.toString().trim();
+                if (mealName.isEmpty()) {
+                    showError(tvMealNameError, "Meal name cannot be empty");
+                } else {
+                    hideError(tvMealNameError);
+                }
+            }
+        });
+
         searchText.addTextChangedListener(new TextWatcher() {
             @Override
             public void afterTextChanged(Editable s) {
@@ -116,76 +147,140 @@ public class CreateMealActivity extends AppCompatActivity implements FoodSelecti
             }
         });
 
-        fullViewBtn.setOnClickListener(v ->openFullView());
-        createBtn.setOnClickListener(v->
+        fullViewBtn.setOnClickListener(v -> openFullView());
+        createBtn.setOnClickListener(v ->
         {
-            String mealName = String.valueOf(nameField.getText());
-          if(foodItemAdapter.getSelectedItemCount()==0 || mealName.isEmpty())
-          {
-              if (mealName.isEmpty()) {
-                  Toast.makeText(this, "Meal name cannot be empty", Toast.LENGTH_SHORT).show();
-              }
-              else {
-                  Toast.makeText(this, "At least one item must be selected", Toast.LENGTH_SHORT).show();
-              }
-          } else {
-              if (db != null)
-              {
-                  //creating the meal......with its fooditems
-                   createNewMeal(mealName);
-                  Toast.makeText(this,"Meal has been created successfully",Toast.LENGTH_SHORT).show();
-                  setResult(RESULT_OK);
-                  finish();
-              }
-          }
+            String mealName = String.valueOf(nameField.getText()).trim();
 
+            // Validation
+            boolean hasError = false;
+
+            if (mealName.isEmpty()) {
+                showError(tvMealNameError, "Meal name cannot be empty");
+                nameField.requestFocus();
+                hasError = true;
+            }
+
+            if (foodItemAdapter.getSelectedItemCount() == 0) {
+                Toast.makeText(this, "At least one item must be selected", Toast.LENGTH_SHORT).show();
+                hasError = true;
+            }
+
+            if (!hasError) {
+                if (db != null) {
+                    //creating the meal......with its fooditems
+                    createNewMeal(mealName);
+                    Toast.makeText(this, "Meal has been created successfully", Toast.LENGTH_SHORT).show();
+                    setResult(RESULT_OK);
+                    finish();
+                }
+            }
         });
     }
 
-    private String createNewMeal(String name)
-    {
-     //get the id for the meal
-        try {
+    private void showError(TextView errorTextView, String message) {
+        errorTextView.setText(message);
+        errorTextView.setVisibility(View.VISIBLE);
 
-            String imageUri = null;
+        if (errorTextView == tvMealNameError) {
+            tilMealName.setBoxStrokeErrorColor(getResources().getColorStateList(R.color.red));
+            tilMealName.setError(" ");
+        }
+    }
+
+    private void hideError(TextView errorTextView) {
+        errorTextView.setText("");
+        errorTextView.setVisibility(View.GONE);
+
+        if (errorTextView == tvMealNameError) {
+            tilMealName.setError(null);
+        }
+    }
+
+    private String createNewMeal(String name) {
+        try {
+            String imageBase64 = null;
 
             if (imageSelectedForCurrentMeal && selectedImageUri != null) {
-                imageUri = saveImageToInternalStorage(selectedImageUri);
+                imageBase64 = saveImageToStorage(this, selectedImageUri);
             }
 
             imageSelectedForCurrentMeal = false;
             selectedImageUri = null;
 
-            Meal meal = new Meal(name, imageUri,db.getConnectedFridgeForUser(session.getUserEmail()).getId());
-            long mealID = db.createMeal(meal,db.getConnectedFridgeForUser(session.getUserEmail()).getId());//creates a new meal and returns its assigned id
+            Meal meal = new Meal(name, imageBase64, db.getConnectedFridgeForUser(session.getUserEmail()).getId());
+            long mealID = db.createMeal(meal, db.getConnectedFridgeForUser(session.getUserEmail()).getId());
             meal.setMealID(mealID);
             meal.setFoodItemIDs(foodItemAdapter.getSelectedItemIds());
-            db.updateMeal(meal);//add entries to the MealFoodItem table
+            db.updateMeal(meal);
             return null;
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
+            Toast.makeText(this, "Error processing image", Toast.LENGTH_SHORT).show();
             throw new RuntimeException(e);
         }
+    }
+    public String saveImageToStorage(Context context, Uri uri) throws IOException {
+        InputStream inputStream = context.getContentResolver().openInputStream(uri);
 
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        BitmapFactory.decodeStream(inputStream, null, options);
+        inputStream.close();
+
+        inputStream = context.getContentResolver().openInputStream(uri);
+        options.inSampleSize = calculateInSampleSize(options, 1024, 1024);
+        options.inJustDecodeBounds = false;
+
+        Bitmap bitmap = BitmapFactory.decodeStream(inputStream, null, options);
+        inputStream.close();
+
+        if (bitmap == null) {
+            throw new IOException("Failed to decode bitmap");
+        }
+
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 85, byteArrayOutputStream);
+        byte[] byteArray = byteArrayOutputStream.toByteArray();
+        byteArrayOutputStream.close();
+        bitmap.recycle();
+
+        return Base64.encodeToString(byteArray, Base64.DEFAULT);
+    }
+    private int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {
+        final int height = options.outHeight;
+        final int width = options.outWidth;
+        int inSampleSize = 1;
+
+        if (height > reqHeight || width > reqWidth) {
+            final int halfHeight = height / 2;
+            final int halfWidth = width / 2;
+
+            while ((halfHeight / inSampleSize) >= reqHeight && (halfWidth / inSampleSize) >= reqWidth) {
+                inSampleSize *= 2;
+            }
+        }
+        return inSampleSize;
     }
 
     private void initiaLizeData(Database db) {
         FOOD_ITEMS.addAll(db.getUserFoodItems(session.getUserEmail()));
     }
+
     private void setupAdapter() {
         foodItemAdapter = new FoodSelectionAdapter(this, FOOD_ITEMS);
         foodItemAdapter.setOnItemSelectionChangeListener(this);
 
-        // Setup RecyclerView
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(foodItemAdapter);
 
         updateCounter();
     }
+
     private void updateCounter() {
         int selectedCount = foodItemAdapter != null ? foodItemAdapter.getSelectedItemCount() : 0;
         counterTextViewer.setText("Selected : " + selectedCount);
     }
+
     private void setupImagePicker() {
         requestNotificationPermission();
         resultLauncher = registerForActivityResult(
@@ -194,11 +289,18 @@ public class CreateMealActivity extends AppCompatActivity implements FoodSelecti
                     try {
                         if (result.getResultCode() == RESULT_OK && result.getData() != null) {
                             Uri imageUri = result.getData().getData();
-                            if (imageUri != null)
-                            {
-                                selectedImageUri =imageUri;
+                            if (imageUri != null) {
+                                selectedImageUri = imageUri;
                                 imageSelectedForCurrentMeal = true;
-                                mealImage.setImageURI(imageUri);
+
+                                // Load the URI directly with Glide (it's not Base64 yet)
+                                Glide.with(this)
+                                        .load(imageUri)
+                                        .placeholder(R.drawable.image_placeholder)
+                                        .error(R.drawable.image_placeholder)
+                                        .centerCrop()
+                                        .into(mealImage);
+
                                 showToast("Image loaded successfully");
                             } else {
                                 showToast("Failed to load image");
@@ -217,12 +319,12 @@ public class CreateMealActivity extends AppCompatActivity implements FoodSelecti
         Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         resultLauncher.launch(intent);
     }
+
     private void showToast(String message) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
+
     private void openFullView() {
-
-
         Intent intent = new Intent(CreateMealActivity.this, FullView.class);
         intent.putExtra("foodItems", foodItemAdapter.getSelectedItemIds());
         fullViewLauncher.launch(intent);
@@ -230,22 +332,7 @@ public class CreateMealActivity extends AppCompatActivity implements FoodSelecti
     }
 
     private ArrayList<FoodItem> FOOD_ITEMS = new ArrayList<>();
-    private String saveImageToInternalStorage(Uri uri) throws IOException {
-        InputStream inputStream = getContentResolver().openInputStream(uri);
-        File file = new File(getFilesDir(), "meal_" + System.currentTimeMillis() + ".jpg");
-        OutputStream outputStream = new FileOutputStream(file);
 
-        byte[] buffer = new byte[4096];
-        int length;
-        while ((length = inputStream.read(buffer)) > 0) {
-            outputStream.write(buffer, 0, length);
-        }
-
-        inputStream.close();
-        outputStream.close();
-
-        return file.getAbsolutePath();
-    }
     private void requestNotificationPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (ContextCompat.checkSelfPermission(this,
@@ -255,7 +342,6 @@ public class CreateMealActivity extends AppCompatActivity implements FoodSelecti
             }
         }
     }
-
 
     @Override
     public void onSelectionChanged(int selectedCount) {
@@ -267,15 +353,18 @@ public class CreateMealActivity extends AppCompatActivity implements FoodSelecti
         String message = item.getCheckState() ? "Selected: " : "Deselected: ";
         Toast.makeText(this, message + item.getName(), Toast.LENGTH_SHORT).show();
     }
+
     private void updateCounterWithCount(int count) {
         counterTextViewer.setText("Selected : " + count);
     }
+
     private void markSelectedItems(ArrayList<String> selectedItemIds) {
         for (FoodItem item : FOOD_ITEMS) {
             String itemId = String.valueOf(item.getId());
             item.setChecked(selectedItemIds.contains(itemId));
         }
     }
+
     @Override
     protected void onResume() {
         super.onResume();

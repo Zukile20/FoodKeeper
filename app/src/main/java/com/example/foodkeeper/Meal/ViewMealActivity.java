@@ -1,8 +1,10 @@
 package com.example.foodkeeper.Meal;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Base64;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -88,7 +90,7 @@ public class ViewMealActivity extends AppCompatActivity {
     {
         if(meal!=null) {
             mealName.setText(meal.getMealName());
-            loadMealImage(mealImage, meal);
+            loadBase64ImageWithGlide(this, meal.getUri(),mealImage);
             if(meal.getLastUsed()!=null)
             {
                 lastUsed.setText(lastUsed.getText()+meal.getLastUsed().toString());
@@ -98,19 +100,24 @@ public class ViewMealActivity extends AppCompatActivity {
             }
         }
     }
-    private void loadMealImage(ImageView imageView, Meal meal) {
-        if(mealImage!=null) {
-            if (meal.getUri() != null) {//since a meal might not have an image
+    public void loadBase64ImageWithGlide(Context context, String base64String, ImageView imageView) {
+        if (base64String == null || base64String.isEmpty()) {
+            imageView.setImageResource(R.drawable.image_placeholder);
+            return;
+        }
 
-                File imageFile  = new File(meal.getUri());
-                Glide.with(this)
-                        .load(imageFile)
-                        .centerCrop()
-                        .placeholder(R.drawable.image_placeholder)
-                        .error(R.drawable.ic_no_meals)
-                        .into(mealImage);
+        try {
+            byte[] decodedBytes = Base64.decode(base64String, Base64.DEFAULT);
 
-            }
+            Glide.with(context)
+                    .load(decodedBytes)
+                    .placeholder(R.drawable.image_placeholder)
+                    .error(R.drawable.image_placeholder)
+                    .centerCrop()
+                    .into(imageView);
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+            imageView.setImageResource(R.drawable.image_placeholder);
         }
     }
 

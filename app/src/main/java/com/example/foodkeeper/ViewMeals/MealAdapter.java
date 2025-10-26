@@ -2,6 +2,7 @@ package com.example.foodkeeper.ViewMeals;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -95,7 +96,6 @@ public class MealAdapter extends RecyclerView.Adapter<MealAdapter.MealViewHolder
         }
 
         private void setupClickListeners() {
-            // Edit button click
             editButton.setOnClickListener(v -> {
                 int position = getAdapterPosition();
                 if (position != RecyclerView.NO_POSITION && onItemActionListener != null) {
@@ -104,7 +104,6 @@ public class MealAdapter extends RecyclerView.Adapter<MealAdapter.MealViewHolder
                 }
             });
 
-            // Delete button click
             deleteButton.setOnClickListener(v -> {
                 int position = getAdapterPosition();
                 if (position != RecyclerView.NO_POSITION && onItemActionListener != null) {
@@ -113,15 +112,12 @@ public class MealAdapter extends RecyclerView.Adapter<MealAdapter.MealViewHolder
                 }
             });
 
-            // Main content click (when not swiped)
             mainContent.setOnClickListener(v -> {
                 int position = getAdapterPosition();
                 if (position != RecyclerView.NO_POSITION && onItemActionListener != null) {
-                    // Only trigger click if not revealed
                     if (!swipeRevealLayout.isRevealed()) {
                         onItemActionListener.onItemClick(meals.get(position), position);
                     } else {
-                        // If revealed, just close it
                         swipeRevealLayout.close();
                     }
                 }
@@ -131,19 +127,30 @@ public class MealAdapter extends RecyclerView.Adapter<MealAdapter.MealViewHolder
         public void bind(Meal meal) {
             mealNameText.setText(meal.getMealName());
 
-            // Close swipe when rebinding (important for recycling)
             swipeRevealLayout.close();
 
-            // Load image with Glide
-            Glide.with(itemView.getContext())
-                    .load(meal.getUri())
-                    .placeholder(R.drawable.image_placeholder)
-                    .error(R.drawable.place_holder)
-                    .into(mealImageView);
+            loadBase64ImageWithGlide(context,meal.getUri(),mealImageView);
+        }
+        public void loadBase64ImageWithGlide(Context context, String base64String, ImageView imageView) {
+            if (base64String == null || base64String.isEmpty()) {
+                imageView.setImageResource(R.drawable.image_placeholder);
+                return;
+            }
+
+            try {
+                byte[] decodedBytes = Base64.decode(base64String, Base64.DEFAULT);
+
+                Glide.with(context)
+                        .load(decodedBytes)
+                        .placeholder(R.drawable.image_placeholder)
+                        .error(R.drawable.image_placeholder)
+                        .centerCrop()
+                        .into(imageView);
+            } catch (IllegalArgumentException e) {
+                e.printStackTrace();
+                imageView.setImageResource(R.drawable.image_placeholder);
+            }
         }
 
-        public SwipeRevealLayout getSwipeRevealLayout() {
-            return swipeRevealLayout;
-        }
     }
 }

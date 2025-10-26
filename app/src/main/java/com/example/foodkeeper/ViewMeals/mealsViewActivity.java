@@ -236,13 +236,13 @@ public class mealsViewActivity extends AppCompatActivity  {
                     LocalDate lastUsed2 = m2.getLastUsed();
 
                     if (lastUsed1 == null && lastUsed2 == null) {
-                        return 0; // Both null, consider equal
+                        return 0;
                     }
                     if (lastUsed1 == null) {
-                        return 1; // null goes to end (less recent)
+                        return 1;
                     }
                     if (lastUsed2 == null) {
-                        return -1; // null goes to end (less recent)
+                        return -1;
                     }
 
                     return lastUsed2.compareTo(lastUsed1);
@@ -262,7 +262,7 @@ public class mealsViewActivity extends AppCompatActivity  {
 
         new Thread(() -> {
             try {
-                Thread.sleep(100); // Simulate network delay
+                Thread.sleep(100);
 
                 List<Meal> meals = loadData();
 
@@ -291,7 +291,7 @@ public class mealsViewActivity extends AppCompatActivity  {
 
     private void hideLoadingState() {
         loadingLayout.setVisibility(GONE);
-    //    mealsRecyclerView.setVisibility(View.VISIBLE);
+        mealsRecyclerView.setVisibility(View.VISIBLE);
     }
 
     private void updateEmptyState() {

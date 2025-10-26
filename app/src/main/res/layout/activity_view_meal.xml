@@ -4,15 +4,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/mainBlue">
+    android:background="@color/blue">
 
     <LinearLayout
         android:id="@+id/linearLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:padding="16dp"
         android:layout_marginTop="20dp"
+        android:padding="16dp"
         android:gravity="center_vertical"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -41,6 +41,7 @@
 
     </LinearLayout>
 
+    <!-- Guideline at 25% of screen height -->
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guidelineMiddle"
         android:layout_width="wrap_content"
@@ -138,8 +139,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="10dp"
                 android:clickable="true"
-                android:divider="@null"
-                android:dividerHeight="0dp" />
+                android:divider="@color/white"
+                android:dividerHeight="1dp" />
 
             <TextView
                 android:id="@+id/lastUsedView"

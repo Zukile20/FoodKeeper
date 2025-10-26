@@ -2,6 +2,7 @@ package com.example.foodkeeper.LandingPage;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -70,23 +71,40 @@ public class MealAdapterLanding extends RecyclerView.Adapter<MealAdapterLanding.
         public ViewHolderLanding(@NonNull View itemView) {
             super(itemView);
 
-            // Initialize views
             mealImageView = itemView.findViewById(R.id.meal_view);
             mealNameText = itemView.findViewById(R.id.meal_name);
             mealType = itemView.findViewById(R.id.mealType);
+        }
+        public void loadBase64ImageWithGlide(Context context, String base64String, ImageView imageView) {
+            if (base64String == null || base64String.isEmpty()) {
+                imageView.setImageResource(R.drawable.image_placeholder);
+                return;
+            }
+
+            try {
+                byte[] decodedBytes = Base64.decode(base64String, Base64.DEFAULT);
+
+                Glide.with(context)
+                        .asBitmap()
+                        .load(decodedBytes)
+                        .placeholder(R.drawable.image_placeholder)
+                        .error(R.drawable.image_placeholder)
+                        .centerCrop()
+                        .into(imageView);
+            } catch (IllegalArgumentException e) {
+                e.printStackTrace();
+                imageView.setImageResource(R.drawable.image_placeholder);
+            } catch (Exception e) {
+                e.printStackTrace();
+                imageView.setImageResource(R.drawable.image_placeholder);
+            }
         }
 
         public void bind(Meal meal) {
             mealNameText.setText(meal.getMealName());
             mealType.setText(meal.getMealType());
 
-            // Load image
-            if (meal.getUri() != null) {
-                Glide.with(itemView.getContext())
-                        .load(meal.getUri())
-                        .placeholder(R.drawable.place_holder)
-                        .into(mealImageView);
-            }
+         loadBase64ImageWithGlide(context,meal.getUri(),mealImageView);
         }
     }
 }

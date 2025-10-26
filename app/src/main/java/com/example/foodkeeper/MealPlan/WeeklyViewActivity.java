@@ -11,7 +11,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.util.Log;
+import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -141,7 +141,6 @@ public class WeeklyViewActivity extends AppCompatActivity implements CalendarAda
                                 db.deleteMealplan(selectedDate,fridgeId);//check if the meal does contain at least one meal ,otherwise delete it
                             }
                             if (mealPlan.getBreakFast() != null) {
-                                //Obtain the breakfast meal from the database
                                 Meal breakfastMeal = db.getMealWithFoodItems(mealPlan.getBreakFast());
                                 try {
                                     showMealLayout(breakFastDisplay, breakfastMeal, breakFastLayout);
@@ -340,7 +339,7 @@ public class WeeklyViewActivity extends AppCompatActivity implements CalendarAda
             mealName.setText(meal.getMealName());
             if (meal.getUri() != null) {//since a meal might not have an image
 
-             loadMealImage(mealImage,meal);
+             loadBase64ImageWithGlide(this,meal.getUri(),mealImage);
 
             } else {
                 mealImage.setImageResource(R.drawable.place_holder);
@@ -420,8 +419,33 @@ public class WeeklyViewActivity extends AppCompatActivity implements CalendarAda
             });
         }
 
+
     }
 
+    public void loadBase64ImageWithGlide(Context context, String base64String, ImageView imageView) {
+        if (base64String == null || base64String.isEmpty()) {
+            imageView.setImageResource(R.drawable.image_placeholder);
+            return;
+        }
+
+        try {
+            byte[] decodedBytes = Base64.decode(base64String, Base64.DEFAULT);
+
+            Glide.with(context)
+                    .asBitmap()
+                    .load(decodedBytes)
+                    .placeholder(R.drawable.image_placeholder)
+                    .error(R.drawable.image_placeholder)
+                    .centerCrop()
+                    .into(imageView);
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+            imageView.setImageResource(R.drawable.image_placeholder);
+        } catch (Exception e) {
+            e.printStackTrace();
+            imageView.setImageResource(R.drawable.image_placeholder);
+        }
+    }
 
 
     @Override
@@ -487,48 +511,6 @@ public class WeeklyViewActivity extends AppCompatActivity implements CalendarAda
             populatedState.setVisibility(GONE);
         }
     }
-    private void loadMealImage(ImageView imageView, Meal meal) {
-        String imagePath = meal.getUri();
-
-
-        if (imagePath != null && !imagePath.isEmpty()) {
-            File imageFile = new File(imagePath);
-
-            if (!imageFile.exists()) {
-                imageView.setImageResource(R.drawable.place_holder);
-                return;
-            }
-
-
-            Glide.with(this)
-                    .load(imageFile)
-                    .placeholder(R.drawable.place_holder)
-                    .error(R.drawable.place_holder)
-                    .fallback(R.drawable.place_holder)
-                    .override(64, 64)
-                    .centerCrop()
-                    .listener(new RequestListener<Drawable>() {
-                        @Override
-                        public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
-                            if (e != null) {
-                                Log.e("ImageLoad", "Glide error details: " + e.getMessage());
-                                e.printStackTrace();
-                            }
-                            return false;
-                        }
-
-                        @Override
-                        public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
-                            Log.d("ImageLoad", "Image loaded successfully from: " + imagePath);
-                            return false;
-                        }
-                    })
-                    .into(imageView);
-        } else {
-            imageView.setImageResource(R.drawable.place_holder);
-        }
-    }
-
     public void newMealPlanAction(View view)
     {
        Intent intent = new Intent(this, MealPlanActivity.class);
