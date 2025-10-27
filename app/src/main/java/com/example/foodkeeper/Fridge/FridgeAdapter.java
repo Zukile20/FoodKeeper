@@ -12,6 +12,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.foodkeeper.Fridge.models.Fridge;
 import com.example.foodkeeper.R;
 
 import java.util.ArrayList;

@@ -12,7 +12,7 @@ import android.widget.Toast;
 
 import com.example.foodkeeper.FoodItem.models.Category;
 import com.example.foodkeeper.FoodItem.models.FoodItem;
-import com.example.foodkeeper.Fridge.Fridge;
+import com.example.foodkeeper.Fridge.models.Fridge;
 import com.example.foodkeeper.Meal.Meal;
 import com.example.foodkeeper.MealPlan.CalendarUtils;
 import com.example.foodkeeper.MealPlan.MealPlan;
@@ -22,7 +22,7 @@ import com.example.foodkeeper.Recipe.Models.Recipe;
 import com.example.foodkeeper.Recipe.Models.RecipeDetailsResponse;
 import com.example.foodkeeper.Recipe.Models.Step;
 import com.example.foodkeeper.Register.SessionManager;
-import com.example.foodkeeper.User;
+import com.example.foodkeeper.Fridge.models.User;
 
 import java.time.LocalDate;
 import java.util.ArrayList;

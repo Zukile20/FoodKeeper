@@ -3,11 +3,9 @@ package com.example.foodkeeper.Register;
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -17,14 +15,13 @@ import android.widget.Toast;
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.foodkeeper.FoodItem.view_items.ItemsViewActivity;
 import com.example.foodkeeper.FoodkeeperUtils.Database;
 import com.example.foodkeeper.LandingPage.LandingPageActivity;
 import com.example.foodkeeper.R;
 import com.example.foodkeeper.Recipe.Listeners.RandomRecipeResponseListener;
 import com.example.foodkeeper.Recipe.Models.RandomRecipeApiResponse;
 import com.example.foodkeeper.Recipe.RequestManager;
-import com.example.foodkeeper.User;
+import com.example.foodkeeper.Fridge.models.User;
 
 public class LoginActivity extends AppCompatActivity {
     EditText edEmail, edPassword;

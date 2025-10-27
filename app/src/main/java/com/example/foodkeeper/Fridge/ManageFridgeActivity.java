@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.foodkeeper.FoodkeeperUtils.Database;
+import com.example.foodkeeper.Fridge.models.Fridge;
 import com.example.foodkeeper.R;
 import com.example.foodkeeper.Register.SessionManager;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;

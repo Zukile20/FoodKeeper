@@ -25,7 +25,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.FoodKeeper">
         <activity
-            android:name=".ChangePasswordActivity"
+            android:name=".profile_activity.ChangePasswordActivity"
             android:exported="false"
             android:theme="@style/PopupTheme" />
         <activity
@@ -42,7 +42,7 @@
             android:name=".FoodItem.SearchActivity"
             android:exported="false" />
         <activity
-            android:name=".ProfileActivity"
+            android:name=".profile_activity.ProfileActivity"
             android:exported="false" />
         <activity
             android:name=".Fridge.AddFridgeActivity"
@@ -60,7 +60,7 @@
             android:name=".FoodItem.expiring.ExpiringActivity"
             android:exported="false" />
         <activity
-            android:name=".MenuActivity"
+            android:name=".menu_page.MenuActivity"
             android:exported="false" />
         <activity
             android:name=".LandingPage.LandingPageActivity"

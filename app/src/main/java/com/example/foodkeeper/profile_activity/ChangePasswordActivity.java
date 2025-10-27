@@ -1,4 +1,4 @@
-package com.example.foodkeeper;
+package com.example.foodkeeper.profile_activity;
 
 import android.os.Bundle;
 import android.view.View;
@@ -10,6 +10,8 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.foodkeeper.FoodkeeperUtils.Database;
+import com.example.foodkeeper.R;
+import com.example.foodkeeper.Fridge.models.User;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 

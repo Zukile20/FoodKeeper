@@ -1,4 +1,4 @@
-package com.example.foodkeeper;
+package com.example.foodkeeper.menu_page;
 
 import android.app.Dialog;
 import android.content.Context;
@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+
+import com.example.foodkeeper.R;
 
 public class LogoutDialog extends Dialog {
 

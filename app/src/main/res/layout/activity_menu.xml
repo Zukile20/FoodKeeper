@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:layout_marginTop="20dp"
     android:background="@color/white"
-    tools:context=".MenuActivity">
+    tools:context=".menu_page.MenuActivity">
 
     <TextView
         android:id="@+id/menuTitle"

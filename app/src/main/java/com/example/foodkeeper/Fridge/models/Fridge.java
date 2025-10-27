@@ -1,4 +1,4 @@
-package com.example.foodkeeper.Fridge;
+package com.example.foodkeeper.Fridge.models;
 
 public class Fridge {
     private String brand, model, description;

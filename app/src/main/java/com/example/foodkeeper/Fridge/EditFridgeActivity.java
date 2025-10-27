@@ -24,6 +24,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import com.example.foodkeeper.FoodkeeperUtils.Database;
+import com.example.foodkeeper.Fridge.models.Fridge;
 import com.example.foodkeeper.R;
 import com.example.foodkeeper.Register.SessionManager;
 import com.google.android.material.imageview.ShapeableImageView;

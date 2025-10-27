@@ -12,7 +12,6 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
@@ -26,7 +25,7 @@ import com.example.foodkeeper.FoodItem.models.FoodItem;
 import com.example.foodkeeper.FoodItem.view_items.ItemsViewActivity;
 import com.example.foodkeeper.FoodkeeperUtils.Database;
 import com.example.foodkeeper.LandingPage.LandingPageActivity;
-import com.example.foodkeeper.MenuActivity;
+import com.example.foodkeeper.menu_page.MenuActivity;
 import com.example.foodkeeper.R;
 import com.example.foodkeeper.Register.LoginActivity;
 import com.example.foodkeeper.Register.SessionManager;
@@ -40,7 +39,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 
 public class SearchActivity extends AppCompatActivity {
     private EditText searchEditText;

@@ -1,4 +1,4 @@
-package com.example.foodkeeper;
+package com.example.foodkeeper.menu_page;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
@@ -15,6 +15,8 @@ import com.example.foodkeeper.FoodItem.view_items.ItemsViewActivity;
 import com.example.foodkeeper.Fridge.ManageFridgeActivity;
 import com.example.foodkeeper.LandingPage.LandingPageActivity;
 import com.example.foodkeeper.MealPlan.WeeklyViewActivity;
+import com.example.foodkeeper.profile_activity.ProfileActivity;
+import com.example.foodkeeper.R;
 import com.example.foodkeeper.Recipe.RecipeActivity;
 import com.example.foodkeeper.Register.LoginActivity;
 import com.example.foodkeeper.Register.SessionManager;

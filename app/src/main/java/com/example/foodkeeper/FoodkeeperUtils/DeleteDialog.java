@@ -1,4 +1,4 @@
-package com.example.foodkeeper;
+package com.example.foodkeeper.FoodkeeperUtils;
 
 import android.app.Dialog;
 import android.graphics.Color;
@@ -17,6 +17,8 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
+
+import com.example.foodkeeper.R;
 
 public class DeleteDialog extends DialogFragment {
     private String itemName;

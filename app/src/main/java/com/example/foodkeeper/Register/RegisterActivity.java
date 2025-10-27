@@ -19,7 +19,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.foodkeeper.FoodkeeperUtils.Database;
-import com.example.foodkeeper.Fridge.Fridge;
+import com.example.foodkeeper.Fridge.models.Fridge;
 import com.example.foodkeeper.R;
 import com.google.android.material.textfield.TextInputEditText;
 import java.io.ByteArrayOutputStream;

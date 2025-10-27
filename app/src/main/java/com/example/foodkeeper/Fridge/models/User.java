@@ -1,8 +1,5 @@
-package com.example.foodkeeper;
+package com.example.foodkeeper.Fridge.models;
 
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import java.io.ByteArrayOutputStream;
 import java.io.Serializable;
 
 public class User implements Serializable {
