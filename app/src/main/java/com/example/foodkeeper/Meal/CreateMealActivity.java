@@ -84,6 +84,7 @@ public class CreateMealActivity extends AppCompatActivity implements FoodSelecti
                 if (data != null) {
                     ArrayList<String> selectedItems = data.getStringArrayListExtra("selectedItems");
                     markSelectedItems(selectedItems);
+                    foodItemAdapter.setSelectedItems(selectedItems);
                     foodItemAdapter.notifyDataSetChanged();
                     updateCounter();
                 }

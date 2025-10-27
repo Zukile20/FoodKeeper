@@ -93,6 +93,7 @@ public class UpdateMealActivity extends AppCompatActivity implements FoodSelecti
                 if (data != null) {
                     ArrayList<String> selectedItems = data.getStringArrayListExtra("selectedItems");
                     markSelectedItems(selectedItems);
+                    adapter.setSelectedItems(selectedItems);
                     adapter.notifyDataSetChanged();
                     updateCounter();
                 }
@@ -102,6 +103,7 @@ public class UpdateMealActivity extends AppCompatActivity implements FoodSelecti
 
     private void setupAdapter() {
         adapter = new FoodSelectionAdapter(this, FOOD_ITEMS);
+        adapter.setOnItemSelectionChangeListener(this);
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
     }

@@ -169,6 +169,10 @@ public class FoodSelectionAdapter extends RecyclerView.Adapter<FoodSelectionAdap
             boolean checked = selectedItemIds.contains(String.valueOf(item.getId()));
             item.setChecked(checked);
         }
+
+        filteredList.clear();
+        filteredList.addAll(originalList);
+
         notifyDataSetChanged();
 
         if (selectionChangeListener != null) {
