@@ -19,7 +19,6 @@
         android:minHeight="72dp"
         android:layout_gravity="fill_horizontal">
 
-        <!-- Meal Image -->
         <androidx.cardview.widget.CardView
             android:layout_width="48dp"
             android:layout_height="48dp"
@@ -36,7 +35,6 @@
 
         </androidx.cardview.widget.CardView>
 
-        <!-- Meal Name -->
         <TextView
             android:id="@+id/eventCellTV"
             android:layout_width="match_parent"
@@ -53,7 +51,6 @@
             android:maxLines="2"
             />
 
-        <!-- Edit Button -->
         <ImageView
             android:id="@+id/editMealBtn"
             android:layout_width="40dp"

@@ -41,7 +41,6 @@
 
     </LinearLayout>
 
-    <!-- Guideline at 25% of screen height -->
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guidelineMiddle"
         android:layout_width="wrap_content"
@@ -49,7 +48,6 @@
         android:orientation="horizontal"
         app:layout_constraintGuide_percent="0.3" />
 
-    <!-- White background -->
     <ImageView
         android:id="@+id/imageView6"
         android:layout_width="0dp"
@@ -60,7 +58,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
-    <!-- Fridge image section (60% overlapping white background) -->
     <RelativeLayout
         android:id="@+id/imageSection"
         android:layout_width="265dp"
@@ -71,7 +68,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
-        <!-- White circle background -->
         <ImageView
             android:id="@+id/circleBackground"
             android:layout_width="match_parent"
@@ -79,7 +75,6 @@
             android:scaleType="centerCrop"
             android:src="@drawable/circle_background_white" />
 
-        <!-- Fridge image -->
         <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/fridgeDetailImage"
             android:layout_width="200dp"
@@ -92,7 +87,6 @@
 
     </RelativeLayout>
 
-    <!-- Content ScrollView -->
     <ScrollView
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -244,7 +238,6 @@
 
     </ScrollView>
 
-    <!-- Bottom Buttons Layout -->
     <LinearLayout
         android:id="@+id/buttonLayout"
         android:layout_width="match_parent"
