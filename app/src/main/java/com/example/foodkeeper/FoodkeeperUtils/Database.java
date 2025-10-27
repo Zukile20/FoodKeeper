@@ -1587,10 +1587,7 @@ public class Database extends SQLiteOpenHelper {
         values.put(KEY_SURNAME, surname);
         values.put(KEY_EMAIL, email);
         values.put(KEY_PHONE, phone);
-
-        if (profileImage != null) {
-            values.put(KEY_PROFILE, profileImage);
-        }
+        values.put(KEY_PROFILE, profileImage);
 
         int rowsAffected = db.update(TABLE_USERS, values,
                 KEY_EMAIL + "=?", new String[]{oldEmail});

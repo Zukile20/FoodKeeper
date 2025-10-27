@@ -1,5 +1,7 @@
 package com.example.foodkeeper.profile_activity;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -38,6 +40,7 @@ public class ProfileActivity extends AppCompatActivity {
     SessionManager session;
 
     private static final int PICK_IMAGE_REQUEST = 1;
+    private static final int TAKE_PHOTO_REQUEST = 2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,7 +73,7 @@ public class ProfileActivity extends AppCompatActivity {
         btnSelectImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                selectImage();
+                showImagePickerDialog();
             }
         });
 
@@ -112,7 +115,6 @@ public class ProfileActivity extends AppCompatActivity {
             etEmail.setText(user.getEmail());
             etPhone.setText(user.getPhone());
 
-            // Load profile image if exists
             if (user.getProfileImage() != null) {
                 Bitmap bitmap = BitmapFactory.decodeByteArray(
                         user.getProfileImage(), 0, user.getProfileImage().length);
@@ -152,33 +154,73 @@ public class ProfileActivity extends AppCompatActivity {
         btnSaveProfile.setVisibility(View.GONE);
     }
 
-    private void selectImage() {
+    private void showImagePickerDialog() {
         if (!isEditMode) {
             Toast.makeText(this, "Please enable edit mode first", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        Intent intent = new Intent(Intent.ACTION_PICK,
-                MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        final CharSequence[] options = {"Take Photo", "Choose from Gallery", "Remove Photo", "Cancel"};
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Select Option");
+        builder.setItems(options, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int item) {
+                if (options[item].equals("Take Photo")) {
+                    takePhoto();
+                } else if (options[item].equals("Choose from Gallery")) {
+                    chooseFromGallery();
+                } else if (options[item].equals("Remove Photo")) {
+                    removePhoto();
+                } else if (options[item].equals("Cancel")) {
+                    dialog.dismiss();
+                }
+            }
+        });
+        builder.show();
+    }
+
+    private void takePhoto() {
+        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        if (intent.resolveActivity(getPackageManager()) != null) {
+            startActivityForResult(intent, TAKE_PHOTO_REQUEST);
+        } else {
+            Toast.makeText(this, "Camera not available", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void chooseFromGallery() {
+        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         startActivityForResult(intent, PICK_IMAGE_REQUEST);
+    }
+
+    private void removePhoto() {
+        ivProfile.setImageResource(R.drawable.image_placeholder);
+        profileImage = null;
+        Toast.makeText(this, "Photo removed", Toast.LENGTH_SHORT).show();
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK
-                && data != null && data.getData() != null) {
-            Uri imageUri = data.getData();
-
-            try {
-                Bitmap bitmap = MediaStore.Images.Media.getBitmap(
-                        getContentResolver(), imageUri);
+        if (resultCode == RESULT_OK && data != null) {
+            if (requestCode == PICK_IMAGE_REQUEST && data.getData() != null) {
+                Uri imageUri = data.getData();
+                try {
+                    Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), imageUri);
+                    ivProfile.setImageBitmap(bitmap);
+                    profileImage = getByteArrayFromBitmap(bitmap);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    Toast.makeText(this, "Failed to load image", Toast.LENGTH_SHORT).show();
+                }
+            } else if (requestCode == TAKE_PHOTO_REQUEST) {
+                Bundle extras = data.getExtras();
+                Bitmap bitmap = (Bitmap) extras.get("data");
                 ivProfile.setImageBitmap(bitmap);
                 profileImage = getByteArrayFromBitmap(bitmap);
-            } catch (IOException e) {
-                e.printStackTrace();
-                Toast.makeText(this, "Failed to load image", Toast.LENGTH_SHORT).show();
             }
         }
     }

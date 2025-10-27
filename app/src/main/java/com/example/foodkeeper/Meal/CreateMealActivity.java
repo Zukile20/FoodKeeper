@@ -459,8 +459,6 @@ public class CreateMealActivity extends AppCompatActivity implements FoodSelecti
 
     @Override
     public void onItemClick(FoodItem item, int position) {
-        String message = item.getCheckState() ? "Selected: " : "Deselected: ";
-        Toast.makeText(this, message + item.getName(), Toast.LENGTH_SHORT).show();
     }
 
     private void updateCounterWithCount(int count) {

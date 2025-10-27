@@ -99,9 +99,6 @@ public class mealsViewActivity extends AppCompatActivity  {
                             try {
                                 db.deleteMeal(meal);
                                 mealAdapter.notifyItemRemoved(position);
-                                Toast.makeText(mealsViewActivity.this,
-                                        "Meal removed from meal plans and deleted",
-                                        Toast.LENGTH_SHORT).show();
                             } catch (Exception e) {
                                 Toast.makeText(mealsViewActivity.this,
                                         "Error: " + e.getMessage(),
