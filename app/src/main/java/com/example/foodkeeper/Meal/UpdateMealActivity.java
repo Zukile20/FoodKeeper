@@ -1,8 +1,10 @@
 package com.example.foodkeeper.Meal;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -22,7 +24,11 @@ import android.widget.Toast;
 import androidx.activity.EdgeToEdge;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -35,6 +41,7 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -56,9 +63,12 @@ public class UpdateMealActivity extends AppCompatActivity implements FoodSelecti
     private SessionManager session;
     FoodSelectionAdapter adapter;
     private boolean imageSelectedForCurrentMeal = false;
+    private boolean imageRemovedForCurrentMeal = false;
     private Uri selectedImageUri;
+    private Uri cameraImageUri;
     ActivityResultLauncher<Intent> fullViewLauncher;
-    private ActivityResultLauncher<Intent> resultLauncher;
+    private ActivityResultLauncher<Intent> galleryLauncher;
+    private ActivityResultLauncher<Intent> cameraLauncher;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -139,7 +149,7 @@ public class UpdateMealActivity extends AppCompatActivity implements FoodSelecti
     @SuppressLint("SetTextI18n")
     private void setupListeners() {
         backBtn.setOnClickListener(view -> finish());
-        loadImage.setOnClickListener(v -> pickImage());
+        loadImage.setOnClickListener(v -> showImagePickerDialog());
 
         nameField.addTextChangedListener(new TextWatcher() {
             @Override
@@ -197,13 +207,18 @@ public class UpdateMealActivity extends AppCompatActivity implements FoodSelecti
             if (!hasError) {
                 if (db != null) {
                     try {
-                        String imageBase64 = EditMeal.getUri();
+                        String imageBase64;
 
-                        if (imageSelectedForCurrentMeal && selectedImageUri != null) {
+                        if (imageRemovedForCurrentMeal) {
+                            imageBase64 = null;
+                        } else if (imageSelectedForCurrentMeal && selectedImageUri != null) {
                             imageBase64 = saveImageToStorage(this, selectedImageUri);
+                        } else {
+                            imageBase64 = EditMeal.getUri();
                         }
 
                         imageSelectedForCurrentMeal = false;
+                        imageRemovedForCurrentMeal = false;
                         selectedImageUri = null;
 
                         EditMeal.setMealName(mealName);
@@ -220,7 +235,75 @@ public class UpdateMealActivity extends AppCompatActivity implements FoodSelecti
                 }
             }
         });
-        setupImagePicker();
+        setupImagePickers();
+    }
+
+    private void showImagePickerDialog() {
+        final CharSequence[] options = {"Take Photo", "Choose from Gallery", "Remove Photo", "Cancel"};
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Select Image");
+        builder.setItems(options, (dialog, item) -> {
+            if (options[item].equals("Take Photo")) {
+                if (checkCameraPermission()) {
+                    openCamera();
+                } else {
+                    requestCameraPermission();
+                }
+            } else if (options[item].equals("Choose from Gallery")) {
+                pickImageFromGallery();
+            } else if (options[item].equals("Remove Photo")) {
+                removePhoto();
+            } else if (options[item].equals("Cancel")) {
+                dialog.dismiss();
+            }
+        });
+        builder.show();
+    }
+
+    private boolean checkCameraPermission() {
+        return ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED;
+    }
+
+    private void requestCameraPermission() {
+        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, 102);
+    }
+
+    private void openCamera() {
+        try {
+            Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+
+            File photoFile = createImageFile();
+            if (photoFile != null) {
+                cameraImageUri = FileProvider.getUriForFile(this,
+                        getApplicationContext().getPackageName() + ".provider",
+                        photoFile);
+                cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, cameraImageUri);
+                cameraLauncher.launch(cameraIntent);
+            }
+        } catch (IOException e) {
+            showToast("Error creating image file");
+        }
+    }
+
+    private File createImageFile() throws IOException {
+        String imageFileName = "MEAL_" + System.currentTimeMillis();
+        File storageDir = getExternalFilesDir(null);
+        return File.createTempFile(imageFileName, ".jpg", storageDir);
+    }
+
+    private void pickImageFromGallery() {
+        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        galleryLauncher.launch(intent);
+    }
+
+    private void removePhoto() {
+        selectedImageUri = null;
+        cameraImageUri = null;
+        imageSelectedForCurrentMeal = false;
+        imageRemovedForCurrentMeal = true;
+        mealImage.setImageResource(R.drawable.image_placeholder);
+        showToast("Photo will be removed when you save");
     }
 
     private void showError(TextView errorTextView, String message) {
@@ -253,8 +336,8 @@ public class UpdateMealActivity extends AppCompatActivity implements FoodSelecti
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
 
-    private void setupImagePicker() {
-        resultLauncher = registerForActivityResult(
+    private void setupImagePickers() {
+        galleryLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
                     try {
@@ -263,6 +346,7 @@ public class UpdateMealActivity extends AppCompatActivity implements FoodSelecti
                             if (imageUri != null) {
                                 selectedImageUri = imageUri;
                                 imageSelectedForCurrentMeal = true;
+                                imageRemovedForCurrentMeal = false;
 
                                 Glide.with(this)
                                         .load(imageUri)
@@ -283,11 +367,47 @@ public class UpdateMealActivity extends AppCompatActivity implements FoodSelecti
                     }
                 }
         );
+
+        cameraLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    try {
+                        if (result.getResultCode() == RESULT_OK) {
+                            if (cameraImageUri != null) {
+                                selectedImageUri = cameraImageUri;
+                                imageSelectedForCurrentMeal = true;
+                                imageRemovedForCurrentMeal = false;
+                                Glide.with(this)
+                                        .load(cameraImageUri)
+                                        .placeholder(R.drawable.image_placeholder)
+                                        .error(R.drawable.image_placeholder)
+                                        .centerCrop()
+                                        .into(mealImage);
+
+                                showToast("Photo captured successfully");
+                            } else {
+                                showToast("Failed to capture photo");
+                            }
+                        } else {
+                            showToast("Photo capture cancelled");
+                        }
+                    } catch (Exception e) {
+                        showToast("Error capturing photo: " + e.getMessage());
+                    }
+                }
+        );
     }
 
-    private void pickImage() {
-        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-        resultLauncher.launch(intent);
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == 102) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                openCamera();
+            } else {
+                showToast("Camera permission is required to take photos");
+            }
+        }
     }
 
     public String saveImageToStorage(Context context, Uri uri) throws IOException {

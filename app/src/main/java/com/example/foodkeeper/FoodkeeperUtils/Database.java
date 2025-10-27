@@ -667,9 +667,8 @@ public class Database extends SQLiteOpenHelper {
             if (meal.getMealName() != null && !meal.getMealName().trim().isEmpty()) {
                 mealValues.put("mealName", meal.getMealName());
             }
-            if (meal.getUri() != null) {
                 mealValues.put("mealImage", meal.getUri());
-            }
+
             if (meal.getLastUsed() != null) {
                 mealValues.put("lastUsed", meal.getLastUsed().toString());
             }

@@ -21,7 +21,7 @@ public class Meal implements Parcelable {
     private ArrayList<String> foodItemIDs = new ArrayList<>();
 
     public void setFoodItemIDs(List<String> foodItemsIDs) {
-        this.foodItemIDs.clear(); // Clear existing items first
+        this.foodItemIDs.clear();
         if (foodItemsIDs != null) {
             this.foodItemIDs.addAll(foodItemsIDs);
         }
@@ -37,14 +37,14 @@ public class Meal implements Parcelable {
         this.url =imageUrl;
         this.lastUsed = null;
         this.fridgeID= fridgeID;
-        this.foodItemIDs = new ArrayList<>(); // Initialize here too
+        this.foodItemIDs = new ArrayList<>();
     }
     public Meal( String name, String url,long fridgeID) {
         this.mealName = name;
         this.url =url;
         this.lastUsed = null;
         this.fridgeID= fridgeID;
-        this.foodItemIDs = new ArrayList<>(); // Initialize here too
+        this.foodItemIDs = new ArrayList<>();
     }
 
     protected Meal(Parcel in) {

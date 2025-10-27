@@ -60,7 +60,7 @@ public class FoodSelectionAdapter extends RecyclerView.Adapter<FoodSelectionAdap
         Glide.with(context)
                 .load(blobUrl)
                 .placeholder(R.drawable.image_placeholder)
-                .error(R.drawable.place_holder)
+                .error(R.drawable.image_placeholder)
                 .into(holder.imgView);
 
         holder.checkBox.setOnCheckedChangeListener(null);
