@@ -8,7 +8,6 @@
     android:orientation="vertical"
     android:background="@color/white">
 
-    <!-- Header Section -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -36,16 +35,13 @@
             android:textSize="24sp"
             android:textStyle="bold" />
 
-        <!-- Spacer to balance the layout -->
         <View
             android:layout_width="45dp"
             android:layout_height="45dp" />
 
     </LinearLayout>
 
-    <!-- Sort and Filter Section -->
 
-    <!-- Divider -->
     <LinearLayout
         android:id="@+id/linearLayout4"
         android:layout_width="match_parent"
@@ -81,7 +77,6 @@
         android:layout_height="1dp"
         android:background="@color/grey" />
 
-    <!-- Breakfast Title Section -->
     <TextView
         android:id="@+id/selectTitle"
         android:layout_width="match_parent"
@@ -94,9 +89,7 @@
         android:padding="16dp"
         android:visibility="visible" />
 
-    <!-- Meals List -->
 
-    <!-- Empty State (Initially Hidden) -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/mealsRecyclerView"
         android:layout_width="match_parent"
@@ -119,7 +112,6 @@
         android:scrollbars="vertical"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
-    <!-- Empty State (Initially Hidden) -->
     <LinearLayout
         android:id="@+id/emptyStateLayout"
         android:layout_width="match_parent"
@@ -153,7 +145,6 @@
 
     </LinearLayout>
 
-    <!-- Loading State (Initially Hidden) -->
     <LinearLayout
         android:id="@+id/loadingLayout"
         android:layout_width="match_parent"

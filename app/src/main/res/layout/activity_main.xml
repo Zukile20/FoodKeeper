@@ -7,7 +7,6 @@
     android:layout_height="match_parent"
     android:background="@color/white">
 
-    <!-- Header Section -->
     <LinearLayout
         android:id="@+id/linearLayout3"
         android:layout_width="0dp"
@@ -53,7 +52,6 @@
 
     </LinearLayout>
 
-    <!-- Greeting Text -->
     <TextView
         android:id="@+id/greetText"
         android:layout_width="wrap_content"
@@ -67,7 +65,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/linearLayout3" />
 
-    <!-- Try Recipes Section -->
     <LinearLayout
         android:id="@+id/tryRecipesSection"
         android:layout_width="0dp"
@@ -120,7 +117,6 @@
 
     </LinearLayout>
 
-    <!-- Today's Meal Plan Section -->
     <LinearLayout
         android:id="@+id/mealPlanSection"
         android:layout_width="0dp"
@@ -162,7 +158,6 @@
 
         </LinearLayout>
 
-        <!-- Container for RecyclerView and Empty State -->
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="250dp">
@@ -174,7 +169,6 @@
                 android:orientation="horizontal"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
-            <!-- Empty State View -->
             <LinearLayout
                 android:id="@+id/mealsEmptyState"
                 android:layout_width="match_parent"
@@ -228,7 +222,6 @@
 
     </LinearLayout>
 
-    <!-- Bottom Navigation -->
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNav"
         android:layout_width="match_parent"

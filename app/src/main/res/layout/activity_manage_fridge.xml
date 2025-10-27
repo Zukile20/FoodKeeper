@@ -36,7 +36,6 @@
             android:textSize="24sp"
             android:textStyle="bold" />
 
-        <!-- Spacer to balance the layout -->
         <View
             android:layout_width="45dp"
             android:layout_height="45dp" />

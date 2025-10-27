@@ -10,7 +10,6 @@
     android:background="@color/light_pink"
     tools:context=".MealPlan.MonthlyViewActivity">
 
-    <!-- Header with year and selected date -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -41,14 +40,12 @@
 
     </LinearLayout>
 
-    <!-- Calendar section -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:padding="16dp">
 
-        <!-- Month navigation -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -89,7 +86,6 @@
                 tools:ignore="HardcodedText" />
         </LinearLayout>
 
-        <!-- Day headers -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -174,7 +170,6 @@
                 tools:ignore="HardcodedText" />
         </LinearLayout>
 
-        <!-- Calendar grid -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/calendarRecyclerView"
             android:layout_width="match_parent"
@@ -183,7 +178,6 @@
 
     </LinearLayout>
 
-    <!-- Action buttons -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

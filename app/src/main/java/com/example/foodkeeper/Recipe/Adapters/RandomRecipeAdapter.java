@@ -28,7 +28,12 @@ public class RandomRecipeAdapter extends RecyclerView.Adapter<RandomRecipeViewHo
     RecipeClickListerner listerner;
     Database db;
     Boolean infavourite = true;
-    private String userEmail; // Add userEmail field
+    private String userEmail;
+    private OnFavoritesEmptyListener emptyListener;
+
+    public interface OnFavoritesEmptyListener {
+        void onFavoritesEmpty();
+    }
 
     public RandomRecipeAdapter(Context contex, List<Recipe> list, RecipeClickListerner listerner) {
         this.contex = contex;
@@ -36,11 +41,14 @@ public class RandomRecipeAdapter extends RecyclerView.Adapter<RandomRecipeViewHo
         this.listerner = listerner;
         this.db = new Database(contex);
 
-        // Get user email from SessionManager
         SessionManager sessionManager = new SessionManager(contex);
         this.userEmail = sessionManager.getUserEmail();
 
         checkState();
+    }
+
+    public void setOnFavoritesEmptyListener(OnFavoritesEmptyListener listener) {
+        this.emptyListener = listener;
     }
 
     @NonNull
@@ -53,7 +61,6 @@ public class RandomRecipeAdapter extends RecyclerView.Adapter<RandomRecipeViewHo
     public void onBindViewHolder(@NonNull RandomRecipeViewHolder holder, int position) {
         Recipe recipe = list.get(position);
 
-        // Set recipe data
         holder.RecipeName.setText(recipe.title);
         holder.RecipeName.setSelected(true);
         holder.textView_likes.setText(recipe.aggregateLikes + " Likes");
@@ -61,7 +68,6 @@ public class RandomRecipeAdapter extends RecyclerView.Adapter<RandomRecipeViewHo
         holder.textView_time.setText(recipe.readyInMinutes + " Minutes");
         Picasso.get().load(recipe.image).into(holder.imageView_food);
 
-        // Set up click listener for recipe
         holder.random_list_container.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -69,7 +75,6 @@ public class RandomRecipeAdapter extends RecyclerView.Adapter<RandomRecipeViewHo
             }
         });
 
-        // Set up favorite button
         updateFavoriteButton(holder, recipe);
 
         holder.favButton.setOnClickListener(v -> {
@@ -85,6 +90,9 @@ public class RandomRecipeAdapter extends RecyclerView.Adapter<RandomRecipeViewHo
 
                 if (infavourite) {
                     updateRecipes();
+                    if (list.isEmpty() && emptyListener != null) {
+                        emptyListener.onFavoritesEmpty();
+                    }
                 }
             } else {
                 Toast.makeText(contex, "Failed to update favorite status", Toast.LENGTH_SHORT).show();

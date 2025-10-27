@@ -76,7 +76,6 @@ public class RecipeActivity extends AppCompatActivity {
 
         launcher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
                 result -> {
-                    // Refresh the current view based on filter state
                     if (showingFavoritesOnly) {
                         showFavoriteRecipes();
                     } else {
@@ -262,6 +261,17 @@ public class RecipeActivity extends AppCompatActivity {
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new GridLayoutManager(RecipeActivity.this, 1));
         randomRecipeAdapter = new RandomRecipeAdapter(RecipeActivity.this, recipes, recipeClickListerner);
+
+        // Set the empty listener
+        randomRecipeAdapter.setOnFavoritesEmptyListener(new RandomRecipeAdapter.OnFavoritesEmptyListener() {
+            @Override
+            public void onFavoritesEmpty() {
+                // Show empty state immediately when last favorite is removed
+                recyclerView.setVisibility(android.view.View.GONE);
+                layoutEmptyFavorites.setVisibility(android.view.View.VISIBLE);
+            }
+        });
+
         recyclerView.setAdapter(randomRecipeAdapter);
     }
 
