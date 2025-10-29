@@ -5,8 +5,10 @@ import static android.view.View.INVISIBLE;
 import static android.view.View.VISIBLE;
 import static com.example.foodkeeper.MealPlan.CalendarUtils.selectedDate;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -95,10 +97,9 @@ public class MealPlanActivity extends AppCompatActivity {
         lunchBtn.setOnClickListener(V ->
         {
           Intent requestIntent = new Intent(this, mealsViewActivity.class);
-          requestIntent.putExtra("mealType","Lunch");
+           requestIntent.putExtra("mealType","Lunch");
             requestIntent.putExtra("ACTIVITY_MODE",1);
             launcher.launch(requestIntent);
-            finish();
         });
 
         dinnerBtn.setOnClickListener(V ->
@@ -107,7 +108,6 @@ public class MealPlanActivity extends AppCompatActivity {
           requestIntent.putExtra("mealType","Dinner");
             requestIntent.putExtra("ACTIVITY_MODE",1);
             launcher.launch(requestIntent);
-            finish();
         });
 
         snackBtn.setOnClickListener(V ->
@@ -116,7 +116,6 @@ public class MealPlanActivity extends AppCompatActivity {
           requestIntent.putExtra("mealType","Snack");
             requestIntent.putExtra("ACTIVITY_MODE",1);
             launcher.launch(requestIntent);
-            finish();
         });
 
         updateSelectedDayText();
@@ -223,20 +222,36 @@ public class MealPlanActivity extends AppCompatActivity {
             container.setClickable(false);
 
             mealName.setText(meal.getMealName());
-            if (meal.getUri() != null) {//since a meal might not have an image
-                File imageUri = new File(meal.getUri());
-                Glide.with(this)
-                        .load(imageUri)
-                        .into(mealImage);
-            } else {
-                mealImage.setImageResource(R.drawable.place_holder);
-            }
+           loadBase64ImageWithGlide(this,meal.getUri(),mealImage);
             mealView.setClickable(false);
             container.addView(mealView);
         }
-
     }
     private FrameLayout breakFastLayout,lunchLayout,dinnerLayout,snackLayout;
+    public void loadBase64ImageWithGlide(Context context, String base64String, ImageView imageView) {
+        if (base64String == null || base64String.isEmpty()) {
+            imageView.setImageResource(R.drawable.image_placeholder);
+            return;
+        }
+
+        try {
+            byte[] decodedBytes = Base64.decode(base64String, Base64.DEFAULT);
+
+            Glide.with(context)
+                    .asBitmap()
+                    .load(decodedBytes)
+                    .placeholder(R.drawable.image_placeholder)
+                    .error(R.drawable.image_placeholder)
+                    .centerCrop()
+                    .into(imageView);
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+            imageView.setImageResource(R.drawable.image_placeholder);
+        } catch (Exception e) {
+            e.printStackTrace();
+            imageView.setImageResource(R.drawable.image_placeholder);
+        }
+    }
 
 
 }
