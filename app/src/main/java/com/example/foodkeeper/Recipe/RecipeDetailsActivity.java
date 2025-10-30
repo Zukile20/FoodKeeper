@@ -512,4 +512,5 @@ public class RecipeDetailsActivity extends AppCompatActivity implements TTSHelpe
             pauseRecipeReading();
         }
     }
+
 }
