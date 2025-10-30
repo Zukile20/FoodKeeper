@@ -6,9 +6,11 @@ import android.os.Handler;
 import android.os.Looper;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.UtteranceProgressListener;
+import android.speech.tts.Voice;
 import android.util.Log;
 
 import java.util.Locale;
+import java.util.Set;
 
 public class TTSHelper implements TextToSpeech.OnInitListener {
 
@@ -96,6 +98,7 @@ public class TTSHelper implements TextToSpeech.OnInitListener {
         } catch (Exception e) {
             Log.e(TAG, "Error setting up TTS settings", e);
         }
+        setHighestQualityVoice();
     }
 
     /**
@@ -209,6 +212,44 @@ public class TTSHelper implements TextToSpeech.OnInitListener {
     private void notifySpeechComplete() {
         if (ttsListener != null) {
             mainHandler.post(() -> ttsListener.onSpeechComplete());
+        }
+    }
+    private void setHighestQualityVoice() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            try {
+                Set<Voice> voices = textToSpeech.getVoices();
+
+                if (voices != null && !voices.isEmpty()) {
+                    Voice bestVoice = null;
+                    int highestQuality = 0;
+
+                    // Find the HIGHEST QUALITY US English voice
+                    for (Voice voice : voices) {
+                        Locale locale = voice.getLocale();
+
+                        if (locale.getLanguage().equals("en") &&
+                                locale.getCountry().equals("US")) {
+
+                            int quality = voice.getQuality();
+                            boolean isLocal = !voice.isNetworkConnectionRequired();
+
+                            // Select highest quality, prefer local
+                            if (quality > highestQuality ||
+                                    (quality == highestQuality && isLocal)) {
+                                bestVoice = voice;
+                                highestQuality = quality;
+                            }
+                        }
+                    }
+
+                    // Apply the best voice
+                    if (bestVoice != null) {
+                        textToSpeech.setVoice(bestVoice);
+                    }
+                }
+            } catch (Exception e) {
+                Log.e(TAG, "Error setting high-quality voice", e);
+            }
         }
     }
 
