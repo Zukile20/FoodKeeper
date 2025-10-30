@@ -102,6 +102,10 @@ public class RecipeDetailsActivity extends AppCompatActivity implements TTSHelpe
         dialog = new ProgressDialog(this);
         dialog.setTitle("Loading Details...");
         dialog.setCancelable(false);
+        dialog.show();
+        if (dialog != null && dialog.isShowing()) {
+            dialog.dismiss();
+        }
 
         manager = new RequestManager(this);
         manager.getRecipeDetails(recipeDetailsListener, id);
@@ -398,7 +402,7 @@ public class RecipeDetailsActivity extends AppCompatActivity implements TTSHelpe
         @Override
         public void didFetch(RecipeDetailsResponse response, String message) {
             // Only show dialog if loading from API
-            if (message != null && message.contains("API")) {
+   /*         if (message != null && message.contains("API")) {
                 if (dialog != null && !dialog.isShowing()) {
                     dialog.show();
                 }
@@ -407,7 +411,7 @@ public class RecipeDetailsActivity extends AppCompatActivity implements TTSHelpe
             // Dismiss dialog when done
             if (dialog != null && dialog.isShowing()) {
                 dialog.dismiss();
-            }
+            }*/
 
             currentRecipe = response;
             saveRecipeToDatabase(response);
