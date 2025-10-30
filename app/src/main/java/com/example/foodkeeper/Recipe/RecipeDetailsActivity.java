@@ -36,7 +36,7 @@ import java.util.List;
 
 public class RecipeDetailsActivity extends AppCompatActivity implements TTSHelper.TTSListener {
     int id;
-    ImageView mealImage,favButton;
+    ImageView mealImage, favButton;
     TextView textView_meal_name;
     RecyclerView recycler_meal_ingredients, recycler_meal_instructions, recycler_meal_similar;
     RequestManager manager;
@@ -49,9 +49,9 @@ public class RecipeDetailsActivity extends AppCompatActivity implements TTSHelpe
     private TTSHelper ttsHelper;
     private ImageView btnPlayPause;
 
-    private boolean isPlaying = false;
-    private boolean isPaused = false;
-    private boolean isTTSReady = false;
+    private volatile boolean isPlaying = false;
+    private volatile boolean isPaused = false;
+    private volatile boolean isTTSReady = false;
 
     private RecipeDetailsResponse currentRecipe;
     private List<InstructionsResponse> currentInstructions;
@@ -83,14 +83,30 @@ public class RecipeDetailsActivity extends AppCompatActivity implements TTSHelpe
 
         dbHelper = new Database(this);
 
-        id = Integer.parseInt(getIntent().getStringExtra("id"));
+        String idString = getIntent().getStringExtra("id");
+        if (idString == null || idString.isEmpty()) {
+            Toast.makeText(this, "Invalid recipe ID", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+        }
+
+        try {
+            id = Integer.parseInt(idString);
+        } catch (NumberFormatException e) {
+            Toast.makeText(this, "Invalid recipe ID format", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+        }
+
+        // Initialize progress dialog but don't show it yet
+        dialog = new ProgressDialog(this);
+        dialog.setTitle("Loading Details...");
+        dialog.setCancelable(false);
+
         manager = new RequestManager(this);
         manager.getRecipeDetails(recipeDetailsListener, id);
         manager.getInstructions(instructionsListener, id);
         manager.getSimilarRecipes(similarRecipesListerner, id);
-        dialog = new ProgressDialog(this);
-        dialog.setTitle("Loading Details...");
-        dialog.show();
     }
 
     private void findViews() {
@@ -100,12 +116,9 @@ public class RecipeDetailsActivity extends AppCompatActivity implements TTSHelpe
         recycler_meal_similar = findViewById(R.id.recycler_meal_similar);
         recycler_meal_instructions = findViewById(R.id.recycler_meal_instructions);
         favButton = findViewById(R.id.favButton);
-        findViewById(R.id.backBtn).setOnClickListener(event -> {
-            finish();
-        });
+        findViewById(R.id.backBtn).setOnClickListener(event -> finish());
 
         btnPlayPause = findViewById(R.id.btn_play);
-
         btnPlayPause.setEnabled(false);
         btnPlayPause.setAlpha(0.5f);
     }
@@ -134,7 +147,10 @@ public class RecipeDetailsActivity extends AppCompatActivity implements TTSHelpe
     }
 
     private void startRecipeReading() {
-        if (ttsHelper == null || !isTTSReady) return;
+        if (ttsHelper == null || !isTTSReady) {
+            Toast.makeText(this, "Text-to-Speech not ready", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
         if (currentRecipe == null || currentInstructions == null) {
             Toast.makeText(this, "Recipe data not loaded yet", Toast.LENGTH_SHORT).show();
@@ -151,7 +167,7 @@ public class RecipeDetailsActivity extends AppCompatActivity implements TTSHelpe
             updatePlayButtonToPause();
             speakCurrentSegment();
             Toast.makeText(this, "Reading complete recipe...", Toast.LENGTH_SHORT).show();
-        }else {
+        } else {
             Toast.makeText(this, "No recipe content to read", Toast.LENGTH_SHORT).show();
         }
     }
@@ -183,13 +199,13 @@ public class RecipeDetailsActivity extends AppCompatActivity implements TTSHelpe
             textSegments.add("Recipe: " + currentRecipe.title + ". Let's start cooking!");
         }
 
-        if (currentRecipe != null && currentRecipe.extendedIngredients != null && !currentRecipe.extendedIngredients.isEmpty()) {
+        if (currentRecipe != null && currentRecipe.extendedIngredients != null &&
+                !currentRecipe.extendedIngredients.isEmpty()) {
             textSegments.add("First, let's gather our ingredients.");
 
-            for (int i = 0; i < currentRecipe.extendedIngredients.size(); i++) {
-                String ingredient = currentRecipe.extendedIngredients.get(i).name;
-                if (ingredient != null && !ingredient.isEmpty()) {
-                    textSegments.add(ingredient);
+            for (ExtendedIngredient ingredient : currentRecipe.extendedIngredients) {
+                if (ingredient != null && ingredient.name != null && !ingredient.name.isEmpty()) {
+                    textSegments.add(ingredient.name);
                 }
             }
             textSegments.add("Now, let's start with the cooking instructions.");
@@ -239,16 +255,20 @@ public class RecipeDetailsActivity extends AppCompatActivity implements TTSHelpe
     }
 
     private void updatePlayButtonToPlay() {
-        btnPlayPause.setImageResource(R.drawable.play);
+        runOnUiThread(() -> btnPlayPause.setImageResource(R.drawable.play));
     }
 
     private void updatePlayButtonToPause() {
-        btnPlayPause.setImageResource(R.drawable.pause);
+        runOnUiThread(() -> btnPlayPause.setImageResource(R.drawable.pause));
     }
 
     private void toggleFavorite() {
-        isFavorite = !isFavorite;
+        if (currentRecipe == null) {
+            Toast.makeText(this, "Recipe not loaded", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
+        isFavorite = !isFavorite;
         updateFavoriteButton();
 
         boolean success = dbHelper.toggleFavorite(currentRecipe.id, isFavorite, userEmail);
@@ -256,6 +276,7 @@ public class RecipeDetailsActivity extends AppCompatActivity implements TTSHelpe
         if (success) {
             showFavoriteToast();
         } else {
+            // Revert on failure
             isFavorite = !isFavorite;
             updateFavoriteButton();
             Toast.makeText(this, "Failed to update favorite status", Toast.LENGTH_SHORT).show();
@@ -271,11 +292,15 @@ public class RecipeDetailsActivity extends AppCompatActivity implements TTSHelpe
     }
 
     private boolean loadFavoriteState(int recipeId) {
-        List<Recipe> favoriteRecipes = dbHelper.getFavoriteRecipes(userEmail);
-        for (Recipe recipe : favoriteRecipes) {
-            if (recipe.id == recipeId) {
-                return true;
+        try {
+            List<Recipe> favoriteRecipes = dbHelper.getFavoriteRecipes(userEmail);
+            for (Recipe recipe : favoriteRecipes) {
+                if (recipe.id == recipeId) {
+                    return true;
+                }
             }
+        } catch (Exception e) {
+            // Handle error silently
         }
         return false;
     }
@@ -286,31 +311,40 @@ public class RecipeDetailsActivity extends AppCompatActivity implements TTSHelpe
     }
 
     private void saveRecipeToDatabase(RecipeDetailsResponse response) {
-        long result = dbHelper.insertRecipe(
-                response.id,
-                response.title,
-                response.image,
-                response.aggregateLikes,
-                response.readyInMinutes,
-                response.servings,
-                response.fav,
-                userEmail
-        );
+        if (response == null) return;
 
-        if (!dbHelper.hasIngredientsForRecipe(response.id) && response.extendedIngredients != null) {
-            for (ExtendedIngredient ingredient : response.extendedIngredients) {
-                if (ingredient.name != null && !ingredient.name.isEmpty()) {
-                    long ingredientId = dbHelper.insertIngredient(ingredient.name);
-                    if (ingredientId > 0) {
-                        dbHelper.insertRecipeIngredient(response.id, ingredientId);
+        try {
+            dbHelper.insertRecipe(
+                    response.id,
+                    response.title,
+                    response.image,
+                    response.aggregateLikes,
+                    response.readyInMinutes,
+                    response.servings,
+                    response.fav,
+                    userEmail
+            );
+
+            if (!dbHelper.hasIngredientsForRecipe(response.id) &&
+                    response.extendedIngredients != null) {
+                for (ExtendedIngredient ingredient : response.extendedIngredients) {
+                    if (ingredient != null && ingredient.name != null && !ingredient.name.isEmpty()) {
+                        long ingredientId = dbHelper.insertIngredient(ingredient.name);
+                        if (ingredientId > 0) {
+                            dbHelper.insertRecipeIngredient(response.id, ingredientId);
+                        }
                     }
                 }
             }
+        } catch (Exception e) {
+            // Handle error silently or log it
         }
     }
 
     private void saveInstructionsToDatabase(int recipeId, List<InstructionsResponse> instructions) {
-        if (instructions != null) {
+        if (instructions == null) return;
+
+        try {
             for (InstructionsResponse instructionBlock : instructions) {
                 if (instructionBlock.steps != null) {
                     for (Step step : instructionBlock.steps) {
@@ -320,6 +354,8 @@ public class RecipeDetailsActivity extends AppCompatActivity implements TTSHelpe
                     }
                 }
             }
+        } catch (Exception e) {
+            // Handle error silently or log it
         }
     }
 
@@ -329,14 +365,13 @@ public class RecipeDetailsActivity extends AppCompatActivity implements TTSHelpe
             isTTSReady = true;
             btnPlayPause.setEnabled(true);
             btnPlayPause.setAlpha(1.0f);
-            Toast.makeText(this, "Text-to-Speech ready!", Toast.LENGTH_SHORT).show();
         });
     }
 
     @Override
     public void onTTSError(String error) {
         runOnUiThread(() -> {
-            Toast.makeText(this, "TTS Error: " + error, Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "TTS Error: " + error, Toast.LENGTH_SHORT).show();
             isPlaying = false;
             updatePlayButtonToPlay();
         });
@@ -362,9 +397,19 @@ public class RecipeDetailsActivity extends AppCompatActivity implements TTSHelpe
     private final RecipeDetailsListener recipeDetailsListener = new RecipeDetailsListener() {
         @Override
         public void didFetch(RecipeDetailsResponse response, String message) {
-            dialog.dismiss();
-            currentRecipe = response;
+            // Only show dialog if loading from API
+            if (message != null && message.contains("API")) {
+                if (dialog != null && !dialog.isShowing()) {
+                    dialog.show();
+                }
+            }
 
+            // Dismiss dialog when done
+            if (dialog != null && dialog.isShowing()) {
+                dialog.dismiss();
+            }
+
+            currentRecipe = response;
             saveRecipeToDatabase(response);
 
             isFavorite = loadFavoriteState(response.id);
@@ -372,24 +417,26 @@ public class RecipeDetailsActivity extends AppCompatActivity implements TTSHelpe
 
             textView_meal_name.setText(response.title);
             Picasso.get().load(response.image).into(mealImage);
+
             recycler_meal_ingredients.setHasFixedSize(true);
-            recycler_meal_ingredients.setLayoutManager(new LinearLayoutManager(RecipeDetailsActivity.this, LinearLayoutManager.VERTICAL, false));
+            recycler_meal_ingredients.setLayoutManager(
+                    new LinearLayoutManager(RecipeDetailsActivity.this, LinearLayoutManager.VERTICAL, false)
+            );
             adapter = new ingredientsAdapter(RecipeDetailsActivity.this, response.extendedIngredients);
             recycler_meal_ingredients.setAdapter(adapter);
 
-            favButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (currentRecipe != null) {
-                        toggleFavorite();
-                    }
+            favButton.setOnClickListener(v -> {
+                if (currentRecipe != null) {
+                    toggleFavorite();
                 }
             });
         }
 
         @Override
         public void didError(String message) {
-            dialog.dismiss();
+            if (dialog != null && dialog.isShowing()) {
+                dialog.dismiss();
+            }
             Toast.makeText(RecipeDetailsActivity.this, message, Toast.LENGTH_SHORT).show();
         }
     };
@@ -398,8 +445,12 @@ public class RecipeDetailsActivity extends AppCompatActivity implements TTSHelpe
         @Override
         public void didFetch(List<SimilarRecipeResponse> response, String message) {
             recycler_meal_similar.setHasFixedSize(true);
-            recycler_meal_similar.setLayoutManager(new LinearLayoutManager(RecipeDetailsActivity.this, LinearLayoutManager.HORIZONTAL, false));
-            similarRecipeAdapter = new SimilarRecipeAdapter(RecipeDetailsActivity.this, response, recipeClickListerner);
+            recycler_meal_similar.setLayoutManager(
+                    new LinearLayoutManager(RecipeDetailsActivity.this, LinearLayoutManager.HORIZONTAL, false)
+            );
+            similarRecipeAdapter = new SimilarRecipeAdapter(
+                    RecipeDetailsActivity.this, response, recipeClickListerner
+            );
             recycler_meal_similar.setAdapter(similarRecipeAdapter);
         }
 
@@ -427,7 +478,9 @@ public class RecipeDetailsActivity extends AppCompatActivity implements TTSHelpe
             }
 
             recycler_meal_instructions.setHasFixedSize(true);
-            recycler_meal_instructions.setLayoutManager(new LinearLayoutManager(RecipeDetailsActivity.this, LinearLayoutManager.VERTICAL, false));
+            recycler_meal_instructions.setLayoutManager(
+                    new LinearLayoutManager(RecipeDetailsActivity.this, LinearLayoutManager.VERTICAL, false)
+            );
             instructionsAdapter = new InstructionsAdapter(RecipeDetailsActivity.this, response);
             recycler_meal_instructions.setAdapter(instructionsAdapter);
         }
@@ -446,6 +499,9 @@ public class RecipeDetailsActivity extends AppCompatActivity implements TTSHelpe
         }
         if (dbHelper != null) {
             dbHelper.close();
+        }
+        if (dialog != null) {
+            dialog.dismiss();
         }
     }
 

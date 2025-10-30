@@ -42,7 +42,7 @@ public class SimilarRecipeAdapter extends RecyclerView.Adapter<SimilarRecipeView
 
         holder.textView_similar_title.setText(list.get(position).title);
         holder.textView_similar_title.setSelected(true);
-        holder.textView_similar_serving.setText(list.get(position).servings+" Persons");
+        holder.textView_similar_serving.setText(list.get(position).servings+" servings");
         Picasso.get().load("https://spoonacular.com/recipeImages/"+list.get(position).id+ "-556x370."+ list.get(position).imageType).into(holder.imageView_similar);
 
         holder.imageView_similar.setOnClickListener(new View.OnClickListener(){
