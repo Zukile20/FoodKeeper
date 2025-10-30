@@ -126,7 +126,7 @@ public class LandingPageActivity extends AppCompatActivity {
         greetText.setText("Hi, "+ sess.getUserName());
     }
     private void setupRecipesRecyclerView() {
-        List<Recipe> recipes = database.getRandomRecipes(5,sess.getUserEmail());
+        List<Recipe> recipes = database.getRandomRecipes(10,sess.getUserEmail());
 
         RecipeClickListerner listener = new RecipeClickListerner() {
             @Override

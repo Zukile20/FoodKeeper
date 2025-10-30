@@ -406,7 +406,7 @@ public class RequestManager {
     public void getSimilarRecipes(SimilarRecipesListerner listener, int id) {
         CallSimilarRecipes callSimilarRecipes = retrofit.create(CallSimilarRecipes.class);
         Call<List<SimilarRecipeResponse>> call = callSimilarRecipes.callSimilarRecipe(
-                id, "10", context.getString(R.string.api_key)
+                id, "5", context.getString(R.string.api_key)
         );
 
         call.enqueue(new Callback<List<SimilarRecipeResponse>>() {
