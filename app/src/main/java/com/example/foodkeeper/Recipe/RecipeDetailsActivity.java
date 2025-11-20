@@ -107,9 +107,6 @@ public class RecipeDetailsActivity extends AppCompatActivity implements TTSHelpe
         dialog.setTitle("Loading Details...");
         dialog.setCancelable(false);
         dialog.show();
-        if (dialog != null && dialog.isShowing()) {
-            dialog.dismiss();
-        }
     }
 
     private void findViews() {
@@ -400,17 +397,7 @@ public class RecipeDetailsActivity extends AppCompatActivity implements TTSHelpe
     private final RecipeDetailsListener recipeDetailsListener = new RecipeDetailsListener() {
         @Override
         public void didFetch(RecipeDetailsResponse response, String message) {
-            // Only show dialog if loading from API
-   /*         if (message != null && message.contains("API")) {
-                if (dialog != null && !dialog.isShowing()) {
-                    dialog.show();
-                }
-            }
-
-            // Dismiss dialog when done
-            if (dialog != null && dialog.isShowing()) {
-                dialog.dismiss();
-            }*/
+            dialog.dismiss();
 
             currentRecipe = response;
             saveRecipeToDatabase(response);

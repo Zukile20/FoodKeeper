@@ -3,6 +3,7 @@ package com.example.foodkeeper.Recipe;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -97,8 +98,17 @@ public class RecipeActivity extends AppCompatActivity {
     }
 
     private void setupSearchView() {
-        searchView.setIconified(false);
+        searchView.setIconified(true);
         searchView.setQueryHint("Search for a Recipe");
+
+        searchView.setOnQueryTextFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (!hasFocus) {
+                    searchView.clearFocus();
+                }
+            }
+        });
 
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
@@ -119,6 +129,7 @@ public class RecipeActivity extends AppCompatActivity {
                 return false;
             }
         });
+
     }
 
     private void setupFilterButtons() {
