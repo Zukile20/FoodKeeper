@@ -4,7 +4,6 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
-import android.app.Dialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -15,7 +14,6 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -35,6 +33,7 @@ import com.example.foodkeeper.FoodkeeperUtils.NotificationHelper;
 import com.example.foodkeeper.R;
 import com.example.foodkeeper.Register.SessionManager;
 import com.google.android.material.imageview.ShapeableImageView;
+import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 
 import java.io.ByteArrayOutputStream;
@@ -54,7 +53,8 @@ public class EditItemActivity extends AppCompatActivity {
 
     private FoodItem currentItem;
     private Database db;
-    private EditText edName, edCategory, edExpiryDate;
+    private TextInputEditText edName, edCategory, edExpiryDate;
+    private TextInputLayout nameInputLayout, categoryInputLayout, txtDateLayout;
     private TextView tvQuantity;
     private ShapeableImageView foodImage;
     private ImageButton cameraIconButton;
@@ -73,7 +73,6 @@ public class EditItemActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_item);
-        setContentView(R.layout.activity_edit_item);
 
         db = new Database(this);
         session = new SessionManager(this);
@@ -84,6 +83,9 @@ public class EditItemActivity extends AppCompatActivity {
         edName = findViewById(R.id.nameEditText);
         edCategory = findViewById(R.id.categoryEditText);
         edExpiryDate = findViewById(R.id.expiryDateEditText);
+        nameInputLayout = findViewById(R.id.nameInputLayout);
+        categoryInputLayout = findViewById(R.id.categoryInputLayout);
+        txtDateLayout = findViewById(R.id.txtDateLayout);
         tvQuantity = findViewById(R.id.tv_quantity);
         btnMinus = findViewById(R.id.btn_minus);
         btnPlus = findViewById(R.id.btn_plus);
@@ -132,6 +134,13 @@ public class EditItemActivity extends AppCompatActivity {
         btnCancel.setOnClickListener(v -> finish());
         btnSave.setOnClickListener(v -> saveItem());
     }
+
+    private void clearAllErrors() {
+        nameInputLayout.setError(null);
+        categoryInputLayout.setError(null);
+        txtDateLayout.setError(null);
+    }
+
     private void CheckExpiringItem(FoodItem item) {
         try {
             SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
@@ -155,6 +164,7 @@ public class EditItemActivity extends AppCompatActivity {
             e.printStackTrace();
         }
     }
+
     private int findCategoryIdByName(String categoryName) {
         for (Category category : categories) {
             if (category.getName().equals(categoryName)) {
@@ -312,6 +322,7 @@ public class EditItemActivity extends AppCompatActivity {
                     String formattedDate = String.format(Locale.getDefault(),
                             "%02d/%02d/%d", selectedDay, (selectedMonth + 1), selectedYear);
                     edExpiryDate.setText(formattedDate);
+                    txtDateLayout.setError(null);
                 },
                 year, month, day);
 
@@ -362,6 +373,7 @@ public class EditItemActivity extends AppCompatActivity {
                 RadioButton radioButton = popupView.findViewById(selectedId);
                 selectedCategory = radioButton.getText().toString();
                 edCategory.setText(selectedCategory);
+                categoryInputLayout.setError(null);
             }
             dialog.dismiss();
         });
@@ -375,20 +387,27 @@ public class EditItemActivity extends AppCompatActivity {
         String expiryDate = edExpiryDate.getText().toString().trim();
         int quantity = Integer.parseInt(tvQuantity.getText().toString());
 
+        clearAllErrors();
+
         boolean isValid = true;
 
         if (name.isEmpty()) {
-            edName.setError("Item name is required");
+            nameInputLayout.setError("Item name is required");
             isValid = false;
         }
 
         if (category.isEmpty()) {
-            edCategory.setError("Category is required");
+            categoryInputLayout.setError("Category is required");
             isValid = false;
         }
 
         if (expiryDate.isEmpty()) {
-            edExpiryDate.setError("Expiry date is required");
+            txtDateLayout.setError("Expiry date is required");
+            isValid = false;
+        }
+
+        if (quantity <= 0) {
+            Toast.makeText(this, "Quantity must be greater than 0", Toast.LENGTH_SHORT).show();
             isValid = false;
         }
 
@@ -397,15 +416,6 @@ public class EditItemActivity extends AppCompatActivity {
             return;
         }
 
-        try {
-            if (quantity <= 0) {
-                Toast.makeText(this, "Quantity must be greater than 0", Toast.LENGTH_SHORT).show();
-                return;
-            }
-        } catch (NumberFormatException e) {
-            Toast.makeText(this, "Invalid quantity", Toast.LENGTH_SHORT).show();
-            return;
-        }
         byte[] imageBytes = null;
         if (selectedImage != null) {
             ByteArrayOutputStream stream = new ByteArrayOutputStream();

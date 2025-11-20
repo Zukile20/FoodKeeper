@@ -99,6 +99,10 @@ public class RecipeDetailsActivity extends AppCompatActivity implements TTSHelpe
         }
 
         // Initialize progress dialog but don't show it yet
+        manager = new RequestManager(this);
+        manager.getRecipeDetails(recipeDetailsListener, id);
+        manager.getInstructions(instructionsListener, id);
+        manager.getSimilarRecipes(similarRecipesListerner, id);
         dialog = new ProgressDialog(this);
         dialog.setTitle("Loading Details...");
         dialog.setCancelable(false);
@@ -106,11 +110,6 @@ public class RecipeDetailsActivity extends AppCompatActivity implements TTSHelpe
         if (dialog != null && dialog.isShowing()) {
             dialog.dismiss();
         }
-
-        manager = new RequestManager(this);
-        manager.getRecipeDetails(recipeDetailsListener, id);
-        manager.getInstructions(instructionsListener, id);
-        manager.getSimilarRecipes(similarRecipesListerner, id);
     }
 
     private void findViews() {

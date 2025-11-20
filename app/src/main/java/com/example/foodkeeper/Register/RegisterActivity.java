@@ -1,5 +1,6 @@
 package com.example.foodkeeper.Register;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -22,11 +23,14 @@ import com.example.foodkeeper.FoodkeeperUtils.Database;
 import com.example.foodkeeper.Fridge.models.Fridge;
 import com.example.foodkeeper.R;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 public class RegisterActivity extends AppCompatActivity {
     TextInputEditText edName, edSurname, edEmail, edPhone, edPassword, edConfirm, edFridgeBrand, edFridgeModel, edFridgeSize, edFridgeDescription;
+    TextInputLayout nameInputLayout, surnameInputLayout, emailInputLayout, phoneInputLayout, passwordInputLayout, confirmPasswordInputLayout;
+    TextInputLayout fridgeBrandInputLayout, fridgeModelInputLayout, fridgeSizeInputLayout, fridgeDescriptionInputLayout;
     Button createBtn;
     TextView txtSignIn;
     ImageButton uploadImageBtn;
@@ -37,6 +41,7 @@ public class RegisterActivity extends AppCompatActivity {
     static final int PICK_IMAGE_REQUEST = 100;
     static final int CAMERA_REQUEST = 101;
 
+    @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,6 +52,7 @@ public class RegisterActivity extends AppCompatActivity {
 
         profileImage = findViewById(R.id.profileImageView);
         uploadImageBtn = findViewById(R.id.uploadImageButton);
+
         edName = findViewById(R.id.nameEditText);
         edSurname = findViewById(R.id.surnameEditText);
         edEmail = findViewById(R.id.emailEditText);
@@ -57,6 +63,18 @@ public class RegisterActivity extends AppCompatActivity {
         edFridgeModel = findViewById(R.id.fridgeModelEditText);
         edFridgeSize = findViewById(R.id.fridgeSizeEditText);
         edFridgeDescription = findViewById(R.id.fridgeDescriptionEditText);
+
+        nameInputLayout = findViewById(R.id.nameInputLayout);
+        surnameInputLayout = findViewById(R.id.surnameInputLayout);
+        emailInputLayout = findViewById(R.id.emailInputLayout);
+        phoneInputLayout = findViewById(R.id.phoneInputLayout);
+        passwordInputLayout = findViewById(R.id.passwordInputLayout);
+        confirmPasswordInputLayout = findViewById(R.id.confirmPasswordInputLayout);
+        fridgeBrandInputLayout = findViewById(R.id.fridgeBrandInputLayout);
+        fridgeModelInputLayout = findViewById(R.id.fridgeModelInputLayout);
+        fridgeSizeInputLayout = findViewById(R.id.fridgeSizeInputLayout);
+        fridgeDescriptionInputLayout = findViewById(R.id.fridgeDescriptionInputLayout);
+
         createBtn = findViewById(R.id.createProfileButton);
         txtSignIn = findViewById(R.id.textViewExistingUser);
 
@@ -102,84 +120,91 @@ public class RegisterActivity extends AppCompatActivity {
         }
     }
 
+    private void clearAllErrors() {
+        nameInputLayout.setError(null);
+        surnameInputLayout.setError(null);
+        emailInputLayout.setError(null);
+        phoneInputLayout.setError(null);
+        passwordInputLayout.setError(null);
+        confirmPasswordInputLayout.setError(null);
+        fridgeBrandInputLayout.setError(null);
+        fridgeModelInputLayout.setError(null);
+        fridgeSizeInputLayout.setError(null);
+    }
+
     private void registerUser() {
-        String name = edName.getText().toString();
-        String surname = edSurname.getText().toString();
-        String email = edEmail.getText().toString();
-        String phoneStr = edPhone.getText().toString();
+        // Clear all previous errors
+        clearAllErrors();
+
+        String name = edName.getText().toString().trim();
+        String surname = edSurname.getText().toString().trim();
+        String email = edEmail.getText().toString().trim();
+        String phoneStr = edPhone.getText().toString().trim();
         String password = edPassword.getText().toString();
         String confirm = edConfirm.getText().toString();
-        String fridgeBrand = edFridgeBrand.getText().toString();
-        String fridgeModel = edFridgeModel.getText().toString();
-        String fridgeSizeStr = edFridgeSize.getText().toString();
-        String fridgeDescription = edFridgeDescription.getText().toString();
+        String fridgeBrand = edFridgeBrand.getText().toString().trim();
+        String fridgeModel = edFridgeModel.getText().toString().trim();
+        String fridgeSizeStr = edFridgeSize.getText().toString().trim();
+        String fridgeDescription = edFridgeDescription.getText().toString().trim();
 
         boolean isValid = true;
 
         if (name.isEmpty()) {
-            edName.setError("Name is required");
+            nameInputLayout.setError("First name is required");
             isValid = false;
         }
         if (surname.isEmpty()) {
-            edSurname.setError("Surname is required");
+            surnameInputLayout.setError("Last name is required");
             isValid = false;
         }
         if (email.isEmpty()) {
-            edEmail.setError("Email is required");
+            emailInputLayout.setError("Email is required");
+            isValid = false;
+        } else if (!isValidEmail(email)) {
+            emailInputLayout.setError("Invalid email format");
             isValid = false;
         }
         if (phoneStr.isEmpty()) {
-            edPhone.setError("Phone number is required");
+            phoneInputLayout.setError("Phone number is required");
+            isValid = false;
+        } else if (!phoneStr.matches("\\d+")) {
+            phoneInputLayout.setError("Phone must contain only digits");
             isValid = false;
         }
         if (password.isEmpty()) {
-            edPassword.setError("Password is required");
+            passwordInputLayout.setError("Password is required");
+            isValid = false;
+        } else if (!isValidPassword(password)) {
+            passwordInputLayout.setError("Min 8 chars with letter, digit, and symbol");
             isValid = false;
         }
         if (confirm.isEmpty()) {
-            edConfirm.setError("Please confirm your password");
+            confirmPasswordInputLayout.setError("Please confirm your password");
+            isValid = false;
+        } else if (!password.equals(confirm)) {
+            confirmPasswordInputLayout.setError("Passwords do not match");
             isValid = false;
         }
         if (fridgeBrand.isEmpty()) {
-            edFridgeBrand.setError("Fridge brand is required");
+            fridgeBrandInputLayout.setError("Fridge brand is required");
             isValid = false;
         }
         if (fridgeModel.isEmpty()) {
-            edFridgeModel.setError("Fridge model is required");
+            fridgeModelInputLayout.setError("Fridge model is required");
             isValid = false;
         }
         if (fridgeSizeStr.isEmpty()) {
-            edFridgeSize.setError("Fridge size is required");
+            fridgeSizeInputLayout.setError("Fridge size is required");
             isValid = false;
         }
 
         if (!isValid) {
-            Toast.makeText(this, "Please correct errors", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        if (!isValidEmail(email)) {
-            edEmail.setError("Invalid email format");
-            return;
-        }
-
-        if (!phoneStr.matches("\\d+")) {
-            edPhone.setError("Phone number must contain only digits");
-            return;
-        }
-
-        if (!isValidPassword(password)) {
-            edPassword.setError("Password must be at least 8 chars with a letter, digit, and symbol");
-            return;
-        }
-
-        if (!password.equals(confirm)) {
-            edConfirm.setError("Passwords do not match");
+            Toast.makeText(this, "Please correct the errors above", Toast.LENGTH_SHORT).show();
             return;
         }
 
         if (isEmailExists(email)) {
-            edEmail.setError("Email already registered");
+            emailInputLayout.setError("Email already registered");
             Toast.makeText(this, "Email already exists, please log in", Toast.LENGTH_SHORT).show();
             Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
             intent.putExtra("USER_EMAIL", email);

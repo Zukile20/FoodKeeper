@@ -13,7 +13,6 @@ import android.provider.MediaStore;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Base64;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -53,7 +52,6 @@ public class CreateMealActivity extends AppCompatActivity implements FoodSelecti
     private boolean imageSelectedForCurrentMeal = false;
     private TextInputEditText nameField;
     private TextInputLayout tilMealName;
-    private TextView tvMealNameError;
     private EditText searchText;
     private RecyclerView recyclerView;
     private ImageButton loadImageBtn;
@@ -103,7 +101,6 @@ public class CreateMealActivity extends AppCompatActivity implements FoodSelecti
         mealImage = findViewById(R.id.mealImage);
         nameField = findViewById(R.id.nameField);
         tilMealName = findViewById(R.id.tilMealName);
-        tvMealNameError = findViewById(R.id.tvMealNameError);
         backBtn = findViewById(R.id.backBtn);
         searchText = findViewById(R.id.searchField);
         fullViewBtn = findViewById(R.id.fullViewBtn);
@@ -126,11 +123,8 @@ public class CreateMealActivity extends AppCompatActivity implements FoodSelecti
 
             @Override
             public void afterTextChanged(Editable s) {
-                String mealName = s.toString().trim();
-                if (mealName.isEmpty()) {
-                    showError(tvMealNameError, "Meal name cannot be empty");
-                } else {
-                    hideError(tvMealNameError);
+                if (!s.toString().trim().isEmpty()) {
+                    tilMealName.setError(null);
                 }
             }
         });
@@ -155,11 +149,12 @@ public class CreateMealActivity extends AppCompatActivity implements FoodSelecti
         {
             String mealName = String.valueOf(nameField.getText()).trim();
 
-            // Validation
+            tilMealName.setError(null);
+
             boolean hasError = false;
 
             if (mealName.isEmpty()) {
-                showError(tvMealNameError, "Meal name cannot be empty");
+                tilMealName.setError("Meal name is required");
                 nameField.requestFocus();
                 hasError = true;
             }
@@ -171,7 +166,6 @@ public class CreateMealActivity extends AppCompatActivity implements FoodSelecti
 
             if (!hasError) {
                 if (db != null) {
-                    //creating the meal......with its fooditems
                     createNewMeal(mealName);
                     Toast.makeText(this, "Meal has been created successfully", Toast.LENGTH_SHORT).show();
                     setResult(RESULT_OK);
@@ -247,25 +241,6 @@ public class CreateMealActivity extends AppCompatActivity implements FoodSelecti
 
         mealImage.setImageResource(R.drawable.image_placeholder);
         showToast("Photo removed");
-    }
-
-    private void showError(TextView errorTextView, String message) {
-        errorTextView.setText(message);
-        errorTextView.setVisibility(View.VISIBLE);
-
-        if (errorTextView == tvMealNameError) {
-            tilMealName.setBoxStrokeErrorColor(getResources().getColorStateList(R.color.red));
-            tilMealName.setError(" ");
-        }
-    }
-
-    private void hideError(TextView errorTextView) {
-        errorTextView.setText("");
-        errorTextView.setVisibility(View.GONE);
-
-        if (errorTextView == tvMealNameError) {
-            tilMealName.setError(null);
-        }
     }
 
     private String createNewMeal(String name) {

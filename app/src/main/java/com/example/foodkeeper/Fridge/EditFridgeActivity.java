@@ -29,6 +29,7 @@ import com.example.foodkeeper.R;
 import com.example.foodkeeper.Register.SessionManager;
 import com.google.android.material.imageview.ShapeableImageView;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -46,6 +47,7 @@ public class EditFridgeActivity extends AppCompatActivity {
     private ShapeableImageView fridgeEditImage;
     private ImageButton cameraIconButton;
     private TextInputEditText brandEditFridgeText, modelEditFridgeText, descriptionEditFridgeText;
+    private TextInputLayout brandEditInputLayout, modelEditInputLayout, descriptionEditInputLayout;
     private EditText numberEditFridgeText;
     private ImageButton btnIncrementFridge, btnDecrementFridge;
     private Button cancelButtonFridge, saveButtonFridge, backEditFridgeBtn;
@@ -67,6 +69,9 @@ public class EditFridgeActivity extends AppCompatActivity {
         brandEditFridgeText = findViewById(R.id.brandEditFridgeText);
         modelEditFridgeText = findViewById(R.id.modelEditFridgeText);
         descriptionEditFridgeText = findViewById(R.id.descriptionEditFridgeText);
+        brandEditInputLayout = findViewById(R.id.brandEditInputLayout);
+        modelEditInputLayout = findViewById(R.id.modelEditInputLayout);
+        descriptionEditInputLayout = findViewById(R.id.descriptionEditInputLayout);
         numberEditFridgeText = findViewById(R.id.numberEditFridgeText);
         btnIncrementFridge = findViewById(R.id.btnIncrementFridge);
         btnDecrementFridge = findViewById(R.id.btnDecrementFridge);
@@ -87,12 +92,16 @@ public class EditFridgeActivity extends AppCompatActivity {
         btnIncrementFridge.setOnClickListener(v -> {
             fridgeSize++;
             numberEditFridgeText.setText(String.valueOf(fridgeSize));
+            numberEditFridgeText.setError(null);
         });
 
         btnDecrementFridge.setOnClickListener(v -> {
             if (fridgeSize > 0) {
                 fridgeSize--;
                 numberEditFridgeText.setText(String.valueOf(fridgeSize));
+                if (fridgeSize > 0) {
+                    numberEditFridgeText.setError(null);
+                }
             }
         });
 
@@ -121,6 +130,9 @@ public class EditFridgeActivity extends AppCompatActivity {
             public void afterTextChanged(Editable s) {
                 try {
                     fridgeSize = Integer.parseInt(s.toString());
+                    if (fridgeSize > 0) {
+                        numberEditFridgeText.setError(null);
+                    }
                 } catch (NumberFormatException e) {
                     fridgeSize = 0;
                 }
@@ -275,20 +287,29 @@ public class EditFridgeActivity extends AppCompatActivity {
         }
     }
 
+    private void clearAllErrors() {
+        brandEditInputLayout.setError(null);
+        modelEditInputLayout.setError(null);
+        descriptionEditInputLayout.setError(null);
+        numberEditFridgeText.setError(null);
+    }
+
     private void saveFridgeDetails() {
         String brand = brandEditFridgeText.getText().toString().trim();
         String model = modelEditFridgeText.getText().toString().trim();
         String description = descriptionEditFridgeText.getText().toString().trim();
 
+        clearAllErrors();
+
         boolean valid = true;
 
         if (brand.isEmpty()) {
-            brandEditFridgeText.setError("Brand is required");
+            brandEditInputLayout.setError("Brand is required");
             valid = false;
         }
 
         if (model.isEmpty()) {
-            modelEditFridgeText.setError("Model is required");
+            modelEditInputLayout.setError("Model is required");
             valid = false;
         }
 

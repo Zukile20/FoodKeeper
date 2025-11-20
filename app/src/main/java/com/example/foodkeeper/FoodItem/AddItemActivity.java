@@ -23,13 +23,11 @@ import com.example.foodkeeper.FoodItem.models.Category;
 import com.example.foodkeeper.FoodItem.models.FoodItem;
 import com.example.foodkeeper.FoodItem.view_items.ItemsViewActivity;
 import com.example.foodkeeper.FoodkeeperUtils.Database;
-
 import com.example.foodkeeper.FoodkeeperUtils.NotificationHelper;
 import com.example.foodkeeper.R;
-import com.example.foodkeeper.Register.LoginActivity;
-import com.example.foodkeeper.Register.RegisterActivity;
 import com.example.foodkeeper.Register.SessionManager;
 import com.google.android.material.imageview.ShapeableImageView;
+import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 
 import java.io.ByteArrayOutputStream;
@@ -46,8 +44,9 @@ public class AddItemActivity extends AppCompatActivity {
     private int quantity = 0;
     private static final int PICK_IMAGE_REQUEST = 1;
     private static final int CAMERA_REQUEST = 2;
-    EditText edName, edCategory, edExpiryDate;
-    TextInputLayout txtDate;
+
+    TextInputEditText edName, edCategory, edExpiryDate;
+    TextInputLayout nameInputLayout, categoryInputLayout, txtDateLayout;
     TextView tvQuantity;
     RadioGroup radioBtns;
     Database db;
@@ -66,10 +65,13 @@ public class AddItemActivity extends AppCompatActivity {
         db = new Database(this);
         session = new SessionManager(this);
         categories = db.getAllCategories();
+
         edName = findViewById(R.id.nameEditText);
         edCategory = findViewById(R.id.categoryEditText);
         edExpiryDate = findViewById(R.id.expiryDateEditText);
-        txtDate = findViewById(R.id.txtDateLayout);
+        nameInputLayout = findViewById(R.id.nameInputLayout);
+        categoryInputLayout = findViewById(R.id.categoryInputLayout);
+        txtDateLayout = findViewById(R.id.txtDateLayout);
         tvQuantity = findViewById(R.id.tv_quantity);
         btnMinus = findViewById(R.id.btn_minus);
         btnPlus = findViewById(R.id.btn_plus);
@@ -90,7 +92,7 @@ public class AddItemActivity extends AppCompatActivity {
             showPopUp();
         });
 
-        txtDate.setEndIconOnClickListener(new View.OnClickListener() {
+        txtDateLayout.setEndIconOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 showCalendar();
@@ -110,40 +112,36 @@ public class AddItemActivity extends AppCompatActivity {
         });
 
         btnSave.setOnClickListener(v -> {
-            String name = edName.getText().toString();
-            String category = edCategory.getText().toString();
-            String expiryDate = edExpiryDate.getText().toString();
-            int quantity = Integer.parseInt(tvQuantity.getText().toString());
+            String name = edName.getText().toString().trim();
+            String category = edCategory.getText().toString().trim();
+            String expiryDate = edExpiryDate.getText().toString().trim();
+
+            clearAllErrors();
 
             boolean isValid = true;
 
             if (name.isEmpty()) {
-                edName.setError("Item name is required");
+                nameInputLayout.setError("Item name is required");
                 isValid = false;
             }
 
             if (category.isEmpty()) {
-                edCategory.setError("Category is required");
+                categoryInputLayout.setError("Category is required");
                 isValid = false;
             }
 
             if (expiryDate.isEmpty()) {
-                edExpiryDate.setError("Expiry date is required");
+                txtDateLayout.setError("Expiry date is required");
+                isValid = false;
+            }
+
+            if (quantity <= 0) {
+                Toast.makeText(this, "Quantity must be greater than 0", Toast.LENGTH_SHORT).show();
                 isValid = false;
             }
 
             if (!isValid) {
                 Toast.makeText(this, "Please correct errors", Toast.LENGTH_SHORT).show();
-                return;
-            }
-
-            try {
-                if (quantity <= 0) {
-                    Toast.makeText(this, "Quantity must be greater than 0", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-            } catch (NumberFormatException e) {
-                Toast.makeText(this, "Invalid quantity", Toast.LENGTH_SHORT).show();
                 return;
             }
 
@@ -155,19 +153,25 @@ public class AddItemActivity extends AppCompatActivity {
             }
 
             int categoryId = findCategoryIdByName(category);
-            
+
             FoodItem item = new FoodItem(name, String.valueOf(categoryId), expiryDate, quantity, imageBytes);
-            long num = db.addFoodItem(item ,session.getUserEmail());
-            
+            long num = db.addFoodItem(item, session.getUserEmail());
+
             if(num != -1)
                 CheckExpiringItem(item);
-            
+
             startActivity(new Intent(AddItemActivity.this, ItemsViewActivity.class));
         });
 
         backBtn.setOnClickListener(v -> {
             startActivity(new Intent(this, ItemsViewActivity.class));
         });
+    }
+
+    private void clearAllErrors() {
+        nameInputLayout.setError(null);
+        categoryInputLayout.setError(null);
+        txtDateLayout.setError(null);
     }
 
     private void CheckExpiringItem(FoodItem item) {
@@ -342,6 +346,7 @@ public class AddItemActivity extends AppCompatActivity {
                 RadioButton selectedBtn = popupView.findViewById(selectedId);
                 String selectedCategory = selectedBtn.getText().toString();
                 edCategory.setText(selectedCategory);
+                categoryInputLayout.setError(null);
                 dialog.dismiss();
             } else {
                 Toast.makeText(this, "Please select a category", Toast.LENGTH_SHORT).show();
@@ -360,6 +365,7 @@ public class AddItemActivity extends AppCompatActivity {
                 (view, selectedYear, selectedMonth, selectedDay) -> {
                     String date = selectedDay + "/" + (selectedMonth + 1) + "/" + selectedYear;
                     edExpiryDate.setText(date);
+                    txtDateLayout.setError(null);
                 },
                 year, month, day
         );

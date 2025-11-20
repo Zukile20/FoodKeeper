@@ -51,7 +51,6 @@ public class UpdateMealActivity extends AppCompatActivity implements FoodSelecti
     Meal EditMeal;
     private TextInputEditText nameField;
     private TextInputLayout tilMealName;
-    private TextView tvMealNameError;
     ArrayList<FoodItem> FOOD_ITEMS = new ArrayList<>();
     private RecyclerView recyclerView;
     private ImageView mealImage;
@@ -89,7 +88,6 @@ public class UpdateMealActivity extends AppCompatActivity implements FoodSelecti
         loadImage = findViewById(R.id.loadPicture);
         nameField = findViewById(R.id.nameField);
         tilMealName = findViewById(R.id.tilMealName);
-        tvMealNameError = findViewById(R.id.tvMealNameError);
         backBtn = findViewById(R.id.backBtn);
         searchText = findViewById(R.id.searchField);
         counterTextViewer = findViewById(R.id.counterTextView);
@@ -162,11 +160,8 @@ public class UpdateMealActivity extends AppCompatActivity implements FoodSelecti
 
             @Override
             public void afterTextChanged(Editable s) {
-                String mealName = s.toString().trim();
-                if (mealName.isEmpty()) {
-                    showError(tvMealNameError, "Meal name cannot be empty");
-                } else {
-                    hideError(tvMealNameError);
+                if (!s.toString().trim().isEmpty()) {
+                    tilMealName.setError(null);
                 }
             }
         });
@@ -191,10 +186,12 @@ public class UpdateMealActivity extends AppCompatActivity implements FoodSelecti
         {
             String mealName = String.valueOf(nameField.getText()).trim();
 
+            tilMealName.setError(null);
+
             boolean hasError = false;
 
             if (mealName.isEmpty()) {
-                showError(tvMealNameError, "Meal name cannot be empty");
+                tilMealName.setError("Meal name is required");
                 nameField.requestFocus();
                 hasError = true;
             }
@@ -304,25 +301,6 @@ public class UpdateMealActivity extends AppCompatActivity implements FoodSelecti
         imageRemovedForCurrentMeal = true;
         mealImage.setImageResource(R.drawable.image_placeholder);
         showToast("Photo will be removed when you save");
-    }
-
-    private void showError(TextView errorTextView, String message) {
-        errorTextView.setText(message);
-        errorTextView.setVisibility(View.VISIBLE);
-
-        if (errorTextView == tvMealNameError) {
-            tilMealName.setBoxStrokeErrorColor(getResources().getColorStateList(R.color.red));
-            tilMealName.setError(" ");
-        }
-    }
-
-    private void hideError(TextView errorTextView) {
-        errorTextView.setText("");
-        errorTextView.setVisibility(View.GONE);
-
-        if (errorTextView == tvMealNameError) {
-            tilMealName.setError(null);
-        }
     }
 
     private void openFullView() {

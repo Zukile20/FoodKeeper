@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -19,7 +18,6 @@ public class ChangePasswordActivity extends AppCompatActivity {
 
     private TextInputEditText etCurrentPassword, etNewPassword, etConfirmPassword;
     private TextInputLayout tilCurrentPassword, tilNewPassword, tilConfirmPassword;
-    private TextView tvCurrentPasswordError, tvNewPasswordError, tvConfirmPasswordError;
     private Button btnUpdate, btnCancel;
     private Database dbHelper;
     private String userEmail;
@@ -34,12 +32,11 @@ public class ChangePasswordActivity extends AppCompatActivity {
         etCurrentPassword = findViewById(R.id.etCurrentPassword);
         etNewPassword = findViewById(R.id.etNewPassword);
         etConfirmPassword = findViewById(R.id.etConfirmPassword);
+
         tilCurrentPassword = findViewById(R.id.tilCurrentPassword);
         tilNewPassword = findViewById(R.id.tilNewPassword);
         tilConfirmPassword = findViewById(R.id.tilConfirmPassword);
-        tvCurrentPasswordError = findViewById(R.id.tvCurrentPasswordError);
-        tvNewPasswordError = findViewById(R.id.tvNewPasswordError);
-        tvConfirmPasswordError = findViewById(R.id.tvConfirmPasswordError);
+
         btnUpdate = findViewById(R.id.btnUpdate);
         btnCancel = findViewById(R.id.btnCancel);
 
@@ -67,54 +64,58 @@ public class ChangePasswordActivity extends AppCompatActivity {
         });
     }
 
+    private void clearAllErrors() {
+        tilCurrentPassword.setError(null);
+        tilNewPassword.setError(null);
+        tilConfirmPassword.setError(null);
+    }
+
     private void changePassword() {
         String currentPassword = etCurrentPassword.getText().toString().trim();
         String newPassword = etNewPassword.getText().toString().trim();
         String confirmPassword = etConfirmPassword.getText().toString().trim();
 
-        hideError(tvCurrentPasswordError);
-        hideError(tvNewPasswordError);
-        hideError(tvConfirmPasswordError);
+        clearAllErrors();
 
         if (currentPassword.isEmpty()) {
-            showError(tvCurrentPasswordError, "Please enter current password");
+            tilCurrentPassword.setError("Please enter current password");
             etCurrentPassword.requestFocus();
             return;
         }
 
         if (newPassword.isEmpty()) {
-            showError(tvNewPasswordError, "Please enter new password");
+            tilNewPassword.setError("Please enter new password");
             etNewPassword.requestFocus();
             return;
         }
 
         if (confirmPassword.isEmpty()) {
-            showError(tvConfirmPasswordError, "Please confirm new password");
+            tilConfirmPassword.setError("Please confirm new password");
             etConfirmPassword.requestFocus();
             return;
         }
 
         User user = dbHelper.loadUserByEmail(userEmail);
         if (user == null || !user.getPassword().equals(currentPassword)) {
-            showError(tvCurrentPasswordError, "Current password is incorrect");
+            tilCurrentPassword.setError("Current password is incorrect");
             etCurrentPassword.requestFocus();
             return;
         }
 
         if (!isValidPassword(newPassword)) {
-            showError(tvNewPasswordError, "Password must be at least 8 chars with a letter, digit, and symbol");
+            tilNewPassword.setError("Password must meet all requirements");
             etNewPassword.requestFocus();
             return;
         }
 
         if (!newPassword.equals(confirmPassword)) {
-            showError(tvConfirmPasswordError, "Passwords do not match");
+            tilConfirmPassword.setError("Passwords do not match");
             etConfirmPassword.requestFocus();
             return;
         }
 
         if (currentPassword.equals(newPassword)) {
-            showError(tvNewPasswordError, "New password must be different from current password");
+            tilNewPassword.setError("New password must be different");
             etNewPassword.requestFocus();
             return;
         }
@@ -127,16 +128,6 @@ public class ChangePasswordActivity extends AppCompatActivity {
         } else {
             Toast.makeText(this, "Failed to change password", Toast.LENGTH_SHORT).show();
         }
-    }
-
-    private void showError(TextView errorTextView, String message) {
-        errorTextView.setText(message);
-        errorTextView.setVisibility(View.VISIBLE);
-    }
-
-    private void hideError(TextView errorTextView) {
-        errorTextView.setText("");
-        errorTextView.setVisibility(View.GONE);
     }
 
     public static boolean isValidPassword(String password) {

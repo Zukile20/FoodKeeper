@@ -19,6 +19,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.foodkeeper.R;
 import com.google.android.material.imageview.ShapeableImageView;
+import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -27,7 +29,9 @@ public class AddFridgeActivity extends AppCompatActivity {
     private static final int PICK_IMAGE_REQUEST = 1;
     private static final int CAMERA_REQUEST = 2;
     private ShapeableImageView fridgeImage;
-    private EditText brandEditText, modelEditText, descriptionEditText, numberEditText;
+    private TextInputEditText brandEditText, modelEditText, descriptionEditText;
+    private TextInputLayout brandInputLayout, modelInputLayout, descriptionInputLayout;
+    private EditText numberEditText;
     private ImageButton btnIncrement, btnDecrement, cameraIconButton;
     private Button addFridgeButton;
     private Button backBtn;
@@ -41,15 +45,22 @@ public class AddFridgeActivity extends AppCompatActivity {
         setContentView(R.layout.activity_add_fridge);
 
         fridgeImage = findViewById(R.id.fridgeImage);
+
         brandEditText = findViewById(R.id.brandEditText);
         modelEditText = findViewById(R.id.modelEditText);
         descriptionEditText = findViewById(R.id.descriptionEditText);
         numberEditText = findViewById(R.id.numberEditText);
+
+        brandInputLayout = findViewById(R.id.brandInputLayout);
+        modelInputLayout = findViewById(R.id.modelInputLayout);
+        descriptionInputLayout = findViewById(R.id.descriptionInputLayout);
+
         btnIncrement = findViewById(R.id.btnIncrement);
         btnDecrement = findViewById(R.id.btnDecrement);
         cameraIconButton = findViewById(R.id.cameraIconButton);
         addFridgeButton = findViewById(R.id.addFridgeButton);
         backBtn = findViewById(R.id.backBtn);
+
         numberEditText.setText(String.valueOf(fridgeSize));
 
         fridgeImage.setOnClickListener(new View.OnClickListener() {
@@ -71,6 +82,7 @@ public class AddFridgeActivity extends AppCompatActivity {
             public void onClick(View v) {
                 fridgeSize++;
                 numberEditText.setText(String.valueOf(fridgeSize));
+                numberEditText.setError(null);
             }
         });
 
@@ -80,6 +92,9 @@ public class AddFridgeActivity extends AppCompatActivity {
                 if (fridgeSize > 0) {
                     fridgeSize--;
                     numberEditText.setText(String.valueOf(fridgeSize));
+                    if (fridgeSize > 0) {
+                        numberEditText.setError(null);
+                    }
                 }
             }
         });
@@ -106,6 +121,9 @@ public class AddFridgeActivity extends AppCompatActivity {
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 try {
                     fridgeSize = Integer.parseInt(s.toString());
+                    if (fridgeSize > 0) {
+                        numberEditText.setError(null);
+                    }
                 } catch (NumberFormatException e) {
                     fridgeSize = 0;
                 }
@@ -181,20 +199,29 @@ public class AddFridgeActivity extends AppCompatActivity {
         }
     }
 
+    private void clearAllErrors() {
+        brandInputLayout.setError(null);
+        modelInputLayout.setError(null);
+        descriptionInputLayout.setError(null);
+        numberEditText.setError(null);
+    }
+
     private void addFridge() {
         String brand = brandEditText.getText().toString().trim();
         String model = modelEditText.getText().toString().trim();
         String description = descriptionEditText.getText().toString().trim();
 
+        clearAllErrors();
+
         boolean valid = true;
 
         if (brand.isEmpty()) {
-            brandEditText.setError("Brand is required");
+            brandInputLayout.setError("Brand is required");
             valid = false;
         }
 
         if (model.isEmpty()) {
-            modelEditText.setError("Model is required");
+            modelInputLayout.setError("Model is required");
             valid = false;
         }
 

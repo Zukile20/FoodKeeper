@@ -122,35 +122,20 @@
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="10dp"
                 android:layout_marginTop="20dp"
-                android:layout_marginBottom="0dp"
-                app:boxBackgroundMode="outline"
-                app:hintEnabled="true">
+                app:boxStrokeColor="@color/mainBlue"
+                app:errorEnabled="true">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/nameField"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="meal name"
+                    android:hint="Meal name"
                     android:inputType="textCapWords"
                     android:padding="12dp"
                     android:textColor="@color/black"
                     android:textSize="16sp" />
 
             </com.google.android.material.textfield.TextInputLayout>
-
-            <TextView
-                android:id="@+id/tvMealNameError"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textColor="@color/red"
-                android:textSize="12sp"
-                android:paddingStart="24dp"
-                android:paddingEnd="24dp"
-                android:paddingBottom="2dp"
-                android:visibility="gone"
-                android:drawableStart="@android:drawable/stat_notify_error"
-                android:drawablePadding="4dp"
-                android:drawableTint="@color/red" />
 
             <TextView
                 android:id="@+id/textView9"
