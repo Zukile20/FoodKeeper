@@ -113,9 +113,10 @@ public class MenuActivity extends AppCompatActivity {
     }
 
     private void showLogoutDialog() {
-        LogoutDialog logoutDialog = new LogoutDialog(this, new LogoutDialog.OnLogoutListener() {
+        LogoutDialog logoutDialog = LogoutDialog.newInstance();
+        logoutDialog.setOnLogoutListener(new LogoutDialog.OnLogoutListener() {
             @Override
-            public void onLogoutConfirmed() {
+          public void onLogoutConfirmed() {
                 SessionManager userSession = new SessionManager(MenuActivity.this);
                 Intent intent = new Intent(MenuActivity.this, LoginActivity.class);
                 userSession.logoutUser();
@@ -128,7 +129,7 @@ public class MenuActivity extends AppCompatActivity {
                 Toast.makeText(MenuActivity.this, "Logout cancelled", Toast.LENGTH_SHORT).show();
             }
         });
-        logoutDialog.show();
+        logoutDialog.show(getSupportFragmentManager(), "logout_dialog");
     }
 
     @Override
